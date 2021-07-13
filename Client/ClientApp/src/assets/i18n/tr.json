@@ -1,0 +1,11 @@
+{
+  "home": {
+    "hi": "Merhaba!",
+    "ph": "Bu geçici bir yazı."
+  },
+  "translator": {
+    "en": "İngilizce",
+    "fr": "Fransızca",
+    "tr": "Türkçe"
+  }
+}
