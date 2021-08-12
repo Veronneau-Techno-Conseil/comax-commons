@@ -73,7 +73,10 @@ namespace CommunAxiom.Commons.ClientUI
                 }
             });
 
-            Task.Run(async () => await Electron.WindowManager.CreateWindowAsync());
+            Task.Run(async () => {
+                var window = await Electron.WindowManager.CreateWindowAsync();
+                window.SetMenu(null);
+            });
         }
     }
 }
