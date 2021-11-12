@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>CommunAxiom.Commons.Client.Silo</AssemblyName>
     <RootNamespace>CommunAxiom.Commons.Client.Silo</RootNamespace>
   </PropertyGroup>

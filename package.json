@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@angular/cli": "^13.0.2",
+    "@ngx-translate/core": "^14.0.0",
+    "@ngx-translate/http-loader": "^7.0.0",
+    "browserslist": "^4.17.5"
+  }
+}
