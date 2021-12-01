@@ -16,7 +16,6 @@ namespace CommunAxiom.Commons.Client.Silo
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            RunMainAsync();
         }
 
         private static async Task<int> RunMainAsync()
@@ -50,7 +49,7 @@ namespace CommunAxiom.Commons.Client.Silo
                 }) 
                 // Configure connectivity
                 .Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback)
-                //.ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Accounts).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Accounts).Assembly).WithReferences())
                 .ConfigureServices(services =>
                 {
 
