@@ -13,10 +13,17 @@
     <PackageReference Include="Microsoft.Orleans.Core" Version="3.4.4" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.4.4" />
     <PackageReference Include="Orleans.Security.Clustering" Version="1.3.0-rc.1" />
+    <PackageReference Include="OrleansDashboard" Version="3.6.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AccountGrain\AccountGrain.csproj" />
+    <ProjectReference Include="..\DatasourceGrain\DatasourceGrain.csproj" />
+    <ProjectReference Include="..\DataTransferGrain\DataTransferGrain.csproj" />
+    <ProjectReference Include="..\IngestionGrain\IngestionGrain.csproj" />
+    <ProjectReference Include="..\PortfolioGrain\PortfolioGrain.csproj" />
+    <ProjectReference Include="..\ProjectGrain\ProjectGrain.csproj" />
+    <ProjectReference Include="..\ReplicationGrain\ReplicationGrain.csproj" />
   </ItemGroup>
 
 </Project>

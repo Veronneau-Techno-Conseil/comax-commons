@@ -1,13 +1,12 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Account;
-using CommunAxiom.Commons.Client.Contracts.Encryption;
 using System;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Orleans;
 
 namespace CommunAxiom.Commons.Client.Grains.AccountGrain
 {
-    public class Accounts : Orleans.Grain, IAccount
+    public class Accounts : Grain, IAccount
     {
         public Task<Stream> EncryptStream(Stream data)
         {
@@ -27,6 +26,11 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
         public Task SetAccountName(string name)
         {
             throw new NotImplementedException();
+        }
+
+        public Task<string> TestGrain(string Grain)
+        {
+            return Task.FromResult($"The {Grain} grain has been launched. Check it on the dashboard");
         }
     }
 }

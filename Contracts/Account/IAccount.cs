@@ -3,18 +3,17 @@ using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Orleans;
 
 namespace CommunAxiom.Commons.Client.Contracts.Account
 {
-    public interface IAccount : Orleans.IGrain
+    public interface IAccount: IGrainWithIntegerKey
     {
         Task<string> GetAccountName();
         Task SetAccountName(string name);
         Task<bool> IsAuthenticated();
-        //X509Certificate Certificate { get; }
-        //IEncryptionService EncryptionService { get; }
-
         Task<Stream> EncryptStream(Stream data);
+        Task<string> TestGrain(string Grain);
 
     }
 }
