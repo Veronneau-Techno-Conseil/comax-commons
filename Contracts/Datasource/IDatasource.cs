@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.Contracts.Datasource
 {
-    public interface IDatasource: IGrainWithIntegerKey
+    public interface IDatasource: IGrainWithStringKey
     {
         Task<string> TestGrain(string Grain);
     }

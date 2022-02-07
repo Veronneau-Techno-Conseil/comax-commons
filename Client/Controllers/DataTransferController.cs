@@ -19,7 +19,7 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var result = await _clusterClient.GetGrain<IDataTransfer>(0).TestGrain("DataTransfer");
+            var result = await _clusterClient.GetGrain<IDataTransfer>("DataTransfer").TestGrain("DataTransfer");
 
             return Ok(result);
         }

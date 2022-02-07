@@ -18,7 +18,7 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var result = await _clusterClient.GetGrain<IDatasource>(0).TestGrain("Datasource");
+            var result = await _clusterClient.GetGrain<IDatasource>("DataSource").TestGrain("Datasource");
 
             return Ok(result);
         }

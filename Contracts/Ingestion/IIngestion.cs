@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.Contracts.Ingestion
 {
-    public interface IIngestion: IGrainWithIntegerKey
+    public interface IIngestion: IGrainWithStringKey
     {
         Task<string> TestGrain(string Grain);
     }

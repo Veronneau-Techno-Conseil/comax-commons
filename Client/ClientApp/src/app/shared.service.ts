@@ -11,10 +11,4 @@ export class SharedService {
 
   constructor(private http: HttpClient) { }
 
-
-  AccountTest(): Observable<any[]> {
-    console.log("Reached the shared service");
-    return this.http.get<any>(this.APIURL + '/Account/Get')
-  }
-
 }

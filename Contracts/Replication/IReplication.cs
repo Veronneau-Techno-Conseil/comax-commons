@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.Contracts.Replication
 {
-    public interface IReplication: IGrainWithIntegerKey
+    public interface IReplication: IGrainWithStringKey
     {
         Task<string> TestGrain(string Grain);
     }

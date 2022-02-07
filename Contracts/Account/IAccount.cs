@@ -7,13 +7,15 @@ using Orleans;
 
 namespace CommunAxiom.Commons.Client.Contracts.Account
 {
-    public interface IAccount: IGrainWithIntegerKey
+    public interface IAccount: IGrainWithStringKey
     {
         Task<string> GetAccountName();
         Task SetAccountName(string name);
         Task<bool> IsAuthenticated();
         Task<Stream> EncryptStream(Stream data);
-        Task<string> TestGrain(string Grain);
-
+        //Added to test the launching the grains. To be removed then
+        Task<string> TestGrain(string GrainId);
+        Task<string> SetDetails(string GrainId, AccountDetails account);
+        Task<string> GetDetails(string GrainId);
     }
 }

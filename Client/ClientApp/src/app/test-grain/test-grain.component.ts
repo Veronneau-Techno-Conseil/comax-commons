@@ -12,7 +12,6 @@ export class TestGrainComponent implements OnInit {
   constructor(private service:SharedService) { }
 
   ngOnInit(): void {
-    console.log("OK, this point has been reached")
-    this.service.AccountTest();
+
   }
 }
