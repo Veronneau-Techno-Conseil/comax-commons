@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+	  <AssemblyName>Comax.Commons.Orchestrator.Conmtracts</AssemblyName>
+	  <RootNamespace>Comax.Commons.Orchestrator.Conmtracts</RootNamespace>
   </PropertyGroup>
 
 </Project>

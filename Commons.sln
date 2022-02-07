@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientUI", "Client\ClientUI.csproj", "{CD1DD010-0C2F-4025-B598-2B48FD6B954F}"
 EndProject
@@ -13,9 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Network", "Network", "{B7FA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{7E7E8EC0-9FBA-41F3-9B39-A855DDBD6A0B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Node", "Node\Node.csproj", "{C5C22D30-CDEB-4A22-891E-841F99556535}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orchestrator", "Node\Orchestrator.csproj", "{C5C22D30-CDEB-4A22-891E-841F99556535}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Node.Contracts", "Node.Contracts\Node.Contracts.csproj", "{EDCA0F8A-7CBA-48A5-8638-22C808B98599}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orchestrator.Contracts", "Node.Contracts\Orchestrator.Contracts.csproj", "{EDCA0F8A-7CBA-48A5-8638-22C808B98599}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccountGrain", "AccountGrain\AccountGrain.csproj", "{1D665A9F-FD7A-4CD1-B742-822D8F887CDC}"
 EndProject
@@ -23,7 +23,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClusterCommon", "ClusterCom
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Grains", "Grains", "{3DD02847-72B1-4C8D-B625-CCB050883278}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiteDbStorageProvider", "LiteDbStorageProvider\LiteDbStorageProvider.csproj", "{C565769E-1170-4EED-A285-3DF870BFC674}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LiteDbStorageProvider", "LiteDbStorageProvider\LiteDbStorageProvider.csproj", "{C565769E-1170-4EED-A285-3DF870BFC674}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerializationProvider", "StorageProvider\SerializationProvider.csproj", "{80CFB09D-D4AD-4436-BA62-9A9A755DBA92}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{34ECA2FF-4A79-4572-8D68-601F6CA5787E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongodbStorageProvider", "MongodbStorageProvider\MongodbStorageProvider.csproj", "{6595B2FC-4A22-4893-BE56-0386C9CFCDCD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -131,6 +137,30 @@ Global
 		{C565769E-1170-4EED-A285-3DF870BFC674}.Release|x64.Build.0 = Release|Any CPU
 		{C565769E-1170-4EED-A285-3DF870BFC674}.Release|x86.ActiveCfg = Release|Any CPU
 		{C565769E-1170-4EED-A285-3DF870BFC674}.Release|x86.Build.0 = Release|Any CPU
+		{80CFB09D-D4AD-4436-BA62-9A9A755DBA92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80CFB09D-D4AD-4436-BA62-9A9A755DBA92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80CFB09D-D4AD-4436-BA62-9A9A755DBA92}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{80CFB09D-D4AD-4436-BA62-9A9A755DBA92}.Debug|x64.Build.0 = Debug|Any CPU
+		{80CFB09D-D4AD-4436-BA62-9A9A755DBA92}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{80CFB09D-D4AD-4436-BA62-9A9A755DBA92}.Debug|x86.Build.0 = Debug|Any CPU
+		{80CFB09D-D4AD-4436-BA62-9A9A755DBA92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80CFB09D-D4AD-4436-BA62-9A9A755DBA92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80CFB09D-D4AD-4436-BA62-9A9A755DBA92}.Release|x64.ActiveCfg = Release|Any CPU
+		{80CFB09D-D4AD-4436-BA62-9A9A755DBA92}.Release|x64.Build.0 = Release|Any CPU
+		{80CFB09D-D4AD-4436-BA62-9A9A755DBA92}.Release|x86.ActiveCfg = Release|Any CPU
+		{80CFB09D-D4AD-4436-BA62-9A9A755DBA92}.Release|x86.Build.0 = Release|Any CPU
+		{6595B2FC-4A22-4893-BE56-0386C9CFCDCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6595B2FC-4A22-4893-BE56-0386C9CFCDCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6595B2FC-4A22-4893-BE56-0386C9CFCDCD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6595B2FC-4A22-4893-BE56-0386C9CFCDCD}.Debug|x64.Build.0 = Debug|Any CPU
+		{6595B2FC-4A22-4893-BE56-0386C9CFCDCD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6595B2FC-4A22-4893-BE56-0386C9CFCDCD}.Debug|x86.Build.0 = Debug|Any CPU
+		{6595B2FC-4A22-4893-BE56-0386C9CFCDCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6595B2FC-4A22-4893-BE56-0386C9CFCDCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6595B2FC-4A22-4893-BE56-0386C9CFCDCD}.Release|x64.ActiveCfg = Release|Any CPU
+		{6595B2FC-4A22-4893-BE56-0386C9CFCDCD}.Release|x64.Build.0 = Release|Any CPU
+		{6595B2FC-4A22-4893-BE56-0386C9CFCDCD}.Release|x86.ActiveCfg = Release|Any CPU
+		{6595B2FC-4A22-4893-BE56-0386C9CFCDCD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -144,7 +174,8 @@ Global
 		{1D665A9F-FD7A-4CD1-B742-822D8F887CDC} = {3DD02847-72B1-4C8D-B625-CCB050883278}
 		{74112E1C-1067-415B-91BF-A436F0F17E46} = {7E7E8EC0-9FBA-41F3-9B39-A855DDBD6A0B}
 		{3DD02847-72B1-4C8D-B625-CCB050883278} = {7E7E8EC0-9FBA-41F3-9B39-A855DDBD6A0B}
-		{C565769E-1170-4EED-A285-3DF870BFC674} = {7E7E8EC0-9FBA-41F3-9B39-A855DDBD6A0B}
+		{C565769E-1170-4EED-A285-3DF870BFC674} = {34ECA2FF-4A79-4572-8D68-601F6CA5787E}
+		{6595B2FC-4A22-4893-BE56-0386C9CFCDCD} = {34ECA2FF-4A79-4572-8D68-601F6CA5787E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DB42BB94-31D8-4A5B-8B27-43D0E871D612}
