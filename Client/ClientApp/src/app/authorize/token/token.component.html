@@ -1,0 +1,22 @@
+<p>Enter your ClientID, Client Secret and User Challenge Code obtained from Accounts</p>
+
+<form [formGroup]="AccountForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label>Client ID</label>
+    <div>
+      <input formControlName="ClientID" [(ngModel)]="AccountModel.ClientID" />
+    </div>
+
+    <label>Client Secret</label>
+    <div>
+      <input formControlName="ClientSecret" [(ngModel)]="AccountModel.ClientSecret" />
+    </div>
+
+    <label>User Challenge Code</label>
+    <div>
+      <input formControlName="UserChallengeCode" [(ngModel)]="AccountModel.UserChallengeCode" />
+    </div>
+
+    <button mat-button type="submit" id="GetTokenButton">Get Token</button>
+  </div>
+</form>

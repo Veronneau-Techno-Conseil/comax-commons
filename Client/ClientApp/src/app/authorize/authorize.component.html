@@ -1,0 +1,16 @@
+<p>Authorize With Accounts</p>
+
+
+<form [formGroup]="AuthorizeForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label> ClientID</label>
+    <div>
+      <input formControlName="ClientID" [(ngModel)]="AccountModel.ClientID"/>
+    </div>
+
+    <br />
+    <div>
+      <button mat-button type="submit" id="AuthorizeButton">Login with CommunAxiom.Accounts</button>
+    </div>
+  </div>
+</form>
