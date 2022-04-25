@@ -27,10 +27,10 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
         }
 
         [HttpPost("SetDetails/{GrainId}")]
-        public async Task<IActionResult> SetDetails(string GrainId, [FromBody] object account)
+        public async Task<IActionResult> SetDetails(string GrainId, [FromBody] object Account)
         {
 
-            var AccountJSON = JObject.Parse(account.ToString());
+            var AccountJSON = JObject.Parse(Account.ToString());
 
             var accountDetails = new AccountDetails
             {

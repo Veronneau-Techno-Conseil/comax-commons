@@ -59,5 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ClientApp\src\app\authorize\Models\" />
+    <Folder Include="ClientApp\src\app\portfolio\Models\" />
   </ItemGroup>
 </Project>

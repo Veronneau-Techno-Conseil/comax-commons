@@ -7,21 +7,21 @@ using System.Threading.Tasks;
 using System.Net;
 using Orleans.Security.Clustering;
 using Microsoft.Extensions.DependencyInjection;
-using CommunAxiom.Commons.Client.Contracts.Account;
-using CommunAxiom.Commons.Client.Contracts.Portfolio;
-using CommunAxiom.Commons.Client.Grains.AccountGrain;
 using System.Threading;
-using PortfolioGrain;
-using ReplicationGrain;
-using ProjectGrain;
-using CommunAxiom.Commons.Client.Contracts.Replication;
-using CommunAxiom.Commons.Client.Contracts.Project;
-using CommunAxiom.Commons.Client.Contracts.Datasource;
-using CommunAxiom.Commons.Client.Contracts.Ingestion;
-using CommunAxiom.Commons.Client.Contracts.DataTransfer;
+using CommunAxiom.Commons.Client.Grains.AccountGrain;
 using DatasourceGrain;
 using DataTransferGrain;
 using IngestionGrain;
+using PortfolioGrain;
+using ProjectGrain;
+using ReplicationGrain;
+using CommunAxiom.Commons.Client.Contracts.Account;
+using CommunAxiom.Commons.Client.Contracts.Datasource;
+using CommunAxiom.Commons.Client.Contracts.DataTransfer;
+using CommunAxiom.Commons.Client.Contracts.Ingestion;
+using CommunAxiom.Commons.Client.Contracts.Portfolio;
+using CommunAxiom.Commons.Client.Contracts.Project;
+using CommunAxiom.Commons.Client.Contracts.Replication;
 
 namespace CommunAxiom.Commons.Client.Silo
 {
@@ -87,7 +87,7 @@ namespace CommunAxiom.Commons.Client.Silo
                 {
                     options.ClusterId = "dev";
                     options.ServiceId = "OrleansBasics";
-                }) 
+                })
                 // Configure connectivity
                 .UseDashboard()
                 .Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback)
@@ -100,6 +100,7 @@ namespace CommunAxiom.Commons.Client.Silo
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Projects).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Replications).Assembly).WithReferences())
                 .ConfigureLogging(logging => logging.AddConsole());
+                //to add the redis Grain directory
 
             var silo = builder.Build();
             await silo.StartAsync();

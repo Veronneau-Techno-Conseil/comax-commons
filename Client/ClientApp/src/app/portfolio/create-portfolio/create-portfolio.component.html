@@ -1,0 +1,12 @@
+<p>Enter your Portfolio Details</p>
+
+<form [formGroup]="PortfolioForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label>Portfolio Name</label>
+    <div>
+      <input formControlName="PortfolioName" [(ngModel)]="PortfolioModel.PortfolioName" />
+    </div>
+
+    <button mat-button type="submit" id="CreatePortfolioButton">Create Portfolio</button>
+  </div>
+</form>
