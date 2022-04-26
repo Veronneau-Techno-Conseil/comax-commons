@@ -1,14 +1,15 @@
 {
-  "executable": "Client",
+  "executable": "CommunAxiom.Commons.ClientUI",
   "splashscreen": {
     "imageFile": ""
   },
-  "name": "Client",
+  "name": "ClientUI",
   "author": "",
   "singleInstance": false,
+  "environment": "Production",
   "build": {
-    "appId": "com.Client.app",
-    "productName": "Client",
+    "appId": "com.CommunAxiom.Commons.ClientUI.app",
+    "productName": "CommunAxiom.Commons.ClientUI",
     "copyright": "Copyright © 2020",
     "buildVersion": "1.0.0",
     "compression": "maximum",
@@ -19,14 +20,14 @@
       {
         "from": "./bin",
         "to": "bin",
-        "filter": ["**/*"]
+        "filter": [ "**/*" ]
       }
     ],
     "files": [
       {
         "from": "./ElectronHostHook/node_modules",
         "to": "ElectronHostHook/node_modules",
-        "filter": ["**/*"]
+        "filter": [ "**/*" ]
       },
       "**/*"
     ]

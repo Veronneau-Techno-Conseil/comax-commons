@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Orleans;
+using System;
 using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.ClientUI.Controllers
@@ -21,35 +22,24 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
         public async Task<IActionResult> Get(string GrainId)
         {
 
-            var result = await _clusterClient.GetGrain<IAccount>(GrainId).TestGrain(GrainId);
+            var result = _clusterClient.GetGrain<IAccount>(Guid.Empty).GetGrainIdentity().IdentityString;
 
             return Ok(result);
         }
 
         [HttpPost("SetDetails/{GrainId}")]
-        public async Task<IActionResult> SetDetails(string GrainId, [FromBody] object account)
+        public async Task<IActionResult> SetDetails(string GrainId, AccountDetails account)
         {
+            await _clusterClient.GetGrain<IAccount>(Guid.Empty).Initialize(account);
 
-            var AccountJSON = JObject.Parse(account.ToString());
-
-            var accountDetails = new AccountDetails
-            {
-                ApplicationId = AccountJSON["ApplicationID"].ToString(),
-                ClientID = AccountJSON["ClientID"].ToString(),
-                ClientSecret = AccountJSON["ClientSecret"].ToString(),
-                AccountsToken = AccountJSON["AccessToken"].ToString()
-            };           
-
-            var result = await _clusterClient.GetGrain<IAccount>(GrainId).SetDetails(GrainId,accountDetails);
-
-            return Ok(result);
+            return Ok();
         }
 
         [HttpGet("GetDetails/{GrainId}")]
         public async Task<IActionResult> GetDetails(string GrainId)
         {
 
-            var result = await _clusterClient.GetGrain<IAccount>(GrainId).GetDetails(GrainId);
+            var result = await _clusterClient.GetGrain<IAccount>(Guid.Empty).GetDetails();
 
             return Ok(result);
         }
