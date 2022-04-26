@@ -62,7 +62,7 @@ namespace CommunAxiom.Commons.ClientUI
 
                 if (hostingEnvironment.IsDevelopment())
                 {
-                    clientBuilder = clientBuilder.UseLocalhostClustering();
+                    clientBuilder = clientBuilder.UseLocalhostClustering(30000);
                 }
 
                 var client = clientBuilder.Build();

@@ -22,7 +22,16 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
         [HttpGet("Get/{GrainId}")]
         public async Task<IActionResult> Get(string GrainId)
         {
-            var result = await _clusterClient.GetGrain<IPortfolio>(GrainId).TestGrain(GrainId);
+            var portfolio = _clusterClient.GetGrain<IPortfolio>(GrainId);
+            var result = await portfolio.TestGrain(GrainId);
+            if (!await portfolio.IsSet()) {
+                var portfolioDetails = new PortfolioDetails
+                {
+                    PortfolioID = GrainId,
+                    PortfolioName = GrainId + "-name"
+                };
+                await portfolio.CreatePortfolio(portfolioDetails);
+            }
 
             return Ok(result);
         }
@@ -38,7 +47,7 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
                 PortfolioName = PortfolioJSON["PortfolioName"].ToString()
             };
 
-            var result = await _clusterClient.GetGrain<IPortfolio>(GrainId).CreatePortfolio(GrainId, PortfolioDetails);
+            var result = await _clusterClient.GetGrain<IPortfolio>(GrainId).CreatePortfolio(PortfolioDetails);
 
             return Ok(result);
         }
