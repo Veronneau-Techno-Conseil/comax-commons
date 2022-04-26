@@ -1,8 +1,9 @@
 ﻿using System;
 
-namespace Node.Contracts
+namespace MongodbStorageProvider
 {
     public class Class1
     {
+
     }
 }

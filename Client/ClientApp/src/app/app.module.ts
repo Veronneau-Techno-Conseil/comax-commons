@@ -8,6 +8,8 @@ import { MenuComponent } from './menu/menu.component';
 import { AuthorizeComponent } from './authorize/authorize.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TokenComponent } from './authorize/token/token.component';
+import { PortfolioComponent } from './portfolio/portfolio.component';
+import { CreatePortfolioComponent } from './portfolio/create-portfolio/create-portfolio.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +17,9 @@ import { TokenComponent } from './authorize/token/token.component';
     TestGrainComponent,
     MenuComponent,
     AuthorizeComponent,
-    TokenComponent
+    TokenComponent,
+    PortfolioComponent,
+    CreatePortfolioComponent
   ],
   imports: [
     BrowserModule,

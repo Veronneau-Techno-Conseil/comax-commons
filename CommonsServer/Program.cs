@@ -7,27 +7,31 @@ using System.Threading.Tasks;
 using System.Net;
 using Orleans.Security.Clustering;
 using Microsoft.Extensions.DependencyInjection;
-using CommunAxiom.Commons.Client.Contracts.Account;
-using CommunAxiom.Commons.Client.Contracts.Portfolio;
-using CommunAxiom.Commons.Client.Grains.AccountGrain;
 using System.Threading;
-using PortfolioGrain;
-using ReplicationGrain;
-using ProjectGrain;
-using CommunAxiom.Commons.Client.Contracts.Replication;
-using CommunAxiom.Commons.Client.Contracts.Project;
-using CommunAxiom.Commons.Client.Contracts.Datasource;
-using CommunAxiom.Commons.Client.Contracts.Ingestion;
-using CommunAxiom.Commons.Client.Contracts.DataTransfer;
+using CommunAxiom.Commons.Client.Grains.AccountGrain;
 using DatasourceGrain;
 using DataTransferGrain;
 using IngestionGrain;
+using PortfolioGrain;
+using ProjectGrain;
+using ReplicationGrain;
+using CommunAxiom.Commons.Client.Contracts.Account;
+using CommunAxiom.Commons.Client.Contracts.Datasource;
+using CommunAxiom.Commons.Client.Contracts.DataTransfer;
+using CommunAxiom.Commons.Client.Contracts.Ingestion;
+using CommunAxiom.Commons.Client.Contracts.Portfolio;
+using CommunAxiom.Commons.Client.Contracts.Project;
+using CommunAxiom.Commons.Client.Contracts.Replication;
+using Comax.Commons.StorageProvider.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Orleans.Runtime;
+using Orleans.Providers;
 
 namespace CommunAxiom.Commons.Client.Silo
 {
     class Program
     {
-
         static ISiloHost silo;
         static readonly ManualResetEvent _siloStopped = new ManualResetEvent(false);
 
@@ -64,16 +68,18 @@ namespace CommunAxiom.Commons.Client.Silo
         {
             // define the cluster configuration
             var builder = new SiloHostBuilder()
+                .SetConfiguration(out var conf)
                 .UseLocalhostClustering()
                 .ConfigureServices(services =>
                 {
-                    services.AddOrleansClusteringAuthorization(new Orleans.Security.IdentityServer4Info("https://localhost:5001/", "org1_node1", "846B62D0-DEF9-4215-A99D-86E6B8DAB342", "org1"),
-                        config =>
-                        {
-                            config.ConfigureAuthorizationOptions = CommunAxiom.Commons.Client.Contracts.Auth.Configuration.ConfigureOptions;
-                            config.TracingEnabled = true;
-                        });
+                    //services.AddOrleansClusteringAuthorization(new Orleans.Security.IdentityServer4Info("https://localhost:5001/", "org1_node1", "846B62D0-DEF9-4215-A99D-86E6B8DAB342", "org1"),
+                    //    config =>
+                    //    {
+                    //        config.ConfigureAuthorizationOptions = CommunAxiom.Commons.Client.Contracts.Auth.Configuration.ConfigureOptions;
+                    //        config.TracingEnabled = true;
+                    //    });
                     //register singleton services for each grain/interface
+                    services.AddOptions();
                     services.AddSingleton<IAccount, Accounts>();
                     services.AddSingleton<IDatasource, Datasources>();
                     services.AddSingleton<IDataTransfer, DataTransfer>();
@@ -81,13 +87,22 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<IPortfolio, Portfolios>();
                     services.AddSingleton<IProject, Projects>();
                     services.AddSingleton<IReplication, Replications>();
+                    //services.Configure<LiteDbConfig>(conf.GetSection("LiteDbStorage"));
+                    services.SetDefaultLiteDbSerializationProvider();
+                    services.Configure<LiteDbConfig>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, conf.GetSection("LiteDbStorage"));
+                    services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, (svc, key) =>
+                    {
+                        return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
+                    });
 
+                    services.AddLiteDbGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
                 })
+                .ConfigureEndpoints(siloPort: 7717, gatewayPort: 30000)
                 .Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "dev";
                     options.ServiceId = "OrleansBasics";
-                }) 
+                })
                 // Configure connectivity
                 .UseDashboard()
                 .Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback)
@@ -100,6 +115,7 @@ namespace CommunAxiom.Commons.Client.Silo
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Projects).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Replications).Assembly).WithReferences())
                 .ConfigureLogging(logging => logging.AddConsole());
+                //to add the redis Grain directory
 
             var silo = builder.Build();
             await silo.StartAsync();
