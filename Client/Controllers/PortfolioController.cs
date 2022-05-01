@@ -32,8 +32,6 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
                 };
                 await portfolio.CreatePortfolio(portfolioDetails);
             }
-
-            _clusterClient.GetStreamProvider("").GetStream<string>(System.Guid.Empty,"").SubscribeAsync()
             
             return Ok(result);
         }
