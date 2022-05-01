@@ -25,6 +25,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
                     return AccountState.ClientMismatch;
                 return AccountState.CredentialsSet;
             }
+            
 
             return AccountState.Initial;
         }

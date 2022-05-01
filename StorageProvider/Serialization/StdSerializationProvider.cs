@@ -9,11 +9,11 @@ using System.Text;
 
 namespace Comax.Commons.StorageProvider.Serialization
 {
-    internal class StdSerializationProvider : ISerializationProvider
+    public class StdSerializationProvider : ISerializationProvider
     {
         private readonly SerializationManager _serializationManager;
         
-        internal StdSerializationProvider(SerializationManager serializationManager)
+        public StdSerializationProvider(SerializationManager serializationManager)
         {
             _serializationManager = serializationManager;
         }

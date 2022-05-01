@@ -24,11 +24,11 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
     [Route("api/[controller]")]
     public class AuthenticationController : ControllerBase
     {
-        private readonly Client.Contracts.Grains.IClusterClient _clusterClient;
+        private readonly Client.Contracts.Grains.ICommonsClusterClient _clusterClient;
         private readonly ITempData _tempData;
         private readonly IConfiguration _configuration; 
         private readonly IServiceProvider _serviceProvider;
-        public AuthenticationController(Client.Contracts.Grains.IClusterClient clusterClient, ITempData tempData, IConfiguration configuration, IServiceProvider serviceProvider)
+        public AuthenticationController(Client.Contracts.Grains.ICommonsClusterClient clusterClient, ITempData tempData, IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _clusterClient = clusterClient;
             _tempData = tempData;

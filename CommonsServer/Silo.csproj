@@ -22,6 +22,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AccountGrain\AccountGrain.csproj" />
+    <ProjectReference Include="..\ClusterClient\ClusterClient.csproj" />
+    <ProjectReference Include="..\DatasetGrain\DatasetGrain.csproj" />
     <ProjectReference Include="..\DatasourceGrain\DatasourceGrain.csproj" />
     <ProjectReference Include="..\DataTransferGrain\DataTransferGrain.csproj" />
     <ProjectReference Include="..\IngestionGrain\IngestionGrain.csproj" />
@@ -32,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="app.json">
+    <None Update="config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

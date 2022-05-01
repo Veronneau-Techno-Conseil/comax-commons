@@ -25,15 +25,21 @@ using IngestionGrain;
 using Microsoft.Extensions.Configuration;
 using Orleans.Security;
 using CommunAxiom.Commons.Client.Contracts.Configuration;
+using CommunAxiom.Commons.Client.Contracts.Auth;
+using CommunAxiom.Commons.Client.Contracts;
+using DatasetGrain;
+using CommunAxiom.Commons.Client.Contracts.Dataset;
 
 namespace CommunAxiom.Commons.Client.Silo
 {
     internal static class MainSilo
     {
         static ISiloHost _silo;
+
+        public static ISiloHost Host { get { return _silo; } }
         public static bool IsSiloStarted { get; private set; }
 
-        private static async Task StartSilo()
+        public static async Task StartSilo()
         {
             if (IsSiloStarted)
             {
@@ -41,30 +47,17 @@ namespace CommunAxiom.Commons.Client.Silo
             }
             // define the cluster configuration
             var builder = new SiloHostBuilder()
-                .SetClustering()
-                .SetConfiguration()
+                .SetDefaults(out var conf)
                 .ConfigureServices(services =>
                 {
-                    var configs = new Orleans.Security.IdentityServer4Info("https://localhost:5001/", "org1_node1", "846B62D0-DEF9-4215-A99D-86E6B8DAB342", "org1");
-                    services.AddOrleansClusteringAuthorization(configs,
-                        config =>
-                        {
-                            config.ConfigureAuthorizationOptions = CommunAxiom.Commons.Client.Contracts.Auth.Configuration.ConfigurePolicyOptions;
-                            config.TracingEnabled = true;
-                        });
-                    //services.Remove(new ServiceDescriptor(typeof(IdentityServer4Info), configs));
-                    services.AddTransient<IdentityServer4Info>(services =>
-                    {
-                        var gf = services.GetRequiredService<IGrainFactory>();
-                        var actGrain = gf.GetGrain<IAccount>(Guid.Empty);
-                        var act = actGrain.GetDetails().GetAwaiter().GetResult();
-                        var cfg = services.GetRequiredService<IConfiguration>();
-                        OIDCSettings authSettings = new OIDCSettings();
-                        cfg.Bind(Sections.OIDCSection, authSettings);
-                        return new IdentityServer4Info(authSettings.Authority, act.ClientID, act.ClientSecret, authSettings.Scopes);
-                    });
+                    ConfigureIdentitty(services);
+
+                    services.SetStorage(conf);
+
                     //register singleton services for each grain/interface
                     services.AddSingleton<IAccount, Accounts>();
+                    services.AddSingleton<IAuthentication, AuthenticationWorker>();
+                    services.AddSingleton<IDataset, Dataset>();
                     services.AddSingleton<IDatasource, Datasources>();
                     services.AddSingleton<IDataTransfer, DataTransfer>();
                     services.AddSingleton<IIngestion, Ingestions>();
@@ -73,25 +66,15 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<IReplication, Replications>();
 
                 })
-                .AddSimpleMessageStreamProvider("SMSProvider")
-                .Configure<ClusterOptions>(options =>
-                {
-                    options.ClusterId = "dev";
-                    options.ServiceId = "OrleansBasics";
-                })
-                .ConfigureEndpoints(siloPort: 7717, gatewayPort: 30000)
-                // Configure connectivity
-                .UseDashboard()
-                .Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback)
                 //configure application parts for each grain
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Accounts).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Dataset).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Datasources).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DataTransfer).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Ingestions).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Portfolios).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Projects).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Replications).Assembly).WithReferences())
-                .ConfigureLogging(logging => logging.AddConsole());
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Replications).Assembly).WithReferences());
 
             var silo = builder.Build();
             await silo.StartAsync();
@@ -99,7 +82,29 @@ namespace CommunAxiom.Commons.Client.Silo
             IsSiloStarted = true;
         }
 
-        static async Task StopSilo()
+        static void ConfigureIdentitty(IServiceCollection services)
+        {
+            var configs = new Orleans.Security.IdentityServer4Info("https://localhost:5001/", "org1_node1", "846B62D0-DEF9-4215-A99D-86E6B8DAB342", "org1");
+            services.AddOrleansClusteringAuthorization(configs,
+                config =>
+                {
+                    config.ConfigureAuthorizationOptions = CommunAxiom.Commons.Client.Contracts.Auth.Configuration.ConfigurePolicyOptions;
+                    config.TracingEnabled = true;
+                });
+            
+            services.AddTransient<IdentityServer4Info>(services =>
+            {
+                var gf = services.GetRequiredService<IGrainFactory>();
+                var actGrain = gf.GetGrain<IAccount>(Guid.Empty);
+                var act = actGrain.GetDetails().GetAwaiter().GetResult();
+                var cfg = services.GetRequiredService<IConfiguration>();
+                OIDCSettings authSettings = new OIDCSettings();
+                cfg.Bind(Sections.OIDCSection, authSettings);
+                return new IdentityServer4Info(authSettings.Authority, act.ClientID, act.ClientSecret, authSettings.Scopes);
+            });
+        }
+
+        public static async Task StopSilo()
         {
             if (IsSiloStarted)
             {

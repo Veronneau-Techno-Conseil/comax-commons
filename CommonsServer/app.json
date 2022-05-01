@@ -1,6 +1,0 @@
-{
-  "OIDC": {
-    "Authority": "https://accounts.communaxiom.org/",
-    "Scopes": "offline_access roles profile email"
-  } 
-}

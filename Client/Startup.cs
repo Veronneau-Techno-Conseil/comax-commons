@@ -13,6 +13,7 @@ using Orleans.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Threading;
 using ElectronNET.API.Entities;
+using ClusterClient;
 
 namespace CommunAxiom.Commons.ClientUI
 {
@@ -52,16 +53,7 @@ namespace CommunAxiom.Commons.ClientUI
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            //Enable CORS to enable calling an API from JavaScript
-            //Since we’re building an API that will be called by an Angular app, we need CORS. 
-            //services.AddCors(options =>
-            //{
-            //    options.AddPolicy("CorsPolicy",
-            //        builder => builder.AllowAnyOrigin()
-            //        .AllowAnyMethod()
-            //        .AllowAnyHeader());
-            //});
-
+            services.SetupOrleansClient();
             
         }
 

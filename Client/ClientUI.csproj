@@ -53,9 +53,17 @@
 		</ItemGroup>
 	</Target>
 	<ItemGroup>
-		<Folder Include="ClientApp\src\app\authorize\Models\" />
-	</ItemGroup>
+    <ProjectReference Include="..\ClusterClient\ClusterClient.csproj" />
+    <ProjectReference Include="..\Contracts\Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="electron.manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Contracts\Contracts.csproj" />
+    	<Folder Include="ClientApp\src\app\portfolio\Models\" />
+		<Folder Include="ClientApp\src\app\authorize\Models\" />
 	</ItemGroup>
 </Project>
