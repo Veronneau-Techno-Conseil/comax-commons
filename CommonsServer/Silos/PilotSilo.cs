@@ -66,8 +66,9 @@ namespace CommunAxiom.Commons.Client.Silo
             if (IsSiloStarted)
             {
                 await _silo.StopAsync();
-                _silo.Dispose();
+                await _silo.DisposeAsync();
                 _silo = null;
+                IsSiloStarted=false;
             }
         }
     }

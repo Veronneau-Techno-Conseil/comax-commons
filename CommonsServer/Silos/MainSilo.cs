@@ -48,6 +48,7 @@ namespace CommunAxiom.Commons.Client.Silo
             // define the cluster configuration
             var builder = new SiloHostBuilder()
                 .SetDefaults(out var conf)
+                .UseDashboard()
                 .ConfigureServices(services =>
                 {
                     ConfigureIdentitty(services);
@@ -85,6 +86,7 @@ namespace CommunAxiom.Commons.Client.Silo
         static void ConfigureIdentitty(IServiceCollection services)
         {
             var configs = new Orleans.Security.IdentityServer4Info("https://localhost:5001/", "org1_node1", "846B62D0-DEF9-4215-A99D-86E6B8DAB342", "org1");
+            
             services.AddOrleansClusteringAuthorization(configs,
                 config =>
                 {
@@ -92,15 +94,10 @@ namespace CommunAxiom.Commons.Client.Silo
                     config.TracingEnabled = true;
                 });
             
+            
             services.AddTransient<IdentityServer4Info>(services =>
             {
-                var gf = services.GetRequiredService<IGrainFactory>();
-                var actGrain = gf.GetGrain<IAccount>(Guid.Empty);
-                var act = actGrain.GetDetails().GetAwaiter().GetResult();
-                var cfg = services.GetRequiredService<IConfiguration>();
-                OIDCSettings authSettings = new OIDCSettings();
-                cfg.Bind(Sections.OIDCSection, authSettings);
-                return new IdentityServer4Info(authSettings.Authority, act.ClientID, act.ClientSecret, authSettings.Scopes);
+                return Conf.OIDCConfig.Config.Server;
             });
         }
 

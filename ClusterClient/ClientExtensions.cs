@@ -9,23 +9,13 @@ namespace ClusterClient
 {
     public static class ClientExtensions
     {
-        public static void SetupOrleansClient(this IServiceCollection collection, bool transient = false)
+        public static void SetupOrleansClient(this IServiceCollection collection)
         {
-            if (transient)
+            collection.AddTransient<IClusterClient>(provider =>
             {
-                collection.AddTransient<IClusterClient>(provider =>
-                {
-                    return Connect(provider).ConfigureAwait(false).GetAwaiter().GetResult();
-                });
-            }
-            else
-            {
-                collection.AddSingleton<IClusterClient>(provider =>
-                {
-                    return Connect(provider).ConfigureAwait(false).GetAwaiter().GetResult();
-                });
-            }
-
+                return Connect(provider).ConfigureAwait(false).GetAwaiter().GetResult();
+            });
+            
             collection.AddTransient<ICommonsClusterClient, Client>();
         }
         static async Task<IClusterClient> Connect(IServiceProvider provider)
@@ -46,7 +36,7 @@ namespace ClusterClient
             var client = clientBuilder.Build();
             
             await client.Connect(RetryFilter);
-
+            
             return client;
 
             async Task<bool> RetryFilter(Exception exception)

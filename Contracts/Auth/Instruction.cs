@@ -4,9 +4,11 @@ using System.Text;
 
 namespace CommunAxiom.Commons.Client.Contracts.Auth
 {
-    public enum AuthStep
+    public enum Instruction
     {
-        PendingAuthorization = 0,
-        TokenReturned= 1
+        LaunchAuthStream = 0,
+        OpenUrl= 1,
+        SetResult = 2,
+        FetchUser = 3,
     }
 }

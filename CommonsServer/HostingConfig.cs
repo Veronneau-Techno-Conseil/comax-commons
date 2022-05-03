@@ -15,6 +15,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 
 namespace CommunAxiom.Commons.Client.Silo
 {
@@ -80,7 +81,6 @@ namespace CommunAxiom.Commons.Client.Silo
                  options.ClusterId = "dev";
                  options.ServiceId = "OrleansBasics";
              })
-            .UseDashboard()
             .ConfigureLogging(logging => logging.AddConsole());
             return siloHostBuilder;
         }
@@ -120,6 +120,17 @@ namespace CommunAxiom.Commons.Client.Silo
             });
         }
 
+        public static IHostBuilder SetConfiguration(this IHostBuilder siloHostBuilder, out IConfiguration configuration)
+        {
+            ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+            configurationBuilder.AddJsonFile("./config.json");
+            configuration = configurationBuilder.Build();
+
+            return siloHostBuilder.ConfigureAppConfiguration(app =>
+            {
+                app.AddJsonFile("./config.json");
+            });
+        }
 
     }
 }

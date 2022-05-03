@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.Runtime;
+using CommunAxiom.Commons.Client.Contracts;
 
 namespace CommunAxiom.Commons.Client.Grains.AccountGrain
 {
@@ -19,7 +20,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
         public async Task<AccountState> CheckState(string clientIdRef = null)
         {
             await _actDetails.ReadStateAsync();
-            if(_actDetails.State != null && !string.IsNullOrWhiteSpace(_actDetails.State.AccountsToken))
+            if(_actDetails.State != null && !string.IsNullOrWhiteSpace(_actDetails.State.ClientID))
             {
                 if (!string.IsNullOrWhiteSpace(clientIdRef) && _actDetails.State.ClientID != clientIdRef)
                     return AccountState.ClientMismatch;
@@ -41,10 +42,11 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             return this._actDetails.State;
         }
 
-        public Task Initialize(AccountDetails accountDetails)
+        public async Task Initialize(AccountDetails accountDetails)
         {
             this._actDetails.State = accountDetails;
-            return this._actDetails.WriteStateAsync();
+            await this._actDetails.WriteStateAsync();
+            
         }
     }
 }

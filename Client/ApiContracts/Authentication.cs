@@ -5,6 +5,7 @@ namespace CommunAxiom.Commons.ClientUI.ApiContracts
     public class AuthStart
     {
         public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
     }
     public class AuthSteps
     {
@@ -16,6 +17,7 @@ namespace CommunAxiom.Commons.ClientUI.ApiContracts
 
         public const string ERR_ClientMismatch = "CLIDMISMATCH";
         public const string ERR_Authentication = "AUTH_ERR";
+        public const string ERR_Unexpected = "UNEXPECTED";
     }
 
     public class TokenData

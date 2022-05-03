@@ -28,32 +28,30 @@ using Microsoft.Extensions.Options;
 using Orleans.Runtime;
 using Orleans.Providers;
 using CommunAxiom.Commons.Client.Silo.System;
+using ClusterClient;
+using Microsoft.Extensions.Hosting;
 
 namespace CommunAxiom.Commons.Client.Silo
 {
     class Program
     {
         
-        static readonly CancellationTokenSource tokenSource = new CancellationTokenSource();
         
         static void Main(string[] args)
         {
             Console.WriteLine("Starting service...");
-            RunMainAsync().GetAwaiter().GetResult();
+            var host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
+                .SetConfiguration(out var cfg)
+                .ConfigureServices((host, sc) =>
+                {
+                    sc.SetupOrleansClient();
+                    sc.AddTransient<ClusterManagement>();
+                    sc.AddLogging(lb => lb.AddConsole());
+                    sc.AddHostedService<HeartbeatService>();
+                }).Build();
+
+            host.Run();
         }
 
-        private static async Task<int> RunMainAsync()
-        {
-            Services.Bootstrap();
-            await Services.ClusterManagement.SetSilo(Silos.Pilot);
-
-            while (!tokenSource.Token.IsCancellationRequested)
-            {
-                await Services.ClusterManagement.Heartbeat();
-                await Task.Delay(1000);
-            }
-
-            return 0;
-        }
     }
 }

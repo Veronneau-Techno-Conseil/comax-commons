@@ -14,6 +14,7 @@
 	<ItemGroup>
 		<PackageReference Include="ElectronNET.API" Version="13.5.1" />
 		<PackageReference Include="IdentityModel.OidcClient" Version="5.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.4" />
 		<PackageReference Include="Microsoft.Orleans.Core" Version="3.6.2" />
 		<PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.6.2" />

@@ -11,4 +11,11 @@ namespace CommunAxiom.Commons.Client.Contracts
         public string Error { get; set; }
         public string Detail { get; set; }
     }
+
+    public class OperationResult
+    {
+        public bool IsError { get; set; }
+        public string Error { get; set; }
+        public string Detail { get; set; }
+    }
 }

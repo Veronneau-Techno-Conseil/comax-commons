@@ -17,13 +17,20 @@ using System.Threading.Tasks;
 
 namespace ClusterClient
 {
-    public class Client : ICommonsClusterClient
+    public class Client : ICommonsClusterClient, IDisposable
     {
+        private bool _disposed = false;
         private readonly IClusterClient _clusterClient;
         public Client(IClusterClient clusterClient)
         {
             _clusterClient = clusterClient;
         }
+
+        ~Client()
+        {
+            if (!_disposed) { Dispose(); }
+        }
+
         public IAccount GetAccount()
         {
             return _clusterClient.GetGrain<IAccount>(Guid.Empty);
@@ -67,9 +74,24 @@ namespace ClusterClient
         public async Task<StreamSubscriptionHandle<SystemEvent>> SubscribeSystem(Func<SystemEvent, StreamSequenceToken, Task> fn, Func<Exception, Task> funcError, Func<Task> onCompleted)
         {
             var res = await _clusterClient.GetStreamProvider(Constants.DefaultStream)
-                    .GetStream<SystemEvent>(Guid.Empty,Constants.DefaultNamespace)
-                    .SubscribeAsync(fn,funcError,onCompleted);
+                    .GetStream<SystemEvent>(Guid.Empty, Constants.DefaultNamespace)
+                    .SubscribeAsync(fn, funcError, onCompleted);
             return res;
+        }
+
+        public async Task<(StreamSubscriptionHandle<AuthorizationInstructions>, AsyncEnumerableStream<AuthorizationInstructions>)> SubscribeAuth(Guid streamId)
+        {
+            var result = new AsyncEnumerableStream<AuthorizationInstructions>();
+            var handle = await _clusterClient.GetStreamProvider(Constants.DefaultStream)
+                    .GetStream<AuthorizationInstructions>(streamId, Constants.DefaultNamespace)
+                    .SubscribeAsync(result);
+            return (handle, result);
+        }
+
+        public void Dispose()
+        {
+            _clusterClient.Dispose();
+            _disposed = true;
         }
     }
 }

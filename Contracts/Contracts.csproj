@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>CommunAxiom.Commons.Client.Contracts</AssemblyName>
+	  <TargetFramework>netstandard2.0</TargetFramework>
+	  <AssemblyName>CommunAxiom.Commons.Client.Contracts</AssemblyName>
     <RootNamespace>CommunAxiom.Commons.Client.Contracts</RootNamespace>
+	  <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

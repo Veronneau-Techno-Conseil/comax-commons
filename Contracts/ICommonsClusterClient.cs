@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.Contracts
 {
-    public interface ICommonsClusterClient
+    public interface ICommonsClusterClient: IDisposable
     {
         IAccount GetAccount();
         IAuthentication GetAuthentication();
@@ -25,5 +25,6 @@ namespace CommunAxiom.Commons.Client.Contracts
         IProject GetProject(string projectId);
         IReplication GetReplication();
         Task<StreamSubscriptionHandle<SystemEvent>> SubscribeSystem(Func<SystemEvent, StreamSequenceToken, Task> fn, Func<Exception, Task> funcError, Func<Task> onCompleted);
+        Task<(StreamSubscriptionHandle<AuthorizationInstructions>, AsyncEnumerableStream<AuthorizationInstructions>)> SubscribeAuth(Guid streamId);
     }
 }
