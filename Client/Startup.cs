@@ -12,90 +12,73 @@ using Orleans;
 using Orleans.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Threading;
+using ElectronNET.API.Entities;
+using ClusterClient;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace CommunAxiom.Commons.ClientUI
 {
     public class Startup
     {
-        public Startup(Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IConfiguration configuration)
+        public async void ElectronBootstrap()
+        {
+            BrowserWindowOptions options = new BrowserWindowOptions
+            {
+                Show = false,
+            };
+            BrowserWindow mainWindow = await Electron.WindowManager.CreateWindowAsync(options);
+            mainWindow.OnReadyToShow += () =>
+            {
+                mainWindow.Show();
+                mainWindow.SetTitle("Application Name");
+                mainWindow.WebContents.OpenDevTools();
+            };
+        }
+
+        public Startup(Microsoft.AspNetCore.Hosting.IWebHostEnvironment hostingEnvironment, IConfiguration configuration)
         {
             Configuration = configuration;
             HostingEnvironment = hostingEnvironment;
         }
 
         public IConfiguration Configuration { get; }
-        public Microsoft.AspNetCore.Hosting.IHostingEnvironment HostingEnvironment { get; }
+        public Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostingEnvironment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddSingleton<Helper.ITempData, Helper.TempStorage>();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            //Enable CORS to enable calling an API from JavaScript
-            //Since we’re building an API that will be called by an Angular app, we need CORS. 
-            //services.AddCors(options =>
-            //{
-            //    options.AddPolicy("CorsPolicy",
-            //        builder => builder.AllowAnyOrigin()
-            //        .AllowAnyMethod()
-            //        .AllowAnyHeader());
-            //});
-
-            // Add Orleans Service 
-            //Consider refactoring the code
-            services.AddSingleton<IClusterClient>(provider => {
-                var hostingEnvironment = provider.GetRequiredService<Microsoft.AspNetCore.Hosting.IHostingEnvironment>();
-
-                var clientBuilder = new ClientBuilder()
-                    .Configure<ClusterOptions>(options => {
-                        options.ClusterId = "dev";
-                        options.ServiceId = "CoreBlog";
-                    })
-                    .ConfigureApplicationParts(parts => {
-                        parts.AddFromApplicationBaseDirectory();
-                    });
-
-                if (hostingEnvironment.IsDevelopment())
+            services.SetupOrleansClient();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    clientBuilder = clientBuilder.UseLocalhostClustering(30000);
-                }
-
-                var client = clientBuilder.Build();
-                var reset = new ManualResetEvent(false);
-
-                client.Connect(RetryFilter).ContinueWith(task => {
-                    reset.Set();
-
-                    return Task.CompletedTask;
-                });
-
-                reset.WaitOne();
-
-                return client;
-
-                async Task<bool> RetryFilter(Exception exception)
-                {
-                    provider.GetService<ILogger>()?.LogWarning(
-                        exception,
-                        "Exception while attempting to connect to Orleans cluster"
-                    );
-
-                    await Task.Delay(TimeSpan.FromSeconds(2));
-
-                    return true;
-                }
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    ValidAudience = Configuration["Jwt:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                };
             });
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            ElectronBootstrap();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -120,7 +103,8 @@ namespace CommunAxiom.Commons.ClientUI
             }
 
             app.UseRouting();
-
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -141,11 +125,6 @@ namespace CommunAxiom.Commons.ClientUI
                 }
             });
 
-            Task.Run(async () =>
-            {
-                var window = await Electron.WindowManager.CreateWindowAsync();
-                window.SetMenu(null);
-            });
         }
     }
 }

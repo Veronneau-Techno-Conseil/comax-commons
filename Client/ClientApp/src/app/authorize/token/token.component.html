@@ -2,14 +2,14 @@
 
 <form [formGroup]="AccountForm" (ngSubmit)="onSubmit()">
   <div>
-    <label>Client ID</label>
     <div>
+      <label>Client ID</label>
       <input formControlName="ClientID" [(ngModel)]="AccountModel.ClientID" />
     </div>
 
-    <label>Client Secret</label>
     <div>
-      <input formControlName="ClientSecret" [(ngModel)]="AccountModel.ClientSecret" />
+    <label>Client Secret</label>
+    <input type="password" formControlName="ClientSecret" [(ngModel)]="AccountModel.ClientSecret" />
     </div>
 
     <label>User Challenge Code</label>

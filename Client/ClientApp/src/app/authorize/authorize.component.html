@@ -3,9 +3,13 @@
 
 <form [formGroup]="AuthorizeForm" (ngSubmit)="onSubmit()">
   <div>
-    <label> ClientID</label>
-    <div>
+    <div *ngIf="Mode == 'AuthApi'">
+      <label> ClientID</label>
       <input formControlName="ClientID" [(ngModel)]="AccountModel.ClientID"/>
+    </div>
+    <div *ngIf="Mode == 'AuthApi'">
+      <label> Client secret</label>
+      <input formControlName="ClientSecret" [(ngModel)]="AccountModel.ClientSecret"/>
     </div>
 
     <br />
