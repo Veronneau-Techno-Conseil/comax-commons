@@ -2,38 +2,29 @@ import { AccountInterface, AccountModel } from './Models/authorize-model';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { OperationResult } from '../contracts/OperationResult';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthorizeServiceService {
-
-  readonly AccountsURL = "https://localhost:5001/";
-  readonly CommonsURL = "https://localhost:44369/";
+  readonly CommonsURL = "";
 
   constructor(private http: HttpClient) { }
 
-  RequestAuthorization(account: AccountModel): Observable<any> {
-    let params = new HttpParams()
-      .set('client_id', account.ClientID)
-      .set('response_type', "code")
-      .set('scope', "openid")
-      .set('redirect_uri', (this.CommonsURL + "authorize/token")) //consider replacing with form value?!
-      .set('nonce', "abcabc");
-    return this.http.get(this.AccountsURL + "connect/authorize", { params, responseType: 'text' });
+  AuthenticateCluster(account: AccountModel): Observable<OperationResult<{token: string}>> {
+    
+    return this.http.post(this.CommonsURL + "api/authentication/cluster", account);
   }
 
-  GetToken(Account: AccountModel): Observable<AccountInterface> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
-    const body = new HttpParams()
-      .set('grant_type', 'authorization_code')
-      .set('client_id', Account.ClientID)
-      .set('client_secret', Account.ClientSecret)
-      .set('redirect_uri', (this.CommonsURL + 'authorize/token')) //consider replacing with form value?!
-      .set('code', Account.UserChallengeCode);
-    return this.http.post<AccountInterface>(this.AccountsURL + "connect/token", body, { headers: headers });
+  AuthenticateUser(): Observable<OperationResult<{token: string}>>{
+    return this.http.post(this.CommonsURL + "api/authentication", {});
   }
 
+  Init(): Observable<OperationResult<string>>{
+    return this.http.get<OperationResult<string>>(this.CommonsURL + "api/authentication");
+  }
+  
   //In the function below, the Grain associated to the account will be activated
   //The clientId will be used as an Id for the Grain
   //The ApplicationId can not be retrieved since it is not an OpenIdConnect field

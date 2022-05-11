@@ -32,7 +32,7 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
                 };
                 await portfolio.CreatePortfolio(portfolioDetails);
             }
-
+            
             return Ok(result);
         }
 

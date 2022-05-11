@@ -3,54 +3,50 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Orleans;
-using Orleans.Providers;
+using Orleans.Runtime;
+using CommunAxiom.Commons.Client.Contracts;
 
 namespace CommunAxiom.Commons.Client.Grains.AccountGrain
 {
     public class Accounts : Grain, IAccount
     {
+        private readonly IPersistentState<AccountDetails> _actDetails;
+        
+        public Accounts([PersistentState("accounts")]IPersistentState<AccountDetails> actDetails)
+        {
+            _actDetails = actDetails;
+        }
 
-        private AccountDetails _accountDetails = new AccountDetails();
+        public async Task<AccountState> CheckState(string clientIdRef = null)
+        {
+            await _actDetails.ReadStateAsync();
+            if(_actDetails.State != null && !string.IsNullOrWhiteSpace(_actDetails.State.ClientID))
+            {
+                if (!string.IsNullOrWhiteSpace(clientIdRef) && _actDetails.State.ClientID != clientIdRef)
+                    return AccountState.ClientMismatch;
+                return AccountState.CredentialsSet;
+            }
+            
+
+            return AccountState.Initial;
+        }
 
         public Task<Stream> EncryptStream(Stream data)
         {
             throw new NotImplementedException();
         }
 
-        public Task<string> GetAccountName()
+        public async Task<AccountDetails> GetDetails()
         {
-            throw new NotImplementedException();
+            await this._actDetails.ReadStateAsync();
+            return this._actDetails.State;
         }
 
-        public Task<bool> IsAuthenticated()
+        public async Task Initialize(AccountDetails accountDetails)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task SetAccountName(string name)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<string> TestGrain(string GrainId)
-        {
-            return Task.FromResult($"The Account Grain with Id: {GrainId} has been launched. Check it on the dashboard");
-        }
-
-        Task<string> IAccount.SetDetails(string GrainId, AccountDetails account)
-        {
-
-            _accountDetails.ApplicationId = account.ApplicationId;
-            _accountDetails.ClientID = account.ClientID;
-            _accountDetails.ClientSecret = account.ClientSecret;
-            _accountDetails.AccountsToken = account.AccountsToken;
-
-            return Task.FromResult("The ClientID, Secret and AccessToken has been passed to grain " + GrainId + " successfully.\n You ClientID is: " + _accountDetails.ClientID + "\nYour ClientSecret is: " + _accountDetails.ClientSecret + "\nYour AccessToken is: " + _accountDetails.AccountsToken);
-        }
-
-        public Task<string> GetDetails(string GrainId)
-        {
-            return Task.FromResult("The Client Details handled by the Grain " + GrainId + " are: \nClientID: " + _accountDetails.ClientID + "\nClientSecret: " + _accountDetails.ClientSecret + "\nAccessToken: " + _accountDetails.AccountsToken);
+            this._actDetails.State = accountDetails;
+            await this._actDetails.WriteStateAsync();
+            
         }
     }
 }

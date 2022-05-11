@@ -22,10 +22,10 @@ export class TokenComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.authorize.GetToken(this.AccountModel).subscribe(response => {
-      this.AccountModel.AccessToken = response.access_token;
-      this.authorize.SetDetails(this.AccountModel).subscribe();
-    });
+    // this.authorize.GetToken(this.AccountModel).subscribe(response => {
+    //   this.AccountModel.AccessToken = response.access_token;
+    //   this.authorize.SetDetails(this.AccountModel).subscribe();
+    // });
   }
 
   InitializeForm(): void {

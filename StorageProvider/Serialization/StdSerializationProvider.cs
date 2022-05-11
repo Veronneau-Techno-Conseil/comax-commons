@@ -12,7 +12,7 @@ namespace Comax.Commons.StorageProvider.Serialization
     public class StdSerializationProvider : ISerializationProvider
     {
         private readonly SerializationManager _serializationManager;
-
+        
         public StdSerializationProvider(SerializationManager serializationManager)
         {
             _serializationManager = serializationManager;
