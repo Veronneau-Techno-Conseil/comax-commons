@@ -14,6 +14,8 @@ namespace CommunAxiom.Commons.Client.Contracts
 
     public class OperationResult
     {
+        public const string ERR_UNEXP_NULL = "ERR_UNEXP_NULL";
+        public const string ERR_UNEXP_ERR = "ERR_UNEXP_ERR";
         public bool IsError { get; set; }
         public string Error { get; set; }
         public string Detail { get; set; }

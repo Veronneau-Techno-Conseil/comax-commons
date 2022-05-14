@@ -1,4 +1,4 @@
-﻿using CommunAxiom.Commons.ClientUI.ApiContracts;
+﻿using ClientUI.Shared.Models;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace CommunAxiom.Commons.ClientUI.Helper

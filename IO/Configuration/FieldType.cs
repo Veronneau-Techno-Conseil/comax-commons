@@ -13,6 +13,9 @@ namespace CommunAxiom.Commons.Client.IO.Configuration
         Number = 2,
         Password = 3,
         Lookup = 4,
-        File = 5
+        File = 5,
+        Date=6,
+        Boolean = 7,
+        Object = 8
     }
 }
