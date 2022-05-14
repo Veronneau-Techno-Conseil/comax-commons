@@ -1,3 +1,11 @@
 **/bin/**/*
 **/obj/**/*
 .vs/**/*.*
+/DevSilo/Default
+/DevSilo/Default-log
+/DevSilo/PubSubStore
+/DevSilo/PubSubStore-log
+/Silo/Default
+/Silo/Default-log
+/Silo/PubSubStore
+/Silo/PubSubStore-log
