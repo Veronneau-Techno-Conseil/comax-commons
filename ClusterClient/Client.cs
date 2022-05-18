@@ -1,6 +1,7 @@
 ﻿using CommunAxiom.Commons.Client.Contracts;
 using CommunAxiom.Commons.Client.Contracts.Account;
 using CommunAxiom.Commons.Client.Contracts.Auth;
+using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.DataTransfer;
 using CommunAxiom.Commons.Client.Contracts.Ingestion;
@@ -90,8 +91,21 @@ namespace ClusterClient
 
         public void Dispose()
         {
+            try
+            {
+                _clusterClient.Close().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+
+            }
             _clusterClient.Dispose();
             _disposed = true;
+        }
+
+        public Task Close()
+        {
+            return _clusterClient.Close();
         }
     }
 }

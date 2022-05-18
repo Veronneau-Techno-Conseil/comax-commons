@@ -1,5 +1,6 @@
-using ClientUI.Shared.Extensions;
-using ClientUI.Shared.Models;
+
+using CommunAxiom.Commons.ClientUI.Shared.Extensions;
+using CommunAxiom.Commons.ClientUI.Shared.Models;
 using Microsoft.Extensions.Hosting.Internal;
 
 var builder = WebApplication.CreateBuilder(args);

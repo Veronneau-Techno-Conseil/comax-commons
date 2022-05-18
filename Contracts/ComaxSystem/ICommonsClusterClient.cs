@@ -1,5 +1,6 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Account;
 using CommunAxiom.Commons.Client.Contracts.Auth;
+using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.DataTransfer;
 using CommunAxiom.Commons.Client.Contracts.Ingestion;
@@ -12,7 +13,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommunAxiom.Commons.Client.Contracts
+namespace CommunAxiom.Commons.Client.Contracts.ComaxSystem
 {
     public interface ICommonsClusterClient: IDisposable
     {
@@ -24,6 +25,7 @@ namespace CommunAxiom.Commons.Client.Contracts
         IPortfolio GetPortfolio(string portfolioId);
         IProject GetProject(string projectId);
         IReplication GetReplication();
+        Task Close();
         Task<StreamSubscriptionHandle<SystemEvent>> SubscribeSystem(Func<SystemEvent, StreamSequenceToken, Task> fn, Func<Exception, Task> funcError, Func<Task> onCompleted);
         Task<(StreamSubscriptionHandle<AuthorizationInstructions>, AsyncEnumerableStream<AuthorizationInstructions>)> SubscribeAuth(Guid streamId);
     }

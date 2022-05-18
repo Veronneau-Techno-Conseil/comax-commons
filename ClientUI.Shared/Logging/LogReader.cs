@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading;
-using ClientUI.Shared.Models;
+using CommunAxiom.Commons.ClientUI.Shared.Models;
 
-namespace ClientUI.Shared.Logging;
+namespace CommunAxiom.Commons.ClientUI.Shared.Logging;
 
 public class LogReader
 {

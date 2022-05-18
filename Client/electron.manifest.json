@@ -8,7 +8,7 @@
   "singleInstance": false,
   "environment": "Production",
   "build": {
-    "appId": "com.CommunAxiom.Commons.ClientUI.app",
+    "appId": "com.CommunAxiom.Commons.ClientUI.Server.app",
     "productName": "CommunAxiom.Commons.ClientUI",
     "copyright": "Copyright © 2020",
     "buildVersion": "1.0.0",

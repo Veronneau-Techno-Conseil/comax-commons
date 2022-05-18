@@ -1,11 +1,16 @@
 ﻿using System;
 
-namespace ClientUI.Shared.Models
+namespace CommunAxiom.Commons.ClientUI.Shared.Models
 {
     public class AuthStart
     {
         public string? ClientId { get; set; }
         public string? ClientSecret { get; set; }
+    }
+
+    public class AuthResult
+    {
+        public string? Token { get; set; }        
     }
     public class AuthSteps
     {

@@ -1,19 +1,20 @@
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using ClientUI.Shared.Models;
-using ClientUI.Shared.Services;
-using ClientUI.Shared.ViewModels.Interfaces;
+using CommunAxiom.Commons.ClientUI.Shared.Models;
+using CommunAxiom.Commons.ClientUI.Shared.Services;
+using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
+using Claim = System.Security.Claims.Claim;
 
-namespace ClientUI.Client
+namespace CommunAxiom.Commons.ClientUI.Shared
 {
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
-        private readonly ILoginViewModel _loginViewModel;
+        private readonly ISessionViewModel _loginViewModel;
         private readonly IAccessTokenService _accessTokenService;
 
-        public CustomAuthenticationStateProvider(ILoginViewModel loginViewModel, 
+        public CustomAuthenticationStateProvider(ISessionViewModel loginViewModel, 
             IAccessTokenService accessTokenService)
         {
             _loginViewModel = loginViewModel;
@@ -22,28 +23,34 @@ namespace ClientUI.Client
 
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            User currentUser = await GetUserByJWTAsync();
+            var state = await _loginViewModel.GetState();
+            if (state.Result != AuthSteps.OK)
+            {
+                await _accessTokenService.RemoveAccessTokenAsync("jwt_token");
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            }
+                User currentUser = await GetUserByJWTAsync();
 
-            //if (currentUser != null && currentUser.EmailAddress != null)
-            //{
-            //    //create claimsPrincipal
-            //    var claimsPrincipal = GetClaimsPrinciple(currentUser);
-            //    return new AuthenticationState(claimsPrincipal);
-            //}
-            //else
-            //{
-            //    await _accessTokenService.RemoveAccessTokenAsync("jwt_token");
-            //    return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
-            //}
-            throw new NotImplementedException();
+            if (currentUser != null && currentUser.Email != null)
+            {
+                //create claimsPrincipal
+                var claimsPrincipal = GetClaimsPrinciple(currentUser);
+                return new AuthenticationState(claimsPrincipal);
+            }
+            else
+            {
+                await _accessTokenService.RemoveAccessTokenAsync("jwt_token");
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            }
+
         }
 
         public async Task MarkUserAsAuthenticated()
         {
             var user = await GetUserByJWTAsync();
-            //var claimsPrincipal = GetClaimsPrinciple(user);
+            var claimsPrincipal = GetClaimsPrinciple(user);
 
-            //NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
         }
 
         public async Task MarkUserAsLoggedOut()
@@ -56,31 +63,28 @@ namespace ClientUI.Client
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
         }
 
-        public async Task<User> GetUserByJWTAsync()
+        public async Task<User?> GetUserByJWTAsync()
         {
-            //pulling the token from localStorage
-            var jwtToken = await _accessTokenService.GetAccessTokenAsync("jwt_token");
-            if (jwtToken == null) return null;
-
-            jwtToken = $@"""{jwtToken}""";
-            //return await _loginViewModel.GetUserByJWTAsync(jwtToken);
-            throw new NotImplementedException();
+            
+            return await _loginViewModel.GetUserByJWTAsync();
+            
         }
 
-        //private ClaimsPrincipal GetClaimsPrinciple(User currentUser)
-        //{
-        //    //create a claims
-        //    var claimEmailAddress = new Claim(ClaimTypes.Name, currentUser.EmailAddress);
-        //    var claimNameIdentifier = new Claim(ClaimTypes.NameIdentifier, Convert.ToString(currentUser.UserId));
-        //    var claimRole = new Claim(ClaimTypes.Role, currentUser.Role == null ? "" : currentUser.Role);
 
-        //    //create claimsIdentity
-        //    var claimsIdentity = new ClaimsIdentity(new[] { claimEmailAddress, claimNameIdentifier, claimRole }, "serverAuth");
-        //    //create claimsPrincipal
-        //    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-        //    return claimsPrincipal;
-        //}
+        private ClaimsPrincipal GetClaimsPrinciple(User currentUser)
+        {
+            //create a claims
+            var claimEmailAddress = new Claim(ClaimTypes.Name, currentUser.Email);
+            var claimNameIdentifier = new Claim(ClaimTypes.NameIdentifier, Convert.ToString(currentUser.Id));
+            
+            //create claimsIdentity
+            var claimsIdentity = new ClaimsIdentity(new[] { claimEmailAddress, claimNameIdentifier }, "serverAuth");
+            //create claimsPrincipal
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            return claimsPrincipal;
+        }
 
 
     }

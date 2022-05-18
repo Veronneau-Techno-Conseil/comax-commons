@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CommunAxiom.Commons.Client.Contracts
+namespace CommunAxiom.Commons.Client.Contracts.ComaxSystem
 {
     public class SystemEvent
     {

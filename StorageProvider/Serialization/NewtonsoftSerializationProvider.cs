@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Comax.Commons.StorageProvider.Serialization
 {
-    internal class NewtonsoftSerializationProvider : ISerializationProvider
+    public class NewtonsoftSerializationProvider : ISerializationProvider
     {
         private readonly IConfiguration configuration;
         private JsonSerializerSettings _jsonSettings;
@@ -35,10 +35,10 @@ namespace Comax.Commons.StorageProvider.Serialization
                     _config.TypeNameHandling);
         }
 
-        public object Deserialize(byte[] obj)
+        public object Deserialize(byte[] obj, Type t)
         {
             var str = Encoding.UTF8.GetString(obj);
-            var data = JsonConvert.DeserializeObject<object>(str, _jsonSettings);
+            var data = JsonConvert.DeserializeObject(str, t, _jsonSettings);
             return data;
         }
 

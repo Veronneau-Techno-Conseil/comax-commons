@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	  <AssemblyName>CommunAxiom.Commons.FrontEnd.Server</AssemblyName>
+	  <RootNamespace>CommunAxiom.Commons.FrontEnd.Server</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClientUI.Components\ClientUI.Components.csproj" />
+    <ProjectReference Include="..\ClientUI.Shared\ClientUI.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

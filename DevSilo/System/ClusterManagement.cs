@@ -1,4 +1,5 @@
 ﻿using CommunAxiom.Commons.Client.Contracts;
+using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Client.SiloShared;
 using CommunAxiom.Commons.Client.SiloShared.System;
 using Microsoft.Extensions.Configuration;
@@ -31,9 +32,9 @@ namespace CommunAxiom.Commons.Client.DevSilo.System
         {
             if(CurrentSilo == SiloShared.System.Silos.Unspecified)
             {
-                systemListener = new SystemListener(this, serviceProvider.GetRequiredService<ICommonsClusterClient>(), serviceProvider.GetRequiredService<IConfiguration>());
+                systemListener = new SystemListener(this, serviceProvider.GetRequiredService<ICommonsClientFactory>(), serviceProvider.GetRequiredService<IConfiguration>());
                 await systemListener.Listen();
-                SetSilo(SiloShared.System.Silos.Main);
+                _ = SetSilo(SiloShared.System.Silos.Main);
             }
         }
 

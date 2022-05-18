@@ -11,7 +11,7 @@ using static IdentityModel.OidcConstants;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Text;
-using CommunAxiom.Commons.ClientUI.Helper;
+using CommunAxiom.Commons.ClientUI.Server.Helper;
 using Microsoft.Extensions.Configuration;
 using CommunAxiom.Commons.Client.Contracts.Configuration;
 using CommunAxiom.Commons.Client.Contracts;
@@ -25,9 +25,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
-using ClientUI.Shared.Models;
+using CommunAxiom.Commons.ClientUI.Shared.Models;
+using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 
-namespace CommunAxiom.Commons.ClientUI.Controllers
+namespace CommunAxiom.Commons.ClientUI.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -69,13 +70,16 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get([FromServices] ICommonsClusterClient clusterClient)
+        [HttpGet()]
+        public async Task<IActionResult> Get([FromServices] ICommonsClientFactory clusterClient)
         {
-            var act = clusterClient.GetAccount();
-            var state = await act.CheckState();
+            var state = await clusterClient.WithClusterClient(async cc =>
+            {
+                var act = cc.GetAccount();
+                return await act.CheckState(true);
+            });
 
-            if(state == AccountState.Initial || state == AccountState.AuthenticationError)
+            if (state == AccountState.Initial || state == AccountState.AuthenticationError)
             {
                 return Ok(new OperationResult<string>()
                 {
@@ -159,59 +163,66 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
         }
 
         [HttpPost("cluster")]
-        public async Task<IActionResult> AuthenticateCluster(AuthStart auth, [FromServices]ICommonsClusterClient clusterClient, CancellationToken cancellationToken)
+        public async Task<IActionResult> AuthenticateCluster(AuthStart auth, [FromServices]ICommonsClientFactory clusterClient, CancellationToken cancellationToken)
         {
             //Ensure state is valid
-            var act = clusterClient.GetAccount();
-            var state = await act.CheckState(auth.ClientId);
-
-            if (state == Client.Contracts.Account.AccountState.ClientMismatch)
+            return await clusterClient.WithClusterClient(async cc =>
             {
-                //Should reinisitalize the whole cluster is clientId mismatch, clientid is supposed to be permanent and only secret changes
-                return Unauthorized(new OperationResult<string>()
+                var act = cc.GetAccount();
+                var state = await act.CheckState(false, auth.ClientId);
+
+                if (state == Client.Contracts.Account.AccountState.ClientMismatch)
                 {
-                    Detail = "Cannot authenticate against a different client id than that which is set in commons.",
-                    Error = AuthSteps.ERR_ClientMismatch,
-                    IsError = true,
-                    Result = AuthSteps.LOGIN
-                });
-            }
+                    //Should reinisitalize the whole cluster is clientId mismatch, clientid is supposed to be permanent and only secret changes
+                    return Unauthorized(new OperationResult<string>()
+                    {
+                        Detail = "Cannot authenticate against a different client id than that which is set in commons.",
+                        Error = AuthSteps.ERR_ClientMismatch,
+                        IsError = true,
+                        Result = AuthSteps.LOGIN
+                    });
+                }
 
-            //Launch auth with redirect url in ref
-            var authSvc = clusterClient.GetAuthentication();
-            string redirectUri = string.Format($"https://localhost:{Request.Host.Port}/api/authentication/login");
-            var instructions = await authSvc.LaunchServiceAuthentication(auth.ClientId, auth.ClientSecret, redirectUri);
+                //Launch auth with redirect url in ref
+                var authSvc = cc.GetAuthentication();
+                string redirectUri = string.Format($"https://localhost:{Request.Host.Port}/api/authentication/login");
+                var instructions = await authSvc.LaunchServiceAuthentication(auth.ClientId, auth.ClientSecret, redirectUri);
 
-            return await CompleteAuthentication(clusterClient, authSvc, instructions, cancellationToken);
+                return await CompleteAuthentication(cc, authSvc, instructions, cancellationToken);
+            });
         }
 
 
         [HttpPost()]
-        public async Task<IActionResult> Authenticate([FromServices] ICommonsClusterClient clusterClient, CancellationToken cancellationToken)
+        public async Task<IActionResult> Authenticate([FromServices] ICommonsClientFactory clusterClient, CancellationToken cancellationToken)
         {
-            //Ensure state is valid
-            var act = clusterClient.GetAccount();
-            var state = await act.CheckState();
-
-            if(state == Client.Contracts.Account.AccountState.Initial)
+            var (client, result) = await clusterClient.WithUnmanagedClient(async cc =>
             {
-                //Should reinisitalize the whole cluster is clientId mismatch, clientid is supposed to be permanent and only secret changes
-                return Unauthorized(new OperationResult<string>()
+                //Ensure state is valid
+                var act = cc.GetAccount();
+                var state = await act.CheckState(false);
+
+                if (state == Client.Contracts.Account.AccountState.Initial)
                 {
-                    Detail = "You must authenticate the cluster first.",
-                    Error = AuthSteps.ERR_Authentication,
-                    IsError = true,
-                    Result = AuthSteps.LOGIN
-                });
-            }
+                    //Should reinisitalize the whole cluster is clientId mismatch, clientid is supposed to be permanent and only secret changes
+                    return Unauthorized(new OperationResult<string>()
+                    {
+                        Detail = "You must authenticate the cluster first.",
+                        Error = AuthSteps.ERR_Authentication,
+                        IsError = true,
+                        Result = AuthSteps.LOGIN
+                    });
+                }
 
-            //Launch auth with redirect url in ref
-            var authSvc = clusterClient.GetAuthentication();
-            string redirectUri = string.Format($"https://localhost:{Request.Host.Port}/api/authentication/login");
-            var instructions = await authSvc.LaunchAuthentication(redirectUri);
+                //Launch auth with redirect url in ref
+                var authSvc = cc.GetAuthentication();
+                string redirectUri = string.Format($"https://localhost:{Request.Host.Port}/api/authentication/login");
+                var instructions = await authSvc.LaunchAuthentication(redirectUri);
 
-            return await CompleteAuthentication(clusterClient, authSvc, instructions, cancellationToken);
+                return await CompleteAuthentication(cc, authSvc, instructions, cancellationToken);
+            });
 
+            return result;
         }
 
         private async Task<IActionResult> CompleteAuthentication(ICommonsClusterClient clusterClient, IAuthentication authSvc, OperationResult<AuthorizationInstructions> instructions, CancellationToken cancellationToken)
@@ -263,7 +274,10 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
                         break;
                     case Instruction.SetResult:
                         operationResult = Newtonsoft.Json.JsonConvert.DeserializeObject<OperationResult>(item.Payload);
-                        await authSvc.Complete();
+                        if (!operationResult.IsError)
+                        {
+                            await authSvc.Complete();
+                        }
                         break;
                     case Instruction.FetchUser:
                         sessionInfo = await authSvc.GetSessionInfo();
@@ -271,9 +285,12 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
                 }
             }
 
+            await clusterClient.Close();
+            clusterClient.Dispose();
+
             if (operationResult.IsError)
             {
-                return this.Unauthorized(new OperationResult<string>()
+                return this.Ok(new OperationResult<string>()
                 {
                     Result = AuthSteps.LOGIN,
                     Error = AuthSteps.ERR_Authentication,
@@ -294,25 +311,26 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
             _tempData.SetTokenData(data);
             MemoryStream ms = new MemoryStream(sessionInfo.UserData);
             ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(new BinaryReader(ms));
-            string token = GenerateJSONWebToken(claimsPrincipal, sessionInfo.AuthenticationExpiration.Date);
+            string token = GenerateJSONWebToken(claimsPrincipal, sessionInfo.AuthenticationExpiration.DateTime);
 
-            return this.Ok(new OperationResult<object>
+            return this.Ok(new OperationResult<AuthResult>
             {
                 IsError = false,
-                Result = new {token = token}
+                Result = new AuthResult { Token = token}
             });
         }
 
         private string GenerateJSONWebToken(ClaimsPrincipal userInfo, DateTime expiration)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
             
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+                       
 
-            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
-                _configuration["Jwt:Issuer"],
-                userInfo.Claims,
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Issuer"],
+                claims: userInfo.Claims,
                 expires: expiration,
                 signingCredentials: credentials);
 

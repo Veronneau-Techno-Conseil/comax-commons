@@ -1,0 +1,41 @@
+﻿@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+@inherits LayoutComponentBase
+@inject IAccessTokenService _accessTokenService
+@inject ISessionViewModel _loginViewModel
+@inject NavigationManager _navigationManager
+@inject IJSRuntime JsRuntime
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="3"
+                IconType="IconType.FontAwesome"
+                SuccessClass="success-toast-override"
+                SuccessIcon="fa fa-thumbs-up"
+                ErrorIcon="fa fa-bug" />
+
+<MainMenu />
+
+<section class="section">
+    <div class="container content">
+        @Body
+    </div>
+</section>
+
+
+@code {
+    protected override async Task OnParametersSetAsync()
+    {
+
+        
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JsRuntime.InvokeVoidAsync("Startup");
+        
+    }
+
+    private async Task LogoutUser()
+    {
+        await _accessTokenService.RemoveAccessTokenAsync("jwt_token");
+        _navigationManager.NavigateTo("/", true);
+    }
+}

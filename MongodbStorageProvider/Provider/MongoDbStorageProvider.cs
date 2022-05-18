@@ -66,7 +66,7 @@ namespace Comax.Commons.StorageProvider
                 return;
 
             var contents = blob.Contents;
-            grainState.State = _serializationProvider.Deserialize(blob.Contents);
+            grainState.State = _serializationProvider.Deserialize(blob.Contents, grainState.Type);
             grainState.ETag = blob.ETag;
             //TODO: Logging
         }

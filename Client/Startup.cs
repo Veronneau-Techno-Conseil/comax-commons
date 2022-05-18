@@ -18,8 +18,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace CommunAxiom.Commons.ClientUI
+namespace CommunAxiom.Commons.ClientUI.Server
 {
+    //TODO integrate bootstrap in program
     public class Startup
     {
         public async void ElectronBootstrap()

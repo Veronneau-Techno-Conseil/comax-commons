@@ -3,15 +3,22 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
 		<TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
-		<IsPackable>false</IsPackable>
 		<SpaRoot>ClientApp\</SpaRoot>
 		<DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
 		<!-- Set this to true if you enable server-side prerendering -->
 		<BuildServerSideRenderer>false</BuildServerSideRenderer>
-		<AssemblyName>CommunAxiom.Commons.ClientUI</AssemblyName>
-		<RootNamespace>CommunAxiom.Commons.ClientUI</RootNamespace>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<AssemblyName>CommunAxiom.Commons.ClientUI.Server</AssemblyName>
+		<RootNamespace>CommunAxiom.Commons.ClientUI.Server</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.1">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
 		<PackageReference Include="ElectronNET.API" Version="13.5.1" />
 		<PackageReference Include="IdentityModel.OidcClient" Version="5.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
@@ -54,19 +61,15 @@
 		</ItemGroup>
 	</Target>
 	<ItemGroup>
-    <ProjectReference Include="..\ClientUI.Shared\ClientUI.Shared.csproj" />
-    <ProjectReference Include="..\ClusterClient\ClusterClient.csproj" />
-    <ProjectReference Include="..\Contracts\Contracts.csproj" />
-  </ItemGroup>
+		<ProjectReference Include="..\ClientUI.Components\ClientUI.Components.csproj" />
+		<ProjectReference Include="..\ClientUI.Shared\ClientUI.Shared.csproj" />
+		<ProjectReference Include="..\ClusterClient\ClusterClient.csproj" />
+		<ProjectReference Include="..\Contracts\Contracts.csproj" />
+	
+	</ItemGroup>
   <ItemGroup>
     <Content Update="electron.manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\Contracts\Contracts.csproj" />
-		<Folder Include="ApiContracts\" />
-    	<Folder Include="ClientApp\src\app\portfolio\Models\" />
-		<Folder Include="ClientApp\src\app\authorize\Models\" />
-	</ItemGroup>
 </Project>
