@@ -16,7 +16,6 @@ using Microsoft.Extensions.Configuration;
 using CommunAxiom.Commons.Client.Contracts.Configuration;
 using CommunAxiom.Commons.Client.Contracts;
 using CommunAxiom.Commons.Client.Contracts.Account;
-using CommunAxiom.Commons.ClientUI.ApiContracts;
 using Orleans.Streams;
 using IdentityModel.OidcClient.Browser;
 using System.Threading;
@@ -26,6 +25,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
+using ClientUI.Shared.Models;
 
 namespace CommunAxiom.Commons.ClientUI.Controllers
 {
@@ -81,7 +81,7 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
                 {
                     Detail = "Full service auth required.",
                     IsError = false,
-                    Result = ApiContracts.AuthSteps.AuthApi
+                    Result = AuthSteps.AuthApi
                 });
             }
 
@@ -91,7 +91,7 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
                 {
                     Detail = "All good.",
                     IsError = false,
-                    Result = ApiContracts.AuthSteps.OK
+                    Result = AuthSteps.OK
                 });
             }
 
@@ -101,7 +101,7 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
                 {
                     Detail = "Authenticate the user.",
                     IsError = false,
-                    Result = ApiContracts.AuthSteps.LOGIN
+                    Result = AuthSteps.LOGIN
                 });
             }
 
@@ -171,9 +171,9 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
                 return Unauthorized(new OperationResult<string>()
                 {
                     Detail = "Cannot authenticate against a different client id than that which is set in commons.",
-                    Error = ApiContracts.AuthSteps.ERR_ClientMismatch,
+                    Error = AuthSteps.ERR_ClientMismatch,
                     IsError = true,
-                    Result = ApiContracts.AuthSteps.LOGIN
+                    Result = AuthSteps.LOGIN
                 });
             }
 
@@ -199,9 +199,9 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
                 return Unauthorized(new OperationResult<string>()
                 {
                     Detail = "You must authenticate the cluster first.",
-                    Error = ApiContracts.AuthSteps.ERR_Authentication,
+                    Error = AuthSteps.ERR_Authentication,
                     IsError = true,
-                    Result = ApiContracts.AuthSteps.LOGIN
+                    Result = AuthSteps.LOGIN
                 });
             }
 
@@ -221,9 +221,9 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
                 return this.StatusCode(500, new OperationResult<string>()
                 {
                     Detail = $"Cannot authenticate because of cluster error: {instructions.Detail}",
-                    Error = ApiContracts.AuthSteps.ERR_Unexpected,
+                    Error = AuthSteps.ERR_Unexpected,
                     IsError = true,
-                    Result = ApiContracts.AuthSteps.LOGIN
+                    Result = AuthSteps.LOGIN
                 });
             }
 
@@ -275,8 +275,8 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
             {
                 return this.Unauthorized(new OperationResult<string>()
                 {
-                    Result = ApiContracts.AuthSteps.LOGIN,
-                    Error = ApiContracts.AuthSteps.ERR_Authentication,
+                    Result = AuthSteps.LOGIN,
+                    Error = AuthSteps.ERR_Authentication,
                     IsError = true,
                     Detail = $"Error during authentication: {operationResult.Error}"
                 });

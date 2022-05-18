@@ -54,6 +54,7 @@
 		</ItemGroup>
 	</Target>
 	<ItemGroup>
+    <ProjectReference Include="..\ClientUI.Shared\ClientUI.Shared.csproj" />
     <ProjectReference Include="..\ClusterClient\ClusterClient.csproj" />
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
   </ItemGroup>
@@ -64,6 +65,7 @@
   </ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Contracts\Contracts.csproj" />
+		<Folder Include="ApiContracts\" />
     	<Folder Include="ClientApp\src\app\portfolio\Models\" />
 		<Folder Include="ClientApp\src\app\authorize\Models\" />
 	</ItemGroup>
