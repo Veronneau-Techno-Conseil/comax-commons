@@ -5,7 +5,7 @@ using CommunAxiom.Commons.Client.Contracts.Portfolio;
 using Newtonsoft.Json.Linq;
 using Orleans.GrainDirectory;
 
-namespace CommunAxiom.Commons.ClientUI.Controllers
+namespace CommunAxiom.Commons.ClientUI.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

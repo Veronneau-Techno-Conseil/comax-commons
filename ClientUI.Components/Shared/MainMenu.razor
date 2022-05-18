@@ -1,0 +1,93 @@
+﻿@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+@using Microsoft.Extensions.Hosting
+@using Microsoft.Extensions.Localization
+@inject HttpClient _httpClient
+@inject NavigationManager _navigationManager
+@inject IAccessTokenService _accessTokenService
+@inject AuthenticationStateProvider _stateProvider
+@inject IStringLocalizer<MainMenu> _localizer
+@inject IJSRuntime JsRuntime
+@inject IHostEnvironment _environment
+
+<nav class="navbar is-white" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <NavLink class="navbar-item" href="/">
+                <img src="_content/ClientUI.Components/images/Commons.png" />
+                <strong>@_localizer["Commons"]</strong>
+            </NavLink>
+            <a role="button" @onclick="BurgerClick" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navMenuIndex">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div @ref=navMenuIndex id="navMenuIndex" class="navbar-menu">
+            <div class="navbar-start">
+                <AuthorizeView>
+                    <Authorized>
+                        <NavLink class="navbar-item" href="dashboard" Match="NavLinkMatch.All">
+                            @_localizer["Dashboard"]
+                        </NavLink>
+                    </Authorized>
+                </AuthorizeView>
+
+                @if (_environment.IsDevelopment())
+                {
+                    <NavLink class="navbar-item" href="test_grain" Match="NavLinkMatch.All">
+                        @_localizer["Test grains"]
+                    </NavLink>
+                }
+
+                <NavLink class="navbar-item" href="about" Match="NavLinkMatch.All">
+                    @_localizer["About"]                    
+                </NavLink>
+            </div>
+
+            <div class="navbar-end">
+                <AuthorizeView>
+                    <Authorized>
+                        <span class="navbar-item">
+                            @User?.Name
+                        </span>
+                        <a class="navbar-item" @onclick="Logout">
+                            <img alt="Log off" class="image is-32x32" src="https://djp65hxq6jm81.cloudfront.net/uploads/735de877-33df-42ce-a423-af091d396e7c/Logout.png" />
+                        </a>
+                    </Authorized>
+                    <NotAuthorized>
+                        <NavLink class="navbar-item" href="login" Match="NavLinkMatch.All">
+                            @_localizer["Log in"]
+                        </NavLink>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </div>
+</nav>
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthenticationState { get; set; } = null!;
+
+    ElementReference navMenuIndex;
+
+    public User? User { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationState;
+        this.User = await ((CustomAuthenticationStateProvider)_stateProvider).GetUserByJWTAsync();
+    }
+
+    private async Task Logout()
+    {
+        await _accessTokenService.RemoveAccessTokenAsync("jwt_token");
+        _navigationManager.NavigateTo("/", true);
+    }
+
+    private void BurgerClick()
+    {
+        
+    }
+}

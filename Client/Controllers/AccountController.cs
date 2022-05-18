@@ -5,7 +5,7 @@ using Orleans;
 using System;
 using System.Threading.Tasks;
 
-namespace CommunAxiom.Commons.ClientUI.Controllers
+namespace CommunAxiom.Commons.ClientUI.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

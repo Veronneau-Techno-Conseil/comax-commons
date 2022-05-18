@@ -1,4 +1,5 @@
 ﻿using CommunAxiom.Commons.Client.Contracts;
+using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Client.SiloShared.Conf;
 using CommunAxiom.Commons.Client.SiloShared.System;
 using Microsoft.Extensions.Configuration;
@@ -12,13 +13,13 @@ namespace CommunAxiom.Commons.Client.SiloShared
     {
         private bool _disposed;
         private IClusterManagement? clusterManagement;
-        private ICommonsClusterClient? commonsClusterClient;
-        private StreamSubscriptionHandle<SystemEvent> streamSubscriptionHandle;
+        private readonly ICommonsClientFactory clientFactory;
+        private (ICommonsClusterClient, StreamSubscriptionHandle<SystemEvent>) streamSubscriptionHandle;
         private readonly IConfiguration configuration;
-        public SystemListener(IClusterManagement clusterManagement, ICommonsClusterClient commonsClusterClient, IConfiguration configuration)
+        public SystemListener(IClusterManagement clusterManagement, ICommonsClientFactory clientFactory, IConfiguration configuration)
         {
             this.clusterManagement = clusterManagement;
-            this.commonsClusterClient = commonsClusterClient;
+            this.clientFactory = clientFactory;
             this.configuration = configuration;
         }
 
@@ -32,8 +33,7 @@ namespace CommunAxiom.Commons.Client.SiloShared
 
         public async Task Listen()
         {
-
-            streamSubscriptionHandle = await commonsClusterClient.SubscribeSystem(OnsystemEvent, OnSystemStreamError, OnCompleted);
+            streamSubscriptionHandle = await clientFactory.WithUnmanagedClient(cc=> cc.SubscribeSystem(OnsystemEvent, OnSystemStreamError, OnCompleted));
         }
 
         public async Task OnsystemEvent(SystemEvent systemEvent, StreamSequenceToken token)
@@ -41,7 +41,7 @@ namespace CommunAxiom.Commons.Client.SiloShared
             switch (systemEvent.Type)
             {
                 case SystemEventType.ClusterAuthenticationComplete:
-                    await this.commonsClusterClient.SetCredentials(configuration);
+                    await this.clientFactory.WithClusterClient(cl=> cl.SetCredentials(configuration));
                     await clusterManagement.SetSilo(Silos.Main);
                     break;
                 case SystemEventType.ClusterAuthenticationReset:
@@ -71,9 +71,11 @@ namespace CommunAxiom.Commons.Client.SiloShared
         {
             if (!this._disposed)
             {
-                await this.streamSubscriptionHandle.UnsubscribeAsync();
+                await this.streamSubscriptionHandle.Item2.UnsubscribeAsync();
+                await this.streamSubscriptionHandle.Item1.Close();
                 clusterManagement = null;
-                this.commonsClusterClient.Dispose();
+                this.streamSubscriptionHandle.Item1.Dispose();
+                this.streamSubscriptionHandle = (null, null);
                 this._disposed = true;
             }
         }

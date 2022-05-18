@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClientUI.Shared.Models
+namespace CommunAxiom.Commons.ClientUI.Shared.Models
 {
     public enum LoginType
     {

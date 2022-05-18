@@ -123,7 +123,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
                     ClientSecret = clientSecret,
                     LoadProfile = false,
                     RedirectUri = redirectUri,
-                    Scope = StandardScopes.OpenId,
+                    Scope = settings.Scopes,
                     Browser = this
                 };
 

@@ -1,4 +1,5 @@
 ﻿using CommunAxiom.Commons.Client.Contracts;
+using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Client.Contracts.Configuration;
 using Microsoft.Extensions.Configuration;
 using Orleans.Security;
