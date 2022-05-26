@@ -59,7 +59,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.JsonLocalizer
             var cultureInfo = CultureInfo.CurrentUICulture;
 
             var cultureName = cultureInfo.TwoLetterISOLanguageName;
-            var path = Path.Combine(ResourcesPath, $"{Name}-{cultureName}.json");
+            var path = Path.Combine(ResourcesPath, Name, $"{cultureName}.json");
 
             var fileInfo = FileProvider.GetFileInfo(path);
 

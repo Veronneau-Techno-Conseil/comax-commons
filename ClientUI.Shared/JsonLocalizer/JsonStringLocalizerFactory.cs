@@ -16,9 +16,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.JsonLocalizer
 
         public IStringLocalizer Create(Type resourceSource)
         {
-            var assembly = Assembly.GetEntryAssembly();
-
-            var resources = new EmbeddedFileProvider(assembly);
+            var resources = new EmbeddedFileProvider(resourceSource.Assembly);
             return new JsonStringLocalizer(resources, ResourcesPath, resourceSource.Name);
         }
 

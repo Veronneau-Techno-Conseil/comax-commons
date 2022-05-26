@@ -56,32 +56,6 @@ builder.Services.AddCors(option =>
 
 #region ConfigureServices
 
-builder.Services.AddLocalization(options =>
-{
-    options.ResourcesPath = "Resources";
-});
-
-CultureInfo[] supportedCultures = new[]
-           {
-            new CultureInfo("fr"),
-            new CultureInfo("en")
-        };
-
-builder.Services.Configure<RequestLocalizationOptions>(options =>
-{
-    options.DefaultRequestCulture = new RequestCulture("fr");
-    options.SupportedCultures = supportedCultures;
-    options.SupportedUICultures = supportedCultures;
-    options.RequestCultureProviders = new List<IRequestCultureProvider>
-                {
-                    new QueryStringRequestCultureProvider(),
-                    new CookieRequestCultureProvider()
-                };
-
-});
-
-builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
-
 
 // setting client host environment 
 builder.Services.AddSingleton<IHostEnvironment>(

@@ -25,6 +25,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\MainMenu\en.json" />
+    <EmbeddedResource Include="Resources\MainMenu\fr.json" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Update="Authentication\Login.resx">
       <Generator></Generator>
     </EmbeddedResource>
@@ -32,8 +36,18 @@
 
   <ItemGroup>
     <Folder Include="Helper\" />
+    <Folder Include="Resources\" />
+    <Folder Include="Resources\MainMenu\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="Resources\MainMenu\MainMenu-en.json" />
+    <Content Remove="Resources\MainMenu\MainMenu-fr.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\" />
+    <None Remove="Resources\MainMenu\" />
+  </ItemGroup>
 	<Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug'">
 		<!-- Ensure Node.js is installed -->
 		<Exec Command="node --version" ContinueOnError="true">
