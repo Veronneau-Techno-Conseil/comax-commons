@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Comax.Commons.Orchestrator.Conmtracts
+namespace Comax.Commons.Orchestrator.Contracts
 {
     public class Notification
     {

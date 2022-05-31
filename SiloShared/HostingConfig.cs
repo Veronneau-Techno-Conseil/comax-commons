@@ -110,7 +110,7 @@ namespace CommunAxiom.Commons.Client.SiloShared
             });
 
             services.AddLiteDbGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
-            services.AddLiteDbGrainStorage(PubSubStore);
+            services.AddWrappedLiteDbGrainStorage(PubSubStore);
 
             return services;
         }

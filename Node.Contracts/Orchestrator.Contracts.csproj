@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-	  <AssemblyName>Comax.Commons.Orchestrator.Conmtracts</AssemblyName>
-	  <RootNamespace>Comax.Commons.Orchestrator.Conmtracts</RootNamespace>
+	  <AssemblyName>Comax.Commons.Orchestrator.Contracts</AssemblyName>
+	  <RootNamespace>Comax.Commons.Orchestrator.Contracts</RootNamespace>
   </PropertyGroup>
 
 </Project>

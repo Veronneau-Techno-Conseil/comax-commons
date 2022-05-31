@@ -43,8 +43,14 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
                     _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
                 var msg = await _httpClient.GetAsync("authentication");
-
+                
                 var resString = await msg.Content.ReadAsStringAsync();
+
+                if (msg.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                {
+                    return new OperationResult<string> { IsError = true, Error = OperationResult.ERR_UNEXP_NULL, Detail = resString };
+                }
+
                 var res = Newtonsoft.Json.JsonConvert.DeserializeObject<OperationResult<string>>(resString);
 
                 return res ?? new OperationResult<string> { IsError = true, Error = OperationResult.ERR_UNEXP_NULL };

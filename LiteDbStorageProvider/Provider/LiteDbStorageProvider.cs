@@ -15,15 +15,14 @@ using System.Threading.Tasks;
 
 namespace Comax.Commons.StorageProvider
 {
-    internal class LiteDbStorageProvider : IGrainStorage, ILifecycleParticipant<ISiloLifecycle>
+    public class LiteDbStorageProvider : IGrainStorage, ILifecycleParticipant<ISiloLifecycle>
     {
-        internal static Dictionary<string, LiteDatabase> _dbs = new Dictionary<string, LiteDatabase>();
-        
+
         private readonly string _name;
         private LiteDatabase _db;
         private readonly ILogger<LiteDbStorageProvider> _logger;
         private readonly LiteDbConfig _cfg;
-        private ILiteCollection<GrainStorageModel> _grains;
+
         private ISerializationProvider _serializationProvider;
         private readonly IServiceProvider _serviceProvider;
 
@@ -35,53 +34,106 @@ namespace Comax.Commons.StorageProvider
             _serviceProvider = serviceProvider;
         }
 
-        private static string GetBlobName(string grainType, GrainReference grainId)
+        public static string GetBlobName(string grainType, GrainReference grainId)
         {
             return string.Format("{0}-{1}.json", grainType, grainId.ToKeyString());
         }
 
         public void Participate(ISiloLifecycle lifecycle)
         {
-            lifecycle.Subscribe(OptionFormattingUtilities.Name<LiteDbStorageProvider>(_name), 
+            lifecycle.Subscribe(OptionFormattingUtilities.Name<LiteDbStorageProvider>(_name),
                                     ServiceLifecycleStage.RuntimeInitialize, Init);
         }
-        public Task ClearStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
+        public async Task ClearStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
+
             var blobName = GetBlobName(grainType, grainReference);
-            var blob = _grains.Query().Where(x => x.ETag == blobName).FirstOrDefault();
-            if (blob != null)
+            var collection = await CreateLiteCollection(grainState.Type.Name);
+            var grain = collection.Query().Where(x => x["ETag"].AsString == blobName).FirstOrDefault();
+
+            if (grain != null)
             {
-                _grains.Delete(blob.Id);
+                collection.Delete(grain);
             }
-            return Task.CompletedTask;
         }
 
         public Task ReadStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
-            return Task.Run(() =>
+            //return Task.Run(() =>
+            //{
+            //    var blobName = GetBlobName(grainType, grainReference);
+            //    var blob = _grains.Query().Where(x => x.ETag == blobName).FirstOrDefault();
+            //    if (blob == null)
+            //        return;
+            //    grainState.State = _serializationProvider.Deserialize(blob.Contents, grainState.Type);
+            //    grainState.ETag = blob.ETag;
+            //});
+
+            return Task.Run(async () =>
             {
                 var blobName = GetBlobName(grainType, grainReference);
-                var blob = _grains.Query().Where(x => x.ETag == blobName).FirstOrDefault();
-                if (blob == null)
+                var collection = await CreateLiteCollection(grainState.Type.Name);
+                var grain = collection.Query().Where(x => x["ETag"].AsString == blobName).FirstOrDefault();
+                if (grain == null)
                     return;
-                grainState.State = _serializationProvider.Deserialize(blob.Contents, grainState.Type);
-                grainState.ETag = blob.ETag;
+
+                dynamic obj = BsonMapper.Global.Deserialize(typeof(GrainStorageModel<>).MakeGenericType(grainState.Type), grain);
+
+                grainState.State = obj.Contents;
+                grainState.ETag = obj.ETag;
             });
         }
 
         public Task WriteStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
-            return Task.Run(() =>
+            //return Task.Run(() =>
+            //{
+            //    var blobName = GetBlobName(grainType, grainReference);
+            //    var contents = _serializationProvider.Serialize(grainState.State);
+            //    var blob = _grains.Query().Where(x => x.ETag == blobName).FirstOrDefault();
+            //    if (blob == null)
+            //        blob = new GrainStorageModel() { ETag = blobName, Contents = contents };
+            //    else
+            //        blob.Contents = contents;
+
+            //    _grains.Upsert(blob);
+            //});
+
+            return Task.Run(async () =>
             {
                 var blobName = GetBlobName(grainType, grainReference);
-                var contents = _serializationProvider.Serialize(grainState.State);
-                var blob = _grains.Query().Where(x => x.ETag == blobName).FirstOrDefault();
-                if (blob == null)
-                    blob = new GrainStorageModel() { ETag = blobName, Contents = contents };
-                else 
-                    blob.Contents = contents;
+                var collection = await CreateLiteCollection(grainState.Type.Name);
+                var grain = collection.Query().Where(x => x["ETag"].AsString == blobName).FirstOrDefault();
+                object obj;
+                if (grain == null)
+                {
+                    obj = Activator.CreateInstance(typeof(GrainStorageModel<>).MakeGenericType(grainState.Type));
+                    Assign(obj, "Id", LiteDB.ObjectId.NewObjectId());
+                }
+                else
+                {
+                    obj = BsonMapper.Global.Deserialize(typeof(GrainStorageModel<>).MakeGenericType(grainState.Type), grain);
+                }
+                Assign(obj, "ETag", blobName);
+                Assign(obj, "Contents", grainState.State);
 
-                _grains.Upsert(blob);
+                var doc = BsonMapper.Global.Serialize(typeof(GrainStorageModel<>).MakeGenericType(grainState.Type), obj);
+                collection.Upsert(doc.AsDocument);
+            });
+        }
+
+        private void Assign(object o, string property, object value)
+        {
+            o.GetType().GetProperty(property).SetValue(o, value, null);
+        }
+
+        private async Task<ILiteCollection<BsonDocument>> CreateLiteCollection(string name)
+        {
+            return await Task.Run(() =>
+            {
+                var _grains = _db.GetCollection(name, BsonAutoId.ObjectId);
+                _grains.EnsureIndex(BsonExpression.Create("LOWER($.ETag)"), unique: true);
+                return _grains;
             });
         }
 
@@ -100,18 +152,8 @@ namespace Comax.Commons.StorageProvider
                     _serializationProvider.Configure(_cfg.SerializationConfig);
                 }
 
-                if (!_dbs.ContainsKey(_name))
-                {
-                    _db = new LiteDatabase(_name);
-                    await Task.Run(() => _grains = _db.GetCollection<GrainStorageModel>("grains"));
-                    _grains.EnsureIndex(x => x.ETag, unique: true);
-                    _dbs.Add(_name, _db);
-                }
-                else
-                {
-                    _db = _dbs[_name];
-                    await Task.Run(() => _grains = _db.GetCollection<GrainStorageModel>("grains"));
-                }
+                _db = Common.GetOrAdd(_name);
+
                 stopWatch.Stop();
                 _logger.LogInformation($"Initializing provider {_name} of type {this.GetType().Name} in stage { ServiceLifecycleStage.RuntimeInitialize } took {stopWatch.ElapsedMilliseconds} Milliseconds.");
             }
