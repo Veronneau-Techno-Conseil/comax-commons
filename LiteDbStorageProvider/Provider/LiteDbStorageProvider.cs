@@ -59,16 +59,6 @@ namespace Comax.Commons.StorageProvider
 
         public Task ReadStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
-            //return Task.Run(() =>
-            //{
-            //    var blobName = GetBlobName(grainType, grainReference);
-            //    var blob = _grains.Query().Where(x => x.ETag == blobName).FirstOrDefault();
-            //    if (blob == null)
-            //        return;
-            //    grainState.State = _serializationProvider.Deserialize(blob.Contents, grainState.Type);
-            //    grainState.ETag = blob.ETag;
-            //});
-
             return Task.Run(async () =>
             {
                 var blobName = GetBlobName(grainType, grainReference);
@@ -86,19 +76,6 @@ namespace Comax.Commons.StorageProvider
 
         public Task WriteStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
-            //return Task.Run(() =>
-            //{
-            //    var blobName = GetBlobName(grainType, grainReference);
-            //    var contents = _serializationProvider.Serialize(grainState.State);
-            //    var blob = _grains.Query().Where(x => x.ETag == blobName).FirstOrDefault();
-            //    if (blob == null)
-            //        blob = new GrainStorageModel() { ETag = blobName, Contents = contents };
-            //    else
-            //        blob.Contents = contents;
-
-            //    _grains.Upsert(blob);
-            //});
-
             return Task.Run(async () =>
             {
                 var blobName = GetBlobName(grainType, grainReference);
