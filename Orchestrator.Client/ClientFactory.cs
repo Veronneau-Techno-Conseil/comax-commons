@@ -1,5 +1,6 @@
-﻿using CommunAxiom.Commons.Client.Contracts;
-using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
+﻿using Comax.Commons.Orchestrator.Contracts;
+using Comax.Commons.Orchestrator.Contracts.ComaxSystem;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace ClusterClient
 {
-    public class ClientFactory : ICommonsClientFactory
+    public class ClientFactory : IOrchestratorClientFactory
     {
         private readonly IServiceProvider serviceProvider;
         private readonly IConfiguration configuration;
@@ -58,7 +59,7 @@ namespace ClusterClient
             }
         }
 
-        public async Task WithClusterClient(Func<ICommonsClusterClient, Task> action)
+        public async Task WithClusterClient(Func<IOrchestratorClient, Task> action)
         {
             Counter c = new Counter();
             var builder = GetBuilder();
@@ -70,7 +71,7 @@ namespace ClusterClient
                 await cl.Close();
             }
         }
-        public async Task<TResult> WithClusterClient<TResult>(Func<ICommonsClusterClient, Task<TResult>> action)
+        public async Task<TResult> WithClusterClient<TResult>(Func<IOrchestratorClient, Task<TResult>> action)
         {
             Counter c = new Counter();
             var builder = GetBuilder();
@@ -84,7 +85,7 @@ namespace ClusterClient
             }
         }
 
-        public async Task<ICommonsClusterClient> WithUnmanagedClient(Func<ICommonsClusterClient, Task> action)
+        public async Task<IOrchestratorClient> WithUnmanagedClient(Func<IOrchestratorClient, Task> action)
         {
             Counter c = new Counter();
             var builder = GetBuilder();
@@ -95,7 +96,7 @@ namespace ClusterClient
             return cl;
         }
 
-        public async Task<(ICommonsClusterClient, TResult)> WithUnmanagedClient<TResult>(Func<ICommonsClusterClient, Task<TResult>> action)
+        public async Task<(IOrchestratorClient, TResult)> WithUnmanagedClient<TResult>(Func<IOrchestratorClient, Task<TResult>> action)
         {
             Counter c = new Counter();
             var builder = GetBuilder();

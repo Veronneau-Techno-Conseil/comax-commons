@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

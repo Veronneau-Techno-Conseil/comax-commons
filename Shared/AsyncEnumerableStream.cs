@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CommunAxiom.Commons.Client.Contracts
+namespace CommunAxiom.Commons.Shared
 {
     public class AsyncEnumerableStream<TResult> : IAsyncObserver<TResult>, IAsyncEnumerable<TResult>, IAsyncEnumerator<TResult>
     {

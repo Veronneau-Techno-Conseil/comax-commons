@@ -1,5 +1,4 @@
 ﻿using Comax.Commons.StorageProvider.Hosting;
-using CommunAxiom.Commons.Client.Contracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,14 +15,19 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using CommunAxiom.Commons.Client.SiloShared.System;
+using Comax.Commons.Orchestrator.Contracts;
 
-namespace CommunAxiom.Commons.Client.SiloShared
+namespace Comax.Commons.Orchestrator
 {
     public static class HostingConfig
     {
         const string PubSubStore = "PubSubStore";
 
+        /// <summary>
+        /// Kickstarts and maintains the silo
+        /// </summary>
+        /// <param name="sc"></param>
+        /// <returns></returns>
         public static IServiceCollection SetServerServices(this IServiceCollection sc)
         {
             sc.AddHostedService<HeartbeatService>();
@@ -64,7 +68,7 @@ namespace CommunAxiom.Commons.Client.SiloShared
         public static ISiloHostBuilder SetEndPoints(this ISiloHostBuilder siloHostBuilder)
         {
             // the silo port was modified from the default because the option range for that port falls in an unauthorized range
-            siloHostBuilder.ConfigureEndpoints(siloPort: 7717, gatewayPort: 30000);
+            siloHostBuilder.ConfigureEndpoints(siloPort: 7718, gatewayPort: 30001);
             // TODO: use configuration to set the IP Address
             siloHostBuilder.Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback);
             return siloHostBuilder;
@@ -86,7 +90,7 @@ namespace CommunAxiom.Commons.Client.SiloShared
             siloHostBuilder.Configure<ClusterOptions>(options =>
              {
                  options.ClusterId = "0.0.1-a1";
-                 options.ServiceId = "CommonsClientCluster";
+                 options.ServiceId = "OrchestratorCluster";
              })
             .ConfigureLogging(logging => logging.AddConsole());
             return siloHostBuilder;
