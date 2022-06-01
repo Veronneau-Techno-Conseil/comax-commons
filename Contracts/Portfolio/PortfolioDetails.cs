@@ -8,9 +8,10 @@ namespace CommunAxiom.Commons.Client.Contracts.Portfolio
     {
         public const string PROJECT = "Project";
         public const string DATABASE = "Database";
-        public string PortfolioID { get; set; }
-        public string PortfolioName { get; set; }
-        public IEnumerable<PortfolioAssociations> AssociatedPortfolios { get; set; }
-
+        public string ID { get; set; }
+        public string Type { get; set; }
+        public string Name { get; set; }
+        public string ParentId { get; set; }
+        //public IEnumerable<PortfolioAssociations> AssociatedPortfolios { get; set; }
     }
 }

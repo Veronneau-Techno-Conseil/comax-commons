@@ -2,8 +2,13 @@
 using Orleans;
 using System.Threading.Tasks;
 using CommunAxiom.Commons.Client.Contracts.Portfolio;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 using Orleans.GrainDirectory;
+using System.Collections.Generic;
+using System.Text.Json.Nodes;
+using Newtonsoft.Json.Linq;
+using System.Reflection;
+using System;
 
 namespace CommunAxiom.Commons.ClientUI.Controllers
 {
@@ -19,43 +24,33 @@ namespace CommunAxiom.Commons.ClientUI.Controllers
             _clusterClient = clusterClient;
         }
 
-        [HttpGet("Get/{GrainId}")]
-        public async Task<IActionResult> Get(string GrainId)
-        {
-            var portfolio = _clusterClient.GetGrain<IPortfolio>(GrainId);
-            var result = await portfolio.TestGrain(GrainId);
-            if (!await portfolio.IsSet()) {
-                var portfolioDetails = new PortfolioDetails
-                {
-                    PortfolioID = GrainId,
-                    PortfolioName = GrainId + "-name"
-                };
-                await portfolio.CreatePortfolio(portfolioDetails);
-            }
-            
-            return Ok(result);
-        }
-
         [HttpPost("create/{GrainId}")]
-        public async Task<IActionResult> CreatePortfolio(string GrainId, [FromBody] object Portfolio)
+        public async Task<IActionResult> CreatePortfolio([FromBody] object Portfolio)
         {
+            //if not created, create the portfolios grain
+            if (!await _clusterClient.GetGrain<IPortfolio>("Portfolios").ListIsSet())
+            {
+                await _clusterClient.GetGrain<IPortfolio>("Portfolios").CreatePortfoliosList();
+            }
+
+            //set the portfolio ready and extract the details
             var PortfolioJSON = JObject.Parse(Portfolio.ToString());
 
             var PortfolioDetails = new PortfolioDetails
             {
-                PortfolioID = PortfolioJSON["PortfolioID"].ToString(),
-                PortfolioName = PortfolioJSON["PortfolioName"].ToString()
+                ID = PortfolioJSON["ID"].ToString(),
+                Name = PortfolioJSON["Name"].ToString(),
+                Type = PortfolioJSON["Type"].ToString(),
+                ParentId = PortfolioJSON["ParentId"].ToString()
             };
 
-            var result = await _clusterClient.GetGrain<IPortfolio>(GrainId).CreatePortfolio(PortfolioDetails);
+            //Add the portfolio created to the existing portfolioList
+            await _clusterClient.GetGrain<IPortfolio>("Portfolios").AddAPortfolio(PortfolioDetails);
 
-            return Ok(result);
-        }
+            //Get the updated List
+            var PortfoliosFinalList = await _clusterClient.GetGrain<IPortfolio>("Portfolios").GetListDetails();
 
-        [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAll()
-        {
-            return Ok();
+            return Ok(PortfoliosFinalList.Portfolios);
         }
     }
 }
