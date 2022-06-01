@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json.Linq;
 
 namespace CommunAxiom.Commons.Client.IO
 {
@@ -10,7 +6,7 @@ namespace CommunAxiom.Commons.Client.IO
     {
         public void Tester()
         {
-            var jo = new Newtonsoft.Json.Linq.JObject();
+            var jo = new JObject();
             //jo.
         }
     }
