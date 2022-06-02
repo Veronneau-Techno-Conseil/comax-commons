@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+	  <AssemblyName>Comax.Commons.Orchestrator.Client</AssemblyName>
+	  <RootNamespace>Comax.Commons.Orchestrator.Client</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>

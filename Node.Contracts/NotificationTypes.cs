@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Node.Contracts
+namespace Comax.Commons.Orchestrator.Contracts
 {
     public static class NOTIFICATION_TYPES
     {

@@ -5,7 +5,7 @@ using Orleans.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Comax.Commons.Orchestrator.Contracts.ComaxSystem;
 
-namespace ClusterClient
+namespace Comax.Commons.Orchestrator.Client
 {
     public static class ClientExtensions
     {

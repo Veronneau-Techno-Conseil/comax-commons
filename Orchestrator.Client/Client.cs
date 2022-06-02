@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClusterClient
+namespace Comax.Commons.Orchestrator.Client
 {
     public class Client : IOrchestratorClient, IDisposable
     {

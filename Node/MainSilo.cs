@@ -1,6 +1,6 @@
 ﻿
 using Comax.Commons.Orchestrator.Contracts.Mailbox;
-using MailboxGrain;
+using Comax.Commons.Orchestrator.MailboxGrain;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;

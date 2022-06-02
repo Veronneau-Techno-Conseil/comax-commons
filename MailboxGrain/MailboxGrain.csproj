@@ -2,8 +2,8 @@
 
   <PropertyGroup>
 	  <TargetFramework>netstandard2.1</TargetFramework>
-	  <AssemblyName>CommunAxiom.Commons.Client.Grains.AccountGrain</AssemblyName>
-	  <RootNamespace>CommunAxiom.Commons.Client.Grains.AccountGrain</RootNamespace>
+	  <AssemblyName>Comax.Commons.Orchestrator.MailboxGrain</AssemblyName>
+	  <RootNamespace>Comax.Commons.Orchestrator.MailboxGrain</RootNamespace>
 	   <LangVersion>10.0</LangVersion>
   </PropertyGroup>
 

@@ -2,7 +2,7 @@
 using Orleans;
 using System.Threading.Tasks;
 
-namespace MailboxGrain
+namespace Comax.Commons.Orchestrator.MailboxGrain
 {
     public class Mailbox : Grain, IMailbox
     {
