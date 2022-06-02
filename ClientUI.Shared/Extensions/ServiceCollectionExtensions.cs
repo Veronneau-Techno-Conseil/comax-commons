@@ -1,8 +1,10 @@
 ﻿using Blazored.LocalStorage;
 using Blazored.Toast;
-using ClientUI.Client;
-using ClientUI.Shared.Logging;
-using ClientUI.Shared.Models;
+using CommunAxiom.Commons.ClientUI.Shared.Logging;
+using CommunAxiom.Commons.ClientUI.Shared.Models;
+using CommunAxiom.Commons.ClientUI.Shared.Services;
+using CommunAxiom.Commons.ClientUI.Shared.ViewModels;
+using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,7 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClientUI.Shared.Extensions
+namespace CommunAxiom.Commons.ClientUI.Shared.Extensions
 {
     public static class ServiceCollectionExtensions
     {
@@ -26,9 +28,11 @@ namespace ClientUI.Shared.Extensions
             // authetication & authorization
             services.AddOptions();
             services.AddAuthorizationCore();
+            services.AddLocalization();
+            
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-            //services.AddScoped<IAccessTokenService, WebAppAccessTokenService>();
-
+            services.AddScoped<IAccessTokenService, WebAppAccessTokenService>();
+            
             // configuring http clients
             services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(applicationSettings.BaseAddress) });
 
@@ -41,7 +45,7 @@ namespace ClientUI.Shared.Extensions
             //services.AddHttpClient<IAssignRolesViewModel, AssignRolesViewModel>("AssignRolesViewModel", clientConfigurator);
 
             //// authentication http clients
-            //services.AddHttpClient<ILoginViewModel, LoginViewModel>("LoginViewModelClient", clientConfigurator);
+            services.AddHttpClient<ISessionViewModel, SessionViewModel>("LoginViewModelClient", clientConfigurator);
             //services.AddHttpClient<IRegisterViewModel, RegisterViewModel>("RegisterViewModelClient", clientConfigurator);
 
             // logging
@@ -52,6 +56,8 @@ namespace ClientUI.Shared.Extensions
             services.AddSingleton<ILoggerProvider, ApplicationLoggerProvider>();
             services.AddHttpClient("LoggerJob", c => c.BaseAddress = new Uri(applicationSettings.BaseAddress));
             services.AddSingleton<LoggerJob>();
+
+            services.AddScoped<IStdMessagesService, StdMessageService>();
 
             return services;
         }

@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CommunAxiom.Commons.ClientUI.Helper
+namespace CommunAxiom.Commons.ClientUI.Server.Helper
 {
     public class SystemBrowser : IBrowser
     {

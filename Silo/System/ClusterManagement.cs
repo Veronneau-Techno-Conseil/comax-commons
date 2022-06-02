@@ -1,4 +1,5 @@
 ﻿using CommunAxiom.Commons.Client.Contracts;
+using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Client.SiloShared;
 using CommunAxiom.Commons.Client.SiloShared.Conf;
 using CommunAxiom.Commons.Client.SiloShared.System;
@@ -31,8 +32,8 @@ namespace CommunAxiom.Commons.Client.Silo.System
             {
                 if(CurrentSilo != Silos.Main)
                 {
-                    var client = serviceProvider.GetService<ICommonsClusterClient>();
-                    await client.SetCredentials(configuration);
+                    var client = serviceProvider.GetService<ICommonsClientFactory>();
+                    await client.WithClusterClient(cc=>cc.SetCredentials(configuration));
                     logger.LogInformation("Service auth already set, switching to main silo");
                 }
                 await SetSilo(Silos.Main);
@@ -86,14 +87,14 @@ namespace CommunAxiom.Commons.Client.Silo.System
                     break;
             }
 
-            systemListener = new SystemListener(this, serviceProvider.GetRequiredService<ICommonsClusterClient>(), serviceProvider.GetRequiredService<IConfiguration>());
+            systemListener = new SystemListener(this, serviceProvider.GetRequiredService<ICommonsClientFactory>(), serviceProvider.GetRequiredService<IConfiguration>());
             await systemListener.Listen();
         }
 
         public async Task<bool> IsServiceAuthSet()
         {
-            var client = serviceProvider.GetService<ICommonsClusterClient>();
-            var state = await client.GetAccount().CheckState();
+            var client = serviceProvider.GetService<ICommonsClientFactory>();
+            var state = await client.WithClusterClient(cc=>cc.GetAccount().CheckState(false));
             return state == Contracts.Account.AccountState.CredentialsSet;
         }
 

@@ -40,5 +40,10 @@ namespace Comax.Commons.StorageProvider.Hosting
             services.AddSingletonNamedService<ISerializationProvider, StdSerializationProvider>("standard");
             return services;
         }
+        public static IServiceCollection SetJSONLiteDbSerializationProvider(this IServiceCollection services)
+        {
+            services.AddSingletonNamedService<ISerializationProvider, NewtonsoftSerializationProvider>("standard");
+            return services;
+        }
     }
 }

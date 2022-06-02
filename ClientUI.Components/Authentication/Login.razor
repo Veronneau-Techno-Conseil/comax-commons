@@ -1,0 +1,130 @@
+﻿@page "/Login"
+@page "/{RegisterRedirect:bool}"
+@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+@using Microsoft.Extensions.Options
+@using Microsoft.Extensions.Localization
+
+@inject ISessionViewModel _loginViewModel
+@inject NavigationManager _navigationManager
+@inject IToastService _toastService
+@inject IAccessTokenService _accessTokenService
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject IOptions<ApplicationSettings> _applicationSettings
+@inject IStringLocalizer<Login> _localizer
+
+
+<SpinLoader IsLoading="IsLoading">
+    <LoadingTemplate>
+        <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
+            <br /><br />
+            <Chase Center="true" Color="blue" Size="70px" ></Chase>
+        </div>
+    </LoadingTemplate>
+    <ContentTemplate>
+        <div class="level">
+            <div class="level-item">
+                <div class="card w-25">
+                    <div class="card-header">
+                        <div class="card-header-icon">
+                            <img class="image is-48x48" src="_content/ClientUI.Components/images/Comax.png" />
+                        </div>
+                        <div class="card-header-title">
+                            <p class="title is-4">
+                                Commun Axiom
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <EditForm Model="@_loginViewModel" OnValidSubmit="@AuthenticateJWT">
+                            @if (AuthenticateCluster)
+                            {
+                                <h4>@_localizer["authenticate"]</h4>
+                                <ValidationSummary class="help is-danger"></ValidationSummary>
+                                <div class="field">
+                                    <label>@_localizer["ClientId"]</label>
+                                    <input id="input_clientId" @onkeypress="OnKeyPress" type="text" @bind="_loginViewModel.ClientId" class="input is-primary" placeholder="clientid">                                
+                                    <span asp-validation-for="Email" class="help is-danger"><ValidationMessage For="@(()=>_loginViewModel.ClientId)"></ValidationMessage></span>
+                                </div>
+                                <div class="field">
+                                    <label>@_localizer["Secret"]</label>
+                                    <input id="input_clientId" @onkeypress="OnKeyPress" type="text" @bind="_loginViewModel.Secret" class="input is-primary" placeholder="secret">                                
+                                    <span asp-validation-for="Email" class="help is-danger"><ValidationMessage For="@(()=>_loginViewModel.ClientId)"></ValidationMessage></span>
+                                </div>
+                            }
+                            else
+                            {
+                                <h4>@_localizer["signin"]</h4>    
+                                <br />
+                            }
+                            <div class="field level evenly">
+                                <button type="submit" class="button is-link">@_localizer["Log in"]</button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </ContentTemplate>
+</SpinLoader>
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthenticationState { get; set; } = null!;
+
+    [Parameter]
+    public bool RegisterRedirect { get; set; }
+
+    private bool IsLoading { get; set; }
+
+    private bool AuthenticateCluster{ get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationState;
+
+        if (authState.User.Identity is { IsAuthenticated: true })
+        {
+            _navigationManager.NavigateTo("/");
+        }
+
+        var state = await _loginViewModel.GetState();
+        switch (state.Result)
+        {
+            case AuthSteps.Reset:
+            case AuthSteps.AuthApi:
+                AuthenticateCluster = true;
+                break;
+            default:
+                AuthenticateCluster = false;
+                break;
+        }
+    }
+
+    private async Task OnKeyPress(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+            await AuthenticateJWT();
+    }
+
+    private async Task AuthenticateJWT()
+    {
+        IsLoading = true;
+
+        var authenticationResponse = await _loginViewModel.Login();
+        if (authenticationResponse != null)
+        {
+            await ((CustomAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated();
+            
+            if(_applicationSettings.Value.UIFramework == "Server")
+                _navigationManager.NavigateTo("/");
+            else
+                _navigationManager.NavigateTo("/", true);
+        }
+        else
+        {
+            _toastService.ShowError("Invalid username or password");
+        }
+        IsLoading = false;
+    }
+}

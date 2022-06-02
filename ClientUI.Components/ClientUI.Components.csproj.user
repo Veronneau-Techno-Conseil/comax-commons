@@ -3,4 +3,9 @@
   <PropertyGroup>
     <ActiveDebugProfile>IIS Express</ActiveDebugProfile>
   </PropertyGroup>
+  <ItemGroup>
+    <None Update="assets\ts\site.ts">
+      <SubType>Code</SubType>
+    </None>
+  </ItemGroup>
 </Project>

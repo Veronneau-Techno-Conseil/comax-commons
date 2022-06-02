@@ -7,14 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClientUI.Shared.Services
+namespace CommunAxiom.Commons.ClientUI.Shared.Services
 {
     public class StdMessageService : IStdMessagesService
     {
         IStringLocalizer _stringLocalizer;
         IToastService _toastService;
 
-        public StdMessageService(IStringLocalizer stringLocalizer, IToastService toastService)
+        public StdMessageService(IStringLocalizer<StdMessageService> stringLocalizer, IToastService toastService)
         {
             _stringLocalizer = stringLocalizer;
             _toastService = toastService;

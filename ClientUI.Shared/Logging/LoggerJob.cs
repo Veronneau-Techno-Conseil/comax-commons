@@ -2,9 +2,9 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using ClientUI.Shared.Logging;
+using CommunAxiom.Commons.ClientUI.Shared.Logging;
 
-namespace ClientUI.Shared.Logging;
+namespace CommunAxiom.Commons.ClientUI.Shared.Logging;
 
 public class LoggerJob
 {

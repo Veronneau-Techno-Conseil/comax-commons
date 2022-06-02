@@ -1,7 +1,7 @@
 ﻿using Microsoft.JSInterop;
 using System.Threading.Tasks;
 
-namespace ClientUI.Shared.Services
+namespace CommunAxiom.Commons.ClientUI.Shared.Services
 {
     public class WebAppAccessTokenService : IAccessTokenService
     {

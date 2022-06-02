@@ -12,6 +12,6 @@ namespace CommunAxiom.Commons.Client.Contracts.Account
         Task Initialize(AccountDetails accountDetails);
         Task<Stream> EncryptStream(Stream data);
         Task<AccountDetails> GetDetails();
-        Task<AccountState> CheckState(string clientIdRef = null);
+        Task<AccountState> CheckState(bool forceRefresh, string clientIdRef = null);
     }
 }

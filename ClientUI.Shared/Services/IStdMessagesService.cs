@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClientUI.Shared.Services
+namespace CommunAxiom.Commons.ClientUI.Shared.Services
 {
     public interface IStdMessagesService
     {

@@ -95,7 +95,7 @@ namespace CommunAxiom.Commons.Client.SiloShared
         public static IServiceCollection SetStorage(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOptions();
-            services.SetDefaultLiteDbSerializationProvider();
+            services.SetJSONLiteDbSerializationProvider();
             services.Configure<LiteDbConfig>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, configuration.GetSection("LiteDbStorage"));
             services.Configure<LiteDbConfig>(PubSubStore, configuration.GetSection(PubSubStore));
 

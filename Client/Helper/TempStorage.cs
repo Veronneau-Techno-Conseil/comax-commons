@@ -1,7 +1,7 @@
-﻿using ClientUI.Shared.Models;
+﻿using CommunAxiom.Commons.ClientUI.Shared.Models;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace CommunAxiom.Commons.ClientUI.Helper
+namespace CommunAxiom.Commons.ClientUI.Server.Helper
 {
     public interface ITempData
     {

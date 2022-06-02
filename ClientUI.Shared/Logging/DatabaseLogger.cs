@@ -1,12 +1,12 @@
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
-using ClientUI.Shared.Logging;
-using ClientUI.Shared.Models;
+using CommunAxiom.Commons.ClientUI.Shared.Logging;
+using CommunAxiom.Commons.ClientUI.Shared.Models;
 using Microsoft.Extensions.Logging;
 using static Microsoft.Extensions.Logging.LogLevel;
 
-namespace ClientUI.Shared.Logging
+namespace CommunAxiom.Commons.ClientUI.Shared.Logging
 {
     public class DatabaseLogger : ILogger
     {

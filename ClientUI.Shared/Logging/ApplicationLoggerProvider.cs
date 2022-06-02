@@ -1,7 +1,7 @@
-using ClientUI.Shared.Logging;
+using CommunAxiom.Commons.ClientUI.Shared.Logging;
 using Microsoft.Extensions.Logging;
 
-namespace ClientUI.Shared.Logging
+namespace CommunAxiom.Commons.ClientUI.Shared.Logging
 {
     public sealed class ApplicationLoggerProvider : ILoggerProvider
     {

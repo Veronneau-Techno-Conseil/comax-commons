@@ -10,6 +10,10 @@ namespace CommunAxiom.Commons.Client.Contracts.Account
         public string DisplayName { get; set; }
         public string ClientID { get; set; }
         public string ClientSecret { get; set; }
-        public string AccountsToken { get; set; }
+        public string AccessToken { get; set; }
+        public string RefreshToken { get; set; }
+        public DateTime? NextRefresh { get; set; }
+        public DateTime? LastRefresh { get; set; }
+        public AccountState State { get; set; }
     }
 }

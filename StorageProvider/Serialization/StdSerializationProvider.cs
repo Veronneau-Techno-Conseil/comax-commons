@@ -23,9 +23,9 @@ namespace Comax.Commons.StorageProvider.Serialization
             
         }
 
-        public object Deserialize(byte[] obj)
+        public object Deserialize(byte[] obj, Type t)
         {
-            return _serializationManager.DeserializeFromByteArray<object>(obj);
+            return _serializationManager.DeserializeFromByteArray(obj, t);
         }
 
         public byte[] Serialize(object obj)
