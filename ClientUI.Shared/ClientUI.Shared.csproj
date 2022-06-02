@@ -38,16 +38,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Services\StdMessageService.resx">
-      <Generator></Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="ViewModels\LoginViewModel.resx">
-      <Generator></Generator>
-    </EmbeddedResource>
+    <None Remove="JsonLocalizer\" />
+    <None Remove="Microsoft.Extensions.FileProviders.Embedded" />
+    <None Remove="Resources\LoginViewModel\en.json" />
+    <None Remove="Resources\LoginViewModel\fr.json" />
+    <None Remove="Resources\StdMessageService\en.json" />
+    <None Remove="Resources\StdMessageService\fr.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="JsonLocalizer\" />
-    <None Remove="Microsoft.Extensions.FileProviders.Embedded" />
+    <EmbeddedResource Include="Resources\LoginViewModel\en.json" />
+    <EmbeddedResource Include="Resources\LoginViewModel\fr.json" />
+    <EmbeddedResource Include="Resources\StdMessageService\en.json" />
+    <EmbeddedResource Include="Resources\StdMessageService\fr.json" />
   </ItemGroup>
 </Project>
