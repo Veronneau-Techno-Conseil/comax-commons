@@ -85,8 +85,8 @@ namespace CommunAxiom.Commons.Client.SiloShared
         {
             siloHostBuilder.Configure<ClusterOptions>(options =>
              {
-                 options.ClusterId = "dev";
-                 options.ServiceId = "OrleansBasics";
+                 options.ClusterId = "0.0.1-a1";
+                 options.ServiceId = "CommonsClientCluster";
              })
             .ConfigureLogging(logging => logging.AddConsole());
             return siloHostBuilder;
@@ -110,7 +110,7 @@ namespace CommunAxiom.Commons.Client.SiloShared
             });
 
             services.AddLiteDbGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
-            services.AddLiteDbGrainStorage(PubSubStore);
+            services.AddWrappedLiteDbGrainStorage(PubSubStore);
 
             return services;
         }

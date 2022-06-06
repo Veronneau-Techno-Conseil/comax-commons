@@ -49,6 +49,8 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.SetStorage(conf);
 
                     //register singleton services for each grain/interface
+                    services.AddScoped<AccountRepo, AccountRepo>();
+                    services.AddScoped<AccountBusiness, AccountBusiness>();
                     services.AddSingleton<IAccount, Accounts>();
                     services.AddSingleton<IAuthentication, AuthenticationWorker>();
                     services.AddSingleton<IDataset, Dataset>();

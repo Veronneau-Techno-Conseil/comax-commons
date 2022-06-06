@@ -27,6 +27,8 @@ namespace CommunAxiom.Commons.Client.Silo
                 .ConfigureServices(services =>
                 {
                     services.SetStorage(conf);
+                    services.AddScoped<AccountRepo, AccountRepo>();
+                    services.AddScoped<AccountBusiness, AccountBusiness>();
                     services.AddSingleton<IAccount, Accounts>();
                     services.AddSingleton<IAuthentication, AuthenticationWorker>();
 

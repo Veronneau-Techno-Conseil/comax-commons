@@ -168,6 +168,8 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
             //Ensure state is valid
             return await clusterClient.WithClusterClient(async cc =>
             {
+                try
+                {
                 var act = cc.GetAccount();
                 var state = await act.CheckState(false, auth.ClientId);
 
@@ -189,6 +191,17 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
                 var instructions = await authSvc.LaunchServiceAuthentication(auth.ClientId, auth.ClientSecret, redirectUri);
 
                 return await CompleteAuthentication(cc, authSvc, instructions, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    return Ok(new OperationResult<string>()
+                    {
+                        Detail = ex.Message,
+                        Error = AuthSteps.ERR_Unexpected,
+                        IsError = true,
+                        Result = AuthSteps.ERR_Unexpected
+                    });
+                }
             });
         }
 
