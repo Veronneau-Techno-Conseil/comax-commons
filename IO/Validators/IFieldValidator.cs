@@ -24,6 +24,8 @@ namespace CommunAxiom.Commons.Ingestion.Validators
         /// <param name="configuration"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        ValidationError Validate(DataSourceConfiguration configuration, JToken field);
+        ValidationError Validate(DataSourceConfiguration configuration);
     }
+
+  
 }

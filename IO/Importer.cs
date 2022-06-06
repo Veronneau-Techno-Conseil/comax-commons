@@ -4,22 +4,22 @@ using CommunAxiom.Commons.Ingestion.Ingestor;
 
 namespace CommunAxiom.Commons.Ingestion
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public static class Importer
+    public class Importer
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sourceType"></param>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        public static IngestorResult Import(DataSourceType sourceType, DataSourceConfiguration config)
+        private readonly ISourceFactory _sourceFactory;
+        private readonly IngestorFactory _ingestionFactory;
+
+        public Importer(ISourceFactory sourceFactory, IngestorFactory ingestorFactory)
         {
-            var dataSourceReader = SourceFactory.Create(sourceType);
+            _sourceFactory = sourceFactory;
+            _ingestionFactory = ingestorFactory;
+        }
+
+        public IngestorResult Import(DataSourceType sourceType, DataSourceConfiguration config)
+        {
+            var dataSourceReader = _sourceFactory.Create(sourceType);
             var stream = dataSourceReader.ReadData();
-            var ingestor = IngestorFactory.Create(dataSourceReader.IngestionType);
+            var ingestor = _ingestionFactory.Create(dataSourceReader.IngestionType);
             return ingestor.Parse(stream);
         }
     }

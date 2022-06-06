@@ -43,6 +43,11 @@ namespace CommunAxiom.Commons.Ingestion.Configuration
         /// This represents the expected index of the value (should be used for instance on ordered column CSVs and array parsing)
         /// </summary>
         public int? Index { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Value { get; set; }
     }
 
 }
