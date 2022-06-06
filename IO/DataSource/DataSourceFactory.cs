@@ -4,18 +4,18 @@ using CommunAxiom.Commons.Ingestion.Configuration;
 
 namespace CommunAxiom.Commons.Ingestion.DataSource
 {
-    public class SourceFactory : ISourceFactory
+    public class DataSourceFactory : IDataSourceFactory
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public SourceFactory(IServiceProvider serviceProvider)
+        public DataSourceFactory(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
         public IDataSourceReader Create(DataSourceType sourceType)
         {
-            var type = Assembly.GetAssembly(typeof(SourceFactory)).GetTypes()
+            var type = Assembly.GetAssembly(typeof(DataSourceFactory)).GetTypes()
                 .FirstOrDefault(type => Attribute.IsDefined(type, typeof(DataSourceTypeAttribute)) &&
                                 type.GetCustomAttribute<DataSourceTypeAttribute>().DataSourceType == sourceType);
 

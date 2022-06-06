@@ -19,7 +19,7 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
             services.AddTransient<IIngestor, JsonIngestor>();
 
             // factories
-            services.AddTransient<ISourceFactory, SourceFactory>();
+            services.AddTransient<IDataSourceFactory, DataSourceFactory>();
             services.AddTransient<IIngestionFactory, IngestorFactory>();
 
             // validations

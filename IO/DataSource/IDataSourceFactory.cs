@@ -2,7 +2,7 @@
 
 namespace CommunAxiom.Commons.Ingestion.DataSource
 {
-    public interface ISourceFactory
+    public interface IDataSourceFactory
     {
         IDataSourceReader Create(DataSourceType sourceType);
     }

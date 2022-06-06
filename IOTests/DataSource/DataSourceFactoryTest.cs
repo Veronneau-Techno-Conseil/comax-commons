@@ -9,12 +9,12 @@ using Microsoft.Extensions.DependencyInjection;
 namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
 {
     [TestFixture]
-    public class SourceFactoryTest
+    public class DataSourceFactoryTest
     {
         private MockRepository _mockRepository;
         private Mock<IServiceProvider> _serviceProvider;
 
-        private SourceFactory _sourceFactory;
+        private DataSourceFactory _sourceFactory;
 
         [SetUp]
         public void SetUp()
@@ -24,7 +24,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
 
             SetupMock();
 
-            _sourceFactory = new SourceFactory(_serviceProvider.Object);
+            _sourceFactory = new DataSourceFactory(_serviceProvider.Object);
         }
 
         [TearDown]

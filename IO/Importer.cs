@@ -6,10 +6,10 @@ namespace CommunAxiom.Commons.Ingestion
 {
     public class Importer
     {
-        private readonly ISourceFactory _sourceFactory;
+        private readonly IDataSourceFactory _sourceFactory;
         private readonly IngestorFactory _ingestionFactory;
 
-        public Importer(ISourceFactory sourceFactory, IngestorFactory ingestorFactory)
+        public Importer(IDataSourceFactory sourceFactory, IngestorFactory ingestorFactory)
         {
             _sourceFactory = sourceFactory;
             _ingestionFactory = ingestorFactory;
