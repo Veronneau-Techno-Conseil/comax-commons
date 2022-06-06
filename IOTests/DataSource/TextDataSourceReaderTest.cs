@@ -18,7 +18,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         {
             _mockRepository = new MockRepository(MockBehavior.Strict);
             _fieldValidatorLookup = _mockRepository.Create<IFieldValidatorLookup>();
-            _textDataSourceReader = new TextDataSourceReader();
+            _textDataSourceReader = new TextDataSourceReader(_fieldValidatorLookup.Object);
         }
 
         [SetUp]

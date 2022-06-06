@@ -15,9 +15,10 @@ namespace CommunAxiom.Commons.Ingestion
             _ingestionFactory = ingestorFactory;
         }
 
-        public IngestorResult Import(DataSourceType sourceType, DataSourceConfiguration config)
+        public IngestorResult Import(SourceConfig sourceConfig)
         {
-            var dataSourceReader = _sourceFactory.Create(sourceType);
+            var dataSourceReader = _sourceFactory.Create(sourceConfig.DataSourceType);
+            dataSourceReader.Setup(sourceConfig);
             var stream = dataSourceReader.ReadData();
             var ingestor = _ingestionFactory.Create(dataSourceReader.IngestionType);
             return ingestor.Parse(stream);

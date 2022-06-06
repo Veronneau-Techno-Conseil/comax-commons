@@ -5,6 +5,7 @@ using FluentAssertions;
 using System;
 using Moq;
 using Microsoft.Extensions.DependencyInjection;
+using CommunAxiom.Commons.Ingestion.Validators;
 
 namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
 {
@@ -13,6 +14,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
     {
         private MockRepository _mockRepository;
         private Mock<IServiceProvider> _serviceProvider;
+        private Mock<IFieldValidatorLookup> _fieldValidatorLookup;
 
         private DataSourceFactory _sourceFactory;
 
@@ -21,6 +23,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         {
             _mockRepository = new MockRepository(MockBehavior.Strict);
             _serviceProvider = _mockRepository.Create<IServiceProvider>();
+            _fieldValidatorLookup = _mockRepository.Create<IFieldValidatorLookup>();
 
             SetupMock();
 
@@ -36,7 +39,9 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         [Test]
         public void WhenDataSourceTypeIsFileThenSourceFactoryShouldCreateTextDataSourceReader()
         {
-            _serviceProvider.Setup(x => x.GetService(typeof(TextDataSourceReader))).Returns(new TextDataSourceReader());
+            var textDataSourceReader = new TextDataSourceReader(_fieldValidatorLookup.Object);
+
+            _serviceProvider.Setup(x => x.GetService(typeof(TextDataSourceReader))).Returns(textDataSourceReader);
 
             var reader = _sourceFactory.Create(DataSourceType.File);
             reader.Should().BeOfType<TextDataSourceReader>();
@@ -47,7 +52,9 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         public void WhenDataSourceTypeIsNotFoundThenSourceFactoryShouldThrowArgumentException()
         {
             var sourceType = DataSourceType.API;
-            _serviceProvider.Setup(x => x.GetService(typeof(TextDataSourceReader))).Returns(new TextDataSourceReader());
+            var textDataSourceReader = new TextDataSourceReader(_fieldValidatorLookup.Object);
+
+            _serviceProvider.Setup(x => x.GetService(typeof(TextDataSourceReader))).Returns(textDataSourceReader);
 
             Action act = () => _sourceFactory.Create(sourceType);
 

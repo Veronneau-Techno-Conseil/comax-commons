@@ -10,23 +10,18 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
     {
         private readonly IFieldValidatorLookup _fieldValidatorLookup;
 
+        private IEnumerable<DataSourceConfiguration> _dataSourceConfigurations;
+        public IEnumerable<DataSourceConfiguration> ConfigurationFields => _dataSourceConfigurations;
+
+        public IngestionType IngestionType => IngestionType.JSON;
+        public IEnumerable<FieldMetaData> DataDescription => throw new NotImplementedException();
+
+
         public TextDataSourceReader(IFieldValidatorLookup fieldValidatorLookup)
         {
             _fieldValidatorLookup = fieldValidatorLookup;
         }
 
-        public TextDataSourceReader()
-        {
-
-        }
-
-        public IngestionType IngestionType => IngestionType.JSON;
-
-        private IEnumerable<DataSourceConfiguration> _dataSourceConfigurations;
-
-        public IEnumerable<DataSourceConfiguration> ConfigurationFields => _dataSourceConfigurations;
-
-        public IEnumerable<FieldMetaData> DataDescription => throw new NotImplementedException();
 
         public Stream ReadData()
         {
@@ -34,7 +29,7 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 
             if (dataSourceConfiguration == null)
             {
-                throw new Exception("error");
+                throw new NullReferenceException("There is no data source configuration!");
             }
 
             var file = JsonConvert.DeserializeObject<Configuration.File>(dataSourceConfiguration.Value);
@@ -45,9 +40,14 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 
         }
 
-        public void Setup(SourceConfig sourceConfig = null)
+        public void Setup(SourceConfig? sourceConfig)
         {
-            throw new NotImplementedException();
+            List<DataSourceConfiguration> list = new List<DataSourceConfiguration>();
+            if (_dataSourceConfigurations != null)
+            {
+                list.AddRange(sourceConfig.Configurations.Select(x => x.Value));
+            }
+            _dataSourceConfigurations = list.ToArray();
         }
 
         public IEnumerable<ValidationError> ValidateConfiguration()
