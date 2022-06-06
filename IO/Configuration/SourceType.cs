@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CommunAxiom.Commons.Client.IO.Configuration
+﻿namespace CommunAxiom.Commons.Ingestion.Configuration
 {
-    public enum SourceType
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum IngestionType
     {
-        JsonTextFile = 0,
-        JSonHttpRequest = 1,
-        CSVTextFile = 2
+        /// <summary>
+        /// 
+        /// </summary>
+        JSON = 0,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        CSV = 1
     }
 }

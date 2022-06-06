@@ -1,14 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CommunAxiom.Commons.Client.IO.Configuration
+﻿namespace CommunAxiom.Commons.Ingestion.Configuration
 {
-    public class Metadata
+    /// <summary>
+    /// 
+    /// </summary>
+    public class SourceConfig
     {
-        public Dictionary<string, FieldMetadata> Fields { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public Dictionary<string, DataSourceConfiguration> Configurations { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        DataSourceType DataSourceType { get; }
     }
 }

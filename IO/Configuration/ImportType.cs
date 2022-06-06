@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CommunAxiom.Commons.Client.IO.Configuration
+﻿namespace CommunAxiom.Commons.Ingestion.Configuration
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public enum ImportType
     {
+        /// <summary>
+        /// 
+        /// </summary>
         Json = 0
     }
 }

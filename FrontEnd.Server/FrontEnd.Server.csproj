@@ -8,6 +8,7 @@
 	  <RootNamespace>CommunAxiom.Commons.FrontEnd.Server</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'FrontEnd.Server' " />
   <ItemGroup>
     <ProjectReference Include="..\ClientUI.Components\ClientUI.Components.csproj" />
     <ProjectReference Include="..\ClientUI.Shared\ClientUI.Shared.csproj" />

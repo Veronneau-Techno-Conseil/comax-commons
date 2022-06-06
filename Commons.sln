@@ -47,11 +47,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Business", "Business", "{EF
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Connectors", "Connectors", "{C30A4303-BA11-4060-AF26-51536B4B0AEA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IO", "IO\IO.csproj", "{B7DFBE99-F4AC-4400-AFFB-C8F7BB832694}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunAxiom.Commons.Ingestion", "IO\CommunAxiom.Commons.Ingestion.csproj", "{B7DFBE99-F4AC-4400-AFFB-C8F7BB832694}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B2579927-C4DF-4C61-9E58-E16E60C92977}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IOTests", "IOTests\IOTests.csproj", "{DDF189DC-E4A3-4D2C-86D7-0FDB6E9B0CE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunAxiom.Commons.Ingestion.Tests", "IOTests\CommunAxiom.Commons.Ingestion.Tests.csproj", "{DDF189DC-E4A3-4D2C-86D7-0FDB6E9B0CE4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClusterClient", "ClusterClient\ClusterClient.csproj", "{9547FAC4-7D0E-4EFC-8607-F7F61178E519}"
 EndProject
