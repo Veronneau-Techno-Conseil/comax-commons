@@ -24,7 +24,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         [Test]
         public void WhenTextDataSourceReaderThenIngestionTypeShouldBeJSON()
         {
-            _textDataSourceReader.IngestionType.Should().Be(IngestionType.JSON);
+            _textDataSourceReader.IngestorType.Should().Be(IngestorType.JSON);
         }
 
     }

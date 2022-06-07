@@ -1,30 +1,29 @@
 ﻿using System.Reflection;
 using CommunAxiom.Commons.Ingestion.Attributes;
 using CommunAxiom.Commons.Ingestion.Configuration;
-using CommunAxiom.Commons.Ingestion.Injestor;
 
 namespace CommunAxiom.Commons.Ingestion.Ingestor
 {
-    public class IngestorFactory : IIngestionFactory
+    public class IngestorFactory : IIngestorFactory
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public IIngestor Create(IngestionType ingestionType)
+        public IIngestor Create(IngestorType ingestorType)
         {
             var type = Assembly.GetAssembly(typeof(IngestorFactory)).GetTypes()
                 .FirstOrDefault(type => Attribute.IsDefined(type, typeof(DataSourceTypeAttribute)) &&
-                                type.GetCustomAttribute<IngestionTypeAttribute>().IngestionType == ingestionType);
+                                type.GetCustomAttribute<IngestionTypeAttribute>().IngestorType == ingestorType);
 
             if (type == null)
             {
-                throw new ArgumentException($"No IngestionType with name {ingestionType} could be found");
+                throw new ArgumentException($"No IngestionType with name {ingestorType} could be found");
             }
 
             var dataSourceReader = (IIngestor)_serviceProvider.GetService(type);
 
             if (dataSourceReader == null)
             {
-                throw new ArgumentException($"No IngestionType with name {ingestionType} could be found");
+                throw new ArgumentException($"No IngestionType with name {ingestorType} could be found");
             }
 
             return dataSourceReader;

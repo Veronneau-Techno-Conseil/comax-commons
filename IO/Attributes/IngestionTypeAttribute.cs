@@ -5,13 +5,12 @@ namespace CommunAxiom.Commons.Ingestion.Attributes
     [AttributeUsage(AttributeTargets.Class)]
     public class IngestionTypeAttribute : Attribute
     {
-        public IngestionType IngestionType { get; private set; }
+        public IngestorType IngestorType { get; private set; }
 
-        public IngestionTypeAttribute(IngestionType ingestionType)
+        public IngestionTypeAttribute(IngestorType ingestorType)
         {
-            IngestionType = ingestionType;
+            IngestorType = ingestorType;
         }
     }
-
 }
 

@@ -1,11 +1,11 @@
-﻿using CommunAxiom.Commons.Ingestion.Configuration;
+﻿using System;
+using CommunAxiom.Commons.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.DataSource;
-using NUnit.Framework;
-using FluentAssertions;
-using System;
-using Moq;
-using Microsoft.Extensions.DependencyInjection;
 using CommunAxiom.Commons.Ingestion.Validators;
+using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using NUnit.Framework;
 
 namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
 {

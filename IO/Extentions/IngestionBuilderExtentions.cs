@@ -1,6 +1,5 @@
 ﻿using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Ingestor;
-using CommunAxiom.Commons.Ingestion.Injestor;
 using CommunAxiom.Commons.Ingestion.Validators;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,7 +20,7 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
 
             // factories
             services.AddTransient<IDataSourceFactory, DataSourceFactory>();
-            services.AddTransient<IIngestionFactory, IngestorFactory>();
+            services.AddTransient<IIngestorFactory, IngestorFactory>();
 
             // validations
             var fieldValidatorManager = new ValidatorManager();

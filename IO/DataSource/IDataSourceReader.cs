@@ -4,7 +4,7 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 {
     public interface IDataSourceReader
     {
-        IngestionType IngestionType { get; }
+        IngestorType IngestorType { get; }
 
         IEnumerable<DataSourceConfiguration> ConfigurationFields { get; }
 

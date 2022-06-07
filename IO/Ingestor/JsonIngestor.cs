@@ -4,11 +4,11 @@ using CommunAxiom.Commons.Ingestion.Validators;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace CommunAxiom.Commons.Ingestion.Injestor
+namespace CommunAxiom.Commons.Ingestion.Ingestor
 {
     public class JsonIngestor : IngestorBase, IIngestor
     {
-        private IEnumerable<DataSourceConfiguration> _sourceConfigurations;
+        private IEnumerable<DataSourceConfiguration> _configurations;
         private readonly IFieldValidatorLookup _fieldValidatorLookup;
 
         public JsonIngestor(IFieldValidatorLookup fieldValidatorLookup)
@@ -16,9 +16,9 @@ namespace CommunAxiom.Commons.Ingestion.Injestor
             _fieldValidatorLookup = fieldValidatorLookup;
         }
 
-        public void Configure(IEnumerable<DataSourceConfiguration> sourceConfigurations)
+        public void Configure(IEnumerable<DataSourceConfiguration> configurations)
         {
-            _sourceConfigurations = sourceConfigurations;
+            _configurations = configurations;
         }
 
         public async Task<IngestorResult> Parse(Stream stream)
@@ -55,7 +55,7 @@ namespace CommunAxiom.Commons.Ingestion.Injestor
 
         protected override IEnumerable<ValidationError> Validate(JObject data)
         {
-            foreach (var configuration in _sourceConfigurations)
+            foreach (var configuration in _configurations)
             {
                 foreach (var validate in configuration.Validators)
                 {

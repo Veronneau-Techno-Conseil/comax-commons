@@ -13,7 +13,7 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
         private IEnumerable<DataSourceConfiguration> _dataSourceConfigurations;
         public IEnumerable<DataSourceConfiguration> ConfigurationFields => _dataSourceConfigurations;
 
-        public IngestionType IngestionType => IngestionType.JSON;
+        public IngestorType IngestorType => IngestorType.JSON;
         public IEnumerable<FieldMetaData> DataDescription => throw new NotImplementedException();
 
 

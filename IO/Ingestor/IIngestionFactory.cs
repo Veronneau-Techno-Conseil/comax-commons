@@ -1,11 +1,10 @@
 ﻿using CommunAxiom.Commons.Ingestion.Configuration;
-using CommunAxiom.Commons.Ingestion.Injestor;
 
 namespace CommunAxiom.Commons.Ingestion.Ingestor
 {
-    public interface IIngestionFactory
+    public interface IIngestorFactory
     {
-        IIngestor Create(IngestionType ingestionType);
+        IIngestor Create(IngestorType ingestorType);
     }
 }
 

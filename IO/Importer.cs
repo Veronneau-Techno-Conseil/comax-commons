@@ -20,7 +20,7 @@ namespace CommunAxiom.Commons.Ingestion
             var dataSourceReader = _sourceFactory.Create(sourceConfig.DataSourceType);
             dataSourceReader.Setup(sourceConfig);
             var stream = dataSourceReader.ReadData();
-            var ingestor = _ingestionFactory.Create(dataSourceReader.IngestionType);
+            var ingestor = _ingestionFactory.Create(dataSourceReader.IngestorType);
             return ingestor.Parse(stream);
         }
     }
