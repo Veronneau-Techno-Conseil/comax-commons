@@ -11,27 +11,14 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
     public class TextDataSourceReaderTest
     {
         private readonly TextDataSourceReader _textDataSourceReader;
-        private readonly Mock<IFieldValidatorLookup> _fieldValidatorLookup;
+        private readonly Mock<IConfigValidatorLookup> _configValidatorLookup;
         private readonly MockRepository _mockRepository;
 
         public TextDataSourceReaderTest()
         {
             _mockRepository = new MockRepository(MockBehavior.Strict);
-            _fieldValidatorLookup = _mockRepository.Create<IFieldValidatorLookup>();
-            _textDataSourceReader = new TextDataSourceReader(_fieldValidatorLookup.Object);
-        }
-
-        [SetUp]
-        public void Setup()
-        {
-            var requiredFieldValidatorurn = new RequiredFieldValidator();
-            _fieldValidatorLookup.Setup(x => x.Get("required")).Returns(requiredFieldValidatorurn);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _mockRepository.Verify();
+            _configValidatorLookup = _mockRepository.Create<IConfigValidatorLookup>();
+            _textDataSourceReader = new TextDataSourceReader(_configValidatorLookup.Object);
         }
 
         [Test]

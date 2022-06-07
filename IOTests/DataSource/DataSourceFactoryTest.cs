@@ -14,7 +14,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
     {
         private MockRepository _mockRepository;
         private Mock<IServiceProvider> _serviceProvider;
-        private Mock<IFieldValidatorLookup> _fieldValidatorLookup;
+        private Mock<IConfigValidatorLookup> _configValidatorLookup;
 
         private DataSourceFactory _sourceFactory;
 
@@ -23,7 +23,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         {
             _mockRepository = new MockRepository(MockBehavior.Strict);
             _serviceProvider = _mockRepository.Create<IServiceProvider>();
-            _fieldValidatorLookup = _mockRepository.Create<IFieldValidatorLookup>();
+            _configValidatorLookup = _mockRepository.Create<IConfigValidatorLookup>();
 
             SetupMock();
 
@@ -39,7 +39,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         [Test]
         public void WhenDataSourceTypeIsFileThenSourceFactoryShouldCreateTextDataSourceReader()
         {
-            var textDataSourceReader = new TextDataSourceReader(_fieldValidatorLookup.Object);
+            var textDataSourceReader = new TextDataSourceReader(_configValidatorLookup.Object);
 
             _serviceProvider.Setup(x => x.GetService(typeof(TextDataSourceReader))).Returns(textDataSourceReader);
 
@@ -52,7 +52,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         public void WhenDataSourceTypeIsNotFoundThenSourceFactoryShouldThrowArgumentException()
         {
             var sourceType = DataSourceType.API;
-            var textDataSourceReader = new TextDataSourceReader(_fieldValidatorLookup.Object);
+            var textDataSourceReader = new TextDataSourceReader(_configValidatorLookup.Object);
 
             _serviceProvider.Setup(x => x.GetService(typeof(TextDataSourceReader))).Returns(textDataSourceReader);
 

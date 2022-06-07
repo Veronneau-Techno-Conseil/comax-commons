@@ -8,7 +8,7 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
     [DataSourceType(DataSourceType.File)]
     public class TextDataSourceReader : IDataSourceReader
     {
-        private readonly IFieldValidatorLookup _fieldValidatorLookup;
+        private readonly IConfigValidatorLookup _configValidatorLookup;
 
         private IEnumerable<DataSourceConfiguration> _dataSourceConfigurations;
         public IEnumerable<DataSourceConfiguration> ConfigurationFields => _dataSourceConfigurations;
@@ -17,9 +17,9 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
         public IEnumerable<FieldMetaData> DataDescription => throw new NotImplementedException();
 
 
-        public TextDataSourceReader(IFieldValidatorLookup fieldValidatorLookup)
+        public TextDataSourceReader(IConfigValidatorLookup configValidatorLookup)
         {
-            _fieldValidatorLookup = fieldValidatorLookup;
+            _configValidatorLookup = configValidatorLookup;
         }
 
 
@@ -52,17 +52,14 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 
         public IEnumerable<ValidationError> ValidateConfiguration()
         {
-            foreach (var configuration in ConfigurationFields)
+            foreach (var configuration in _dataSourceConfigurations)
             {
-                foreach (var validate in configuration.Validators)
+                foreach (var validator in _configValidatorLookup.Validators)
                 {
-                    var validator = _fieldValidatorLookup.Get(validate.Tag);
-                    if (validator != null)
-                    {
-                        yield return validator.Validate(configuration);
-                    }
+                    yield return validator.Validate(configuration);
                 }
             }
+
         }
     }
 }

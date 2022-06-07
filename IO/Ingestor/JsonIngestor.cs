@@ -1,25 +1,71 @@
 ﻿using CommunAxiom.Commons.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.Ingestor;
+using CommunAxiom.Commons.Ingestion.Validators;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace CommunAxiom.Commons.Ingestion.Injestor
 {
     public class JsonIngestor : IngestorBase, IIngestor
     {
+        private IEnumerable<DataSourceConfiguration> _sourceConfigurations;
+        private readonly IFieldValidatorLookup _fieldValidatorLookup;
 
-        public void Configure(IEnumerable<FieldMetaData> fields)
+        public JsonIngestor(IFieldValidatorLookup fieldValidatorLookup)
         {
-            throw new NotImplementedException();
+            _fieldValidatorLookup = fieldValidatorLookup;
         }
 
-        public IngestorResult Parse(Stream stream)
+        public void Configure(IEnumerable<DataSourceConfiguration> sourceConfigurations)
         {
-            throw new NotImplementedException();
+            _sourceConfigurations = sourceConfigurations;
         }
 
-        public override IEnumerable<ValidationError> Validate(JObject data)
+        public async Task<IngestorResult> Parse(Stream stream)
         {
-            throw new NotImplementedException();
+            IngestorResult ingestorResult = new IngestorResult();
+            List<JObject> data = new List<JObject>();
+
+            using (var streamReader = new StreamReader(stream))
+            using (JsonTextReader jsonTextReader = new JsonTextReader(streamReader))
+            {
+                while (await jsonTextReader.ReadAsync())
+                {
+                    if (jsonTextReader.Depth == 0 && (jsonTextReader.TokenType == JsonToken.StartArray
+                            || jsonTextReader.TokenType == JsonToken.EndArray))
+                        continue;
+
+                    var obj = await JObject.LoadAsync(jsonTextReader);
+                    data.Add(obj);
+                }
+            }
+
+            foreach (var item in data)
+            {
+                var result = Validate(item);
+                if (result != null)
+                {
+                    ingestorResult.Errors.Add((item, result));
+                }
+            }
+
+            ingestorResult.results = data;
+            return ingestorResult;
+        }
+
+        protected override IEnumerable<ValidationError> Validate(JObject data)
+        {
+            foreach (var configuration in _sourceConfigurations)
+            {
+                foreach (var validate in configuration.Validators)
+                {
+                    var validator = _fieldValidatorLookup.Get(validate.Tag);
+                    if (validator != null)
+                    {
+                        yield return validator.Validate(configuration, data);
+                    }
+                }
+            }
         }
     }
 }

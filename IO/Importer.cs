@@ -4,7 +4,7 @@ using CommunAxiom.Commons.Ingestion.Ingestor;
 
 namespace CommunAxiom.Commons.Ingestion
 {
-    public class Importer
+    public sealed class Importer
     {
         private readonly IDataSourceFactory _sourceFactory;
         private readonly IngestorFactory _ingestionFactory;
@@ -15,7 +15,7 @@ namespace CommunAxiom.Commons.Ingestion
             _ingestionFactory = ingestorFactory;
         }
 
-        public IngestorResult Import(SourceConfig sourceConfig)
+        public Task<IngestorResult> Import(SourceConfig sourceConfig)
         {
             var dataSourceReader = _sourceFactory.Create(sourceConfig.DataSourceType);
             dataSourceReader.Setup(sourceConfig);

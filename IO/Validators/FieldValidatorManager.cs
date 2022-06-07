@@ -1,17 +1,16 @@
 ﻿namespace CommunAxiom.Commons.Ingestion.Validators
 {
-    /// <summary>
-    /// .
-    /// </summary>
-    public class FieldValidatorManager
+    public class ValidatorManager
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="options"></param>
         public void Configure(Action<IFieldValidatorOptions> options)
         {
-            options(new FieldValidatorOptions());
+            options(new ValidatorOptions());
+        }
+
+
+        public void Configure(Action<IConfigValidatorOptions> options)
+        {
+            options(new ValidatorOptions());
         }
     }
 }

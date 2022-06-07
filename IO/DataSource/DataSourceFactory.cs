@@ -4,7 +4,7 @@ using CommunAxiom.Commons.Ingestion.Configuration;
 
 namespace CommunAxiom.Commons.Ingestion.DataSource
 {
-    public class DataSourceFactory : IDataSourceFactory
+    public sealed class DataSourceFactory : IDataSourceFactory
     {
         private readonly IServiceProvider _serviceProvider;
 

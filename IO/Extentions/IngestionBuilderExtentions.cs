@@ -10,7 +10,8 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
     {
         public static void AddIngestion(this IServiceCollection services)
         {
-            services.AddTransient<IFieldValidatorLookup, FieldValidatorOptions>();
+            services.AddTransient<IFieldValidatorLookup, ValidatorOptions>();
+            services.AddTransient<IConfigValidatorLookup, ValidatorOptions>();
 
             // data sources
             services.AddTransient<IDataSourceReader, TextDataSourceReader>();
@@ -23,10 +24,15 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
             services.AddTransient<IIngestionFactory, IngestorFactory>();
 
             // validations
-            var fieldValidatorManager = new FieldValidatorManager();
+            var fieldValidatorManager = new ValidatorManager();
             fieldValidatorManager.Configure(options =>
             {
                 options.Add(new RequiredFieldValidator());
+            });
+
+            fieldValidatorManager.Configure(options =>
+            {
+                options.Add(new FileConfigValidator());
             });
         }
 

@@ -1,15 +1,20 @@
 ﻿namespace CommunAxiom.Commons.Ingestion.Validators
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class FieldValidatorOptions : IFieldValidatorOptions
+    public class ValidatorOptions : IFieldValidatorOptions, IConfigValidatorOptions
     {
         private readonly Dictionary<string, IFieldValidator> fieldValidators;
+        private readonly IList<IConfigValidator> configValidators;
+
+        public IList<IConfigValidator> Validators => configValidators;
 
         public void Add(IFieldValidator fieldValidator)
         {
             fieldValidators.Add(fieldValidator.Tag, fieldValidator);
+        }
+
+        public void Add(IConfigValidator configValidator)
+        {
+            configValidators.Add(configValidator);
         }
 
         public IFieldValidator? Get(string tag)

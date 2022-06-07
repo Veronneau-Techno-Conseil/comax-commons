@@ -5,7 +5,7 @@ namespace CommunAxiom.Commons.Ingestion.Injestor
 {
     public abstract class IngestorBase
     {
-        public abstract IEnumerable<ValidationError> Validate(JObject data);
+        protected abstract IEnumerable<ValidationError> Validate(JObject data);
 
     }
 }
