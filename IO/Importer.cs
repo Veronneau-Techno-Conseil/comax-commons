@@ -21,7 +21,7 @@ namespace CommunAxiom.Commons.Ingestion
             dataSourceReader.Setup(sourceConfig);
             var stream = dataSourceReader.ReadData();
             var ingestor = _ingestionFactory.Create(dataSourceReader.IngestorType);
-            return ingestor.Parse(stream);
+            return ingestor.ParseAsync(stream);
         }
     }
 }

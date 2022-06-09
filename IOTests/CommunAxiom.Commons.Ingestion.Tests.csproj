@@ -32,13 +32,30 @@
     <None Remove="Microsoft.NET.Test.Sdk" />
     <None Remove="Ingestor\" />
     <None Remove="Validators\" />
+    <None Remove="Samples\" />
+    <None Remove="Samples\Configurations\" />
+    <None Remove="Samples\Files\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DataSource\" />
     <Folder Include="Ingestor\" />
     <Folder Include="Validators\" />
+    <Folder Include="Samples\" />
+    <Folder Include="Samples\Configurations\" />
+    <Folder Include="Samples\Files\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IO\CommunAxiom.Commons.Ingestion.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Samples\Configurations\datasource.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Files\sample1.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Files\sample1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

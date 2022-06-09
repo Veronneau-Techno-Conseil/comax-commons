@@ -10,11 +10,11 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
     {
         private readonly IConfigValidatorLookup _configValidatorLookup;
 
-        private IEnumerable<DataSourceConfiguration> _dataSourceConfigurations;
-        public IEnumerable<DataSourceConfiguration> ConfigurationFields => _dataSourceConfigurations;
+        private IList<DataSourceConfiguration> _dataSourceConfigurations;
+        public IList<DataSourceConfiguration> ConfigurationFields => _dataSourceConfigurations;
 
         public IngestorType IngestorType => IngestorType.JSON;
-        public IEnumerable<FieldMetaData> DataDescription => throw new NotImplementedException();
+        public IList<FieldMetaData> DataDescription => throw new NotImplementedException();
 
 
         public TextDataSourceReader(IConfigValidatorLookup configValidatorLookup)
@@ -25,25 +25,28 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 
         public Stream ReadData()
         {
-            var dataSourceConfiguration = _dataSourceConfigurations.FirstOrDefault();
-
-            if (dataSourceConfiguration == null)
+            if (_dataSourceConfigurations == null)
             {
                 throw new NullReferenceException("There is no data source configuration!");
             }
 
+            var dataSourceConfiguration = _dataSourceConfigurations.FirstOrDefault();
+
             var file = JsonConvert.DeserializeObject<Configuration.File>(dataSourceConfiguration.Value);
 
-            using var fileStream = new FileStream(Path.Combine(file.Path, file.Name), FileMode.Open, FileAccess.Read);
+            if (file == null)
+            {
+                throw new NullReferenceException("File wasn't able to deserialized!");
+            }
 
-            return fileStream;
+            return new FileStream(Path.Combine(file.Path, file.Name), FileMode.Open, FileAccess.Read);
 
         }
 
         public void Setup(SourceConfig? sourceConfig)
         {
             List<DataSourceConfiguration> list = new List<DataSourceConfiguration>();
-            if (_dataSourceConfigurations != null)
+            if (_dataSourceConfigurations == null)
             {
                 list.AddRange(sourceConfig.Configurations.Select(x => x.Value));
             }
@@ -60,6 +63,11 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
                 }
             }
 
+        }
+
+        public void ClearCofigurations()
+        {
+            _dataSourceConfigurations = null;
         }
     }
 }

@@ -8,10 +8,15 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
     {
         private readonly IServiceProvider _serviceProvider;
 
+        public IngestorFactory(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
         public IIngestor Create(IngestorType ingestorType)
         {
             var type = Assembly.GetAssembly(typeof(IngestorFactory)).GetTypes()
-                .FirstOrDefault(type => Attribute.IsDefined(type, typeof(DataSourceTypeAttribute)) &&
+                .FirstOrDefault(type => Attribute.IsDefined(type, typeof(IngestionTypeAttribute)) &&
                                 type.GetCustomAttribute<IngestionTypeAttribute>().IngestorType == ingestorType);
 
             if (type == null)
@@ -23,7 +28,7 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
 
             if (dataSourceReader == null)
             {
-                throw new ArgumentException($"No IngestionType with name {ingestorType} could be found");
+                throw new NullReferenceException($"No IngestionType resolved with type { type.FullName }");
             }
 
             return dataSourceReader;

@@ -1,9 +1,13 @@
-﻿using CommunAxiom.Commons.Ingestion.Configuration;
+﻿using System.Collections.Generic;
+using CommunAxiom.Commons.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Validators;
 using FluentAssertions;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
+using System.IO;
+using System;
 
 namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
 {
@@ -27,6 +31,57 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
             _textDataSourceReader.IngestorType.Should().Be(IngestorType.JSON);
         }
 
+        [Test]
+        public void ShouldReadDataReturnsStream()
+        {
+            var file = new Configuration.File { Name = "sample1.txt", Path = "Samples/Files" };
+            _textDataSourceReader.Setup(new SourceConfig
+            {
+                DataSourceType = DataSourceType.File,
+                Configurations = new Dictionary<string, DataSourceConfiguration>
+                {
+                    {
+                        "sample datasource",
+                        new DataSourceConfiguration
+                        {
+                            FieldType = FieldType.File,
+                            Value = JsonConvert.SerializeObject(file)
+                        }
+                    }
+                }
+            });
+
+            using var stream = _textDataSourceReader.ReadData();
+            var actual = ReadAsString(stream);
+
+            var expected = ReadAsString(file);
+
+            actual.Should().Be(expected);
+        }
+
+        [Test]
+        public void WhenConfigurationIsNotSetupThenReadDataShouldThrowNullReferenceException()
+        {
+            _textDataSourceReader.ClearCofigurations();
+
+            Action act = () => _textDataSourceReader.ReadData();
+            act.Should()
+                 .Throw<NullReferenceException>()
+                 .WithMessage("There is no data source configuration!");
+        }
+
+
+        private string ReadAsString(Stream stream)
+        {
+            using var sr = new StreamReader(stream);
+            return sr.ReadToEnd();
+        }
+
+        private string ReadAsString(Configuration.File file)
+        {
+            using var expectedStream = new FileStream(Path.Combine(file.Path, file.Name), FileMode.Open, FileAccess.Read);
+            return ReadAsString(expectedStream);
+        }
     }
 }
 

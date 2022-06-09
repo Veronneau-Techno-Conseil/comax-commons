@@ -1,11 +1,12 @@
-﻿using CommunAxiom.Commons.Ingestion.Configuration;
-using CommunAxiom.Commons.Ingestion.Ingestor;
+﻿using CommunAxiom.Commons.Ingestion.Attributes;
+using CommunAxiom.Commons.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.Validators;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace CommunAxiom.Commons.Ingestion.Ingestor
 {
+    [IngestionType(IngestorType.JSON)]
     public class JsonIngestor : IngestorBase, IIngestor
     {
         private IEnumerable<DataSourceConfiguration> _configurations;
@@ -21,7 +22,7 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
             _configurations = configurations;
         }
 
-        public async Task<IngestorResult> Parse(Stream stream)
+        public async Task<IngestorResult> ParseAsync(Stream stream)
         {
             IngestorResult ingestorResult = new IngestorResult();
             List<JObject> data = new List<JObject>();

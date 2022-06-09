@@ -5,7 +5,7 @@ namespace CommunAxiom.Commons.Ingestion.Validators
 {
     public class RequiredFieldValidator : IFieldValidator
     {
-        public string Tag => "required";
+        public string Tag => "required-field";
 
         public string Parameter { get; set; }
 
@@ -16,7 +16,7 @@ namespace CommunAxiom.Commons.Ingestion.Validators
 
             if (obj[configuration.Name] == null || obj[configuration.Name].HasValues)
             {
-                return new ValidationError { FieldName = configuration.Name, ErrorCode = "required" };
+                return new ValidationError { FieldName = configuration.Name, ErrorCode = "This field is required!" };
             }
 
             return null;

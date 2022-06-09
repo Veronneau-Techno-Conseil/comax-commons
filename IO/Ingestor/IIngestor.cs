@@ -4,7 +4,7 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
 {
     public interface IIngestor
     {
-        Task<IngestorResult> Parse(Stream stream);
+        Task<IngestorResult> ParseAsync(Stream stream);
 
         void Configure(IEnumerable<DataSourceConfiguration> configurations);
     }

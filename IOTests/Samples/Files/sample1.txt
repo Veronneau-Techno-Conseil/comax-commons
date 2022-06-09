@@ -1,0 +1,5 @@
+﻿{
+  "property1": "sample property 1",
+  "property2": "sample property 2"
+}
+
