@@ -2,6 +2,6 @@
 {
     public interface IConfigValidatorLookup
     {
-        IList<IConfigValidator> Validators { get; }
+        IList<IConfigValidator> ConfigValidators { get; }
     }
 }

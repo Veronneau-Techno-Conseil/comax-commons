@@ -4,13 +4,13 @@
     {
         public void Configure(Action<IFieldValidatorOptions> options)
         {
-            options(new ValidatorOptions());
+            options(new ValidatorLookup());
         }
 
 
         public void Configure(Action<IConfigValidatorOptions> options)
         {
-            options(new ValidatorOptions());
+            options(new ValidatorLookup());
         }
     }
 }

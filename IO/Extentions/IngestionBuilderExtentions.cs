@@ -9,8 +9,8 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
     {
         public static void AddIngestion(this IServiceCollection services)
         {
-            services.AddTransient<IFieldValidatorLookup, ValidatorOptions>();
-            services.AddTransient<IConfigValidatorLookup, ValidatorOptions>();
+            services.AddTransient<IFieldValidatorLookup, ValidatorLookup>();
+            services.AddTransient<IConfigValidatorLookup, ValidatorLookup>();
 
             // data sources
             services.AddTransient<IDataSourceReader, TextDataSourceReader>();

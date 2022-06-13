@@ -84,7 +84,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
             };
 
             var validators = new List<IConfigValidator> { new FileConfigValidator() };
-            _configValidatorLookup.Setup(x => x.Validators).Returns(validators);
+            _configValidatorLookup.Setup(x => x.ConfigValidators).Returns(validators);
 
             _textDataSourceReader.Setup(sourceConfig);
 

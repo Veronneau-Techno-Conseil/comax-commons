@@ -57,7 +57,7 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
         {
             foreach (var configuration in _dataSourceConfigurations)
             {
-                foreach (var validator in _configValidatorLookup.Validators)
+                foreach (var validator in _configValidatorLookup.ConfigValidators)
                 {
                     yield return validator.Validate(configuration);
                 }
