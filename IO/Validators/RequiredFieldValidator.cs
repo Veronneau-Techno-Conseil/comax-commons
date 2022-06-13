@@ -14,7 +14,7 @@ namespace CommunAxiom.Commons.Ingestion.Validators
             if (configuration == null)
                 return null;
 
-            if (obj[configuration.Name] == null || obj[configuration.Name].HasValues)
+            if (obj != null && (obj[configuration.Name] == null || obj[configuration.Name].HasValues))
             {
                 return new ValidationError { FieldName = configuration.Name, ErrorCode = "This field is required!" };
             }
