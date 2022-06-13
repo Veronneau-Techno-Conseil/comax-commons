@@ -12,10 +12,10 @@ namespace CommunAxiom.Commons.Ingestion.Validators
                 try
                 {
                     var file = JsonConvert.DeserializeObject<Configuration.File>(config.Value);
-                    if (file == null)
-                        throw new Exception();
 
-                } catch (Exception)
+                    if (file == null) throw new Exception();
+                }
+                catch
                 {
                     return new ValidationError
                     {

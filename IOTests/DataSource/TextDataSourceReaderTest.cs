@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using CommunAxiom.Commons.Ingestion.Configuration;
+﻿using CommunAxiom.Commons.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Validators;
 using FluentAssertions;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using System.IO;
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
 {
@@ -70,6 +70,30 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
                  .WithMessage("There is no data source configuration!");
         }
 
+
+        [Test]
+        public void WhenDataSourceConfigurationSetFileTypeWithNoFileValueThenValidateConfigurationShouldReturnValidationError()
+        {
+            var sourceConfig = new SourceConfig
+            {
+                DataSourceType = DataSourceType.File,
+                Configurations = new Dictionary<string, DataSourceConfiguration>
+                {
+                    { "config1", new DataSourceConfiguration { Name = "file1", FieldType = FieldType.File }}
+                }
+            };
+
+            var validators = new List<IConfigValidator> { new FileConfigValidator() };
+            _configValidatorLookup.Setup(x => x.Validators).Returns(validators);
+
+            _textDataSourceReader.Setup(sourceConfig);
+
+            foreach (var actual in _textDataSourceReader.ValidateConfiguration())
+            {
+                actual.ErrorCode.Should().Be("The file type is required to set file name and file path");
+                actual.FieldName.Should().Be("file1");
+            }
+        }
 
         private string ReadAsString(Stream stream)
         {

@@ -39,7 +39,6 @@
   <ItemGroup>
     <Folder Include="DataSource\" />
     <Folder Include="Ingestor\" />
-    <Folder Include="Validators\" />
     <Folder Include="Samples\" />
     <Folder Include="Samples\Configurations\" />
     <Folder Include="Samples\Files\" />
