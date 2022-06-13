@@ -7,9 +7,10 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
     [TestFixture]
     public class ValidatorLookupTest
     {
-        private readonly ValidatorLookup _validatorLookup;
+        private  ValidatorLookup _validatorLookup;
 
-        public ValidatorLookupTest()
+        [SetUp]
+        public void SetUp()
         {
             _validatorLookup = new ValidatorLookup();
         }
@@ -19,7 +20,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
         {
             _validatorLookup.Add(new RequiredFieldValidator());
             var result = _validatorLookup.Get("required-field");
-            
+
             result.Should().BeOfType<RequiredFieldValidator>();
         }
 
@@ -27,7 +28,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
         public void TryGetFieldValidator()
         {
             _validatorLookup.Add(new RequiredFieldValidator());
-            
+
             IFieldValidator validator;
 
             var result = _validatorLookup.TryGet("required-field", out validator);

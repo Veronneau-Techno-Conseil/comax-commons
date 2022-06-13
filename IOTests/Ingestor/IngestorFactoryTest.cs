@@ -1,11 +1,11 @@
-﻿using System;
-using CommunAxiom.Commons.Ingestion.Configuration;
+﻿using CommunAxiom.Commons.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.Ingestor;
+using CommunAxiom.Commons.Ingestion.Validators;
+using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using FluentAssertions;
-using CommunAxiom.Commons.Ingestion.Validators;
+using System;
 
 namespace CommunAxiom.Commons.Ingestion.Tests.Ingestor
 {

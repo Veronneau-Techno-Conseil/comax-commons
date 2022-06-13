@@ -24,7 +24,7 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
                 throw new ArgumentException($"No IngestionType with name {ingestorType} could be found");
             }
 
-            var dataSourceReader = (IIngestor)_serviceProvider.GetService(type);
+            var dataSourceReader = _serviceProvider.GetService(type) as IIngestor;
 
             if (dataSourceReader == null)
             {

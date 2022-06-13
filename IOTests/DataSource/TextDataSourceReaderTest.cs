@@ -1,4 +1,5 @@
-﻿using CommunAxiom.Commons.Ingestion.Configuration;
+﻿using CommunAxiom.Commons.Ingestion.Attributes;
+using CommunAxiom.Commons.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Validators;
 using FluentAssertions;
@@ -23,6 +24,14 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
             _mockRepository = new MockRepository(MockBehavior.Strict);
             _configValidatorLookup = _mockRepository.Create<IConfigValidatorLookup>();
             _textDataSourceReader = new TextDataSourceReader(_configValidatorLookup.Object);
+        }
+
+        [Test]
+        public void TextDataSourceReaderShouldHasIngestionTypeAttribute()
+        {
+            var attr = Attribute.GetCustomAttribute(typeof(TextDataSourceReader), typeof(DataSourceTypeAttribute));
+
+            attr.Should().NotBeNull();
         }
 
         [Test]
