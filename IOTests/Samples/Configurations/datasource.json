@@ -1,10 +1,12 @@
-﻿{
-  "Name": "sample1",
-  "FieldType": "File",
-  "Validators": {},
-  "Value": {
+﻿[
+  {
     "Name": "sample1",
-    "Path": "Samples/Files"
+    "FieldType": "File",
+    "Validators": {},
+    "Value": {
+      "Name": "sample1",
+      "Path": "Samples/Files"
+    }
   }
-}
+]
 

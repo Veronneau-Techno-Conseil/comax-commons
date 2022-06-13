@@ -1,4 +1,5 @@
 ﻿using CommunAxiom.Commons.Ingestion.Configuration;
+using Newtonsoft.Json;
 
 namespace CommunAxiom.Commons.Ingestion.Validators
 {
@@ -8,9 +9,22 @@ namespace CommunAxiom.Commons.Ingestion.Validators
         {
             if (config.FieldType == FieldType.File)
             {
-                return new ValidationError();
+                try
+                {
+                    var file = JsonConvert.DeserializeObject<Configuration.File>(config.Value);
+                    if (file == null)
+                        throw new Exception();
+
+                } catch (Exception)
+                {
+                    return new ValidationError
+                    {
+                        ErrorCode = "The file type is required to set file name and file path",
+                        FieldName = config.Name
+                    };
+                }
             }
-            return new ValidationError();
+            return null;
         }
     }
 }
