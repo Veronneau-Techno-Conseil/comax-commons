@@ -9,6 +9,6 @@ namespace CommunAxiom.Commons.Ingestion.Validators
 
         string Parameter { get; set; }
 
-        ValidationError Validate(DataSourceConfiguration configuration, JObject obj);
+        ValidationError Validate(FieldMetaData fieldMetaData, JObject obj);
     }
 }

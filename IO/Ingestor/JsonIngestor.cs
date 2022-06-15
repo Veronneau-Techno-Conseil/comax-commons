@@ -9,7 +9,7 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
     [IngestionType(IngestorType.JSON)]
     public class JsonIngestor : IngestorBase, IIngestor
     {
-        private IEnumerable<DataSourceConfiguration> _configurations;
+        private IEnumerable<FieldMetaData>  _fieldMetaDatas;
         private readonly IFieldValidatorLookup _fieldValidatorLookup;
 
         public JsonIngestor(IFieldValidatorLookup fieldValidatorLookup)
@@ -17,9 +17,9 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
             _fieldValidatorLookup = fieldValidatorLookup;
         }
 
-        public void Configure(IEnumerable<DataSourceConfiguration> configurations)
+        public void Configure(IEnumerable<FieldMetaData> fieldMetaDatas)
         {
-            _configurations = configurations;
+            _fieldMetaDatas = fieldMetaDatas;
         }
 
         public async Task<IngestorResult> ParseAsync(Stream stream)
@@ -56,14 +56,14 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
 
         protected override IEnumerable<ValidationError> Validate(JObject data)
         {
-            foreach (var configuration in _configurations)
+            foreach (var fieldMetaData in _fieldMetaDatas)
             {
-                foreach (var validate in configuration.Validators)
+                foreach (var validate in fieldMetaData.Validators)
                 {
                     var validator = _fieldValidatorLookup.Get(validate.Tag);
                     if (validator != null)
                     {
-                        yield return validator.Validate(configuration, data);
+                        yield return validator.Validate(fieldMetaData, data);
                     }
                 }
             }

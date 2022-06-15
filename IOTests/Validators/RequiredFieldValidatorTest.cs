@@ -36,8 +36,8 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
         [Test]
         public void WhenJObjectIsNullThenShouldReturnNull()
         {
-            var dataSourceConfiguration = new DataSourceConfiguration { FieldType = FieldType.Text, Name = "file1" };
-            var actual = _requiredFieldValidator.Validate(dataSourceConfiguration, null);
+            var fieldMetaData = new FieldMetaData { FieldType = FieldType.Text, Name = "file1" };
+            var actual = _requiredFieldValidator.Validate(fieldMetaData, null);
 
             actual.Should().BeNull();
         }
@@ -45,12 +45,12 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
         [Test]
         public void WhenFieldIsRequired()
         {
-            var dataSourceConfiguration = new DataSourceConfiguration { FieldType = FieldType.Text, Name = "file1" };
+            var fieldMetaData = new FieldMetaData { FieldType = FieldType.Text, Name = "file1" };
 
             var obj = new JObject();
             obj.Add("file1", "some value");
 
-            var actual = _requiredFieldValidator.Validate(dataSourceConfiguration, obj);
+            var actual = _requiredFieldValidator.Validate(fieldMetaData, obj);
             
             actual.Should().BeNull();
         }
@@ -58,12 +58,12 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
         [Test]
         public void WhenFieldIsRequiredButNotInJObjectThenShouldReturnValidationError()
         {
-            var dataSourceConfiguration = new DataSourceConfiguration { FieldType = FieldType.Text, Name = "file1" };
+            var fieldMetaData = new FieldMetaData { FieldType = FieldType.Text, Name = "file1" };
 
             var obj = new JObject();
             obj.Add("file2", "some value");
 
-            var actual = _requiredFieldValidator.Validate(dataSourceConfiguration, obj);
+            var actual = _requiredFieldValidator.Validate(fieldMetaData, obj);
 
             actual.FieldName.Should().Be("file1");
             actual.ErrorCode.Should().Be("This field is required!");

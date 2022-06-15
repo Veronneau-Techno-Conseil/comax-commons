@@ -4,6 +4,7 @@ namespace CommunAxiom.Commons.Ingestion.Configuration
 {
     public class FieldMetaData
     {
+        public string FieldName { get; set; }
         public string Name { get; set; }
 
         public FieldType FieldType { get; set; }

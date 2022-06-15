@@ -24,12 +24,12 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
 
             // validations
             var fieldValidatorManager = new ValidatorManager();
-            fieldValidatorManager.Configure(options =>
+            fieldValidatorManager.ConfigureFields(options =>
             {
                 options.Add(new RequiredFieldValidator());
             });
 
-            fieldValidatorManager.Configure(options =>
+            fieldValidatorManager.ConfigureConfigs(options =>
             {
                 options.Add(new FileConfigValidator());
             });

@@ -9,14 +9,14 @@ namespace CommunAxiom.Commons.Ingestion.Validators
 
         public string Parameter { get; set; }
 
-        public ValidationError Validate(DataSourceConfiguration configuration, JObject obj)
+        public ValidationError Validate(FieldMetaData fieldMetaData, JObject obj)
         {
-            if (configuration == null)
+            if (fieldMetaData == null)
                 return null;
 
-            if (obj != null && (obj[configuration.Name] == null || obj[configuration.Name].HasValues))
+            if (obj != null && (obj[fieldMetaData.Name] == null || obj[fieldMetaData.Name].HasValues))
             {
-                return new ValidationError { FieldName = configuration.Name, ErrorCode = "This field is required!" };
+                return new ValidationError { FieldName = fieldMetaData.Name, ErrorCode = "This field is required!" };
             }
 
             return null;

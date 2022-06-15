@@ -2,15 +2,22 @@
 {
     public class ValidatorManager
     {
-        public void Configure(Action<IFieldValidatorOptions> options)
+        private ValidatorLookup _validatorLookup;
+
+        public ValidatorManager()
         {
-            options(new ValidatorLookup());
+            _validatorLookup = new ValidatorLookup();
+        }
+
+        public void ConfigureFields(Action<IFieldValidatorOptions> options)
+        {
+            options(_validatorLookup);
         }
 
 
-        public void Configure(Action<IConfigValidatorOptions> options)
+        public void ConfigureConfigs(Action<IConfigValidatorOptions> options)
         {
-            options(new ValidatorLookup());
+            options(_validatorLookup);
         }
     }
 }
