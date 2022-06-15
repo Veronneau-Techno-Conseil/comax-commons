@@ -9,7 +9,7 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
     [IngestionType(IngestorType.JSON)]
     public class JsonIngestor : IngestorBase, IIngestor
     {
-        private IEnumerable<FieldMetaData> _fieldMetaDatas;
+        private IEnumerable<FieldMetaData> _fields;
         private readonly IFieldValidatorLookup _fieldValidatorLookup;
 
         public JsonIngestor(IFieldValidatorLookup fieldValidatorLookup)
@@ -17,56 +17,45 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
             _fieldValidatorLookup = fieldValidatorLookup;
         }
 
-        public void Configure(IEnumerable<FieldMetaData> fieldMetaDatas)
+        public void Configure(IEnumerable<FieldMetaData> fields)
         {
-            _fieldMetaDatas = fieldMetaDatas;
+            _fields = fields;
         }
 
         public async Task<IngestorResult> ParseAsync(Stream stream)
         {
             IngestorResult ingestorResult = new IngestorResult();
-            List<JObject> data = new List<JObject>();
 
             using (var streamReader = new StreamReader(stream))
             using (JsonTextReader jsonTextReader = new JsonTextReader(streamReader))
             {
                 while (await jsonTextReader.ReadAsync())
                 {
-                    if (jsonTextReader.Depth == 0 && (jsonTextReader.TokenType == JsonToken.StartArray
-                            || jsonTextReader.TokenType == JsonToken.EndArray))
-                        continue;
+                    if (jsonTextReader.Depth == 0 && (jsonTextReader.TokenType == JsonToken.StartArray || jsonTextReader.TokenType == JsonToken.EndArray)) continue;
 
-                    var obj = await JObject.LoadAsync(jsonTextReader);
-                    data.Add(obj);
-                }
-            }
+                    var row = await JObject.LoadAsync(jsonTextReader);
 
-            foreach (var item in data)
-            {
-                foreach (var result in Validate(item))
-                {
-                    if (result != null)
+                    foreach (var result in Validate(row))
                     {
-                        ingestorResult.Errors.Add((item, result));
+                        if (result != null) ingestorResult.Errors.Add((row, result));
+                        else ingestorResult.Rows.Add(row);
                     }
                 }
-
             }
 
-            ingestorResult.results = data;
             return ingestorResult;
         }
 
-        protected override IEnumerable<ValidationError> Validate(JObject data)
+        protected override IEnumerable<ValidationError> Validate(JObject row)
         {
-            foreach (var fieldMetaData in _fieldMetaDatas)
+            foreach (var field in _fields)
             {
-                foreach (var validate in fieldMetaData.Validators)
+                foreach (var validate in field.Validators)
                 {
-                    var validator = _fieldValidatorLookup.Get(validate.Tag);
-                    if (validator != null)
+                    var lookup = _fieldValidatorLookup.Get(validate.Tag);
+                    if (lookup != null)
                     {
-                        yield return validator.Validate(fieldMetaData, data);
+                        yield return lookup.Validate(field, row);
                     }
                 }
             }

@@ -2,6 +2,6 @@
 {
     public interface IConfigValidatorOptions : IConfigValidatorLookup
     {
-        void Add(IConfigValidator fieldValidator);
+        void Add(IConfigValidator validator);
     }
 }

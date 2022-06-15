@@ -1,28 +1,30 @@
 ﻿using CommunAxiom.Commons.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Ingestor;
-using Moq;
-using NUnit.Framework;
-using FluentAssertions;
 using CommunAxiom.Commons.Ingestion.Validators;
+using FluentAssertions;
+using Moq;
+using Newtonsoft.Json;
+using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace CommunAxiom.Commons.Ingestion.Tests
 {
     [TestFixture]
     public class ImporterTest
     {
-        private readonly MockRepository _mockRepository;
-        private readonly Mock<IDataSourceFactory> _dataSourceFactory;
-        private readonly Mock<IIngestorFactory> _ingestorFactory;
-        private readonly Mock<IConfigValidatorLookup> _configValidatorLookup;
-        private readonly Mock<IFieldValidatorLookup> _fieldValidatorLookup;
+        private MockRepository _mockRepository;
+        private Mock<IDataSourceFactory> _dataSourceFactory;
+        private Mock<IIngestorFactory> _ingestorFactory;
+        private Mock<IConfigValidatorLookup> _configValidatorLookup;
+        private Mock<IFieldValidatorLookup> _fieldValidatorLookup;
 
-        private readonly Importer _importer;
+        private Importer _importer;
 
-        public ImporterTest()
+
+        [SetUp]
+        public void SetUp()
         {
             _mockRepository = new MockRepository(MockBehavior.Strict);
             _dataSourceFactory = new Mock<IDataSourceFactory>();
@@ -34,35 +36,82 @@ namespace CommunAxiom.Commons.Ingestion.Tests
         }
 
         [Test]
-        public async Task WhenImporterReturnResults()
+        public async Task WhenImporterReturnRows()
         {
-            var file = new File { Name = "sample1.txt", Path = "Samples/Files" };
-
             var sourceConfig = new SourceConfig
             {
                 DataSourceType = DataSourceType.File,
                 Configurations = new Dictionary<string, DataSourceConfiguration>
                 {
                     {
-                        "sample datasource",
+                        "file-type",
                         new DataSourceConfiguration
                         {
+                            Name = "file1",
                             FieldType = FieldType.File,
-                            Value = JsonConvert.SerializeObject(file)
+                            Value = JsonConvert.SerializeObject(new FileModel { Name = "sample1.txt", Path = "Samples/Files" })
                         }
                     }
                 }
             };
 
+            var field = new FieldMetaData
+            {
+                DisplayName = "sample1",
+                FieldName = "property1",
+                Validators = new List<IFieldValidator>() { new RequiredFieldValidator() }
+            };
+
+            var fields = new List<FieldMetaData> { field };
+
             _ingestorFactory.Setup(x => x.Create(IngestorType.JSON)).Returns(new JsonIngestor(_fieldValidatorLookup.Object));
             _dataSourceFactory.Setup(x => x.Create(sourceConfig.DataSourceType)).Returns(new TextDataSourceReader(_configValidatorLookup.Object));
+            _fieldValidatorLookup.Setup(x => x.Get("required-field")).Returns(new RequiredFieldValidator());
 
-            var result = await _importer.Import(sourceConfig);
+            var result = await _importer.Import(sourceConfig, fields);
 
-            result.Errors.Should().BeNull();
-            result.results.Should().NotBeEmpty();
+            result.Errors.Should().BeEmpty();
+            result.Rows.Count.Should().Be(2);
         }
 
+        [Test]
+        public async Task WhenImporterReturnErrors()
+        {
+            var sourceConfig = new SourceConfig
+            {
+                DataSourceType = DataSourceType.File,
+                Configurations = new Dictionary<string, DataSourceConfiguration>
+                {
+                    {
+                        "file-type",
+                        new DataSourceConfiguration
+                        {
+                            Name = "file1",
+                            FieldType = FieldType.File,
+                            Value = JsonConvert.SerializeObject(new FileModel { Name = "sample2.txt", Path = "Samples/Files" })
+                        }
+                    }
+                }
+            };
+
+            var field = new FieldMetaData
+            {
+                DisplayName = "sample1",
+                FieldName = "property",
+                Validators = new List<IFieldValidator>() { new RequiredFieldValidator() }
+            };
+
+            var fields = new List<FieldMetaData> { field };
+
+            _ingestorFactory.Setup(x => x.Create(IngestorType.JSON)).Returns(new JsonIngestor(_fieldValidatorLookup.Object));
+            _dataSourceFactory.Setup(x => x.Create(sourceConfig.DataSourceType)).Returns(new TextDataSourceReader(_configValidatorLookup.Object));
+            _fieldValidatorLookup.Setup(x => x.Get("required-field")).Returns(new RequiredFieldValidator());
+
+            var result = await _importer.Import(sourceConfig, fields);
+
+            result.Rows.Should().BeEmpty();
+            result.Errors.Count.Should().Be(2);
+        }
     }
 }
 

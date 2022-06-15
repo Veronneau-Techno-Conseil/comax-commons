@@ -19,7 +19,11 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
         [Test]
         public void WhenDataSourceConfigurationIsNotSetFileTypeThenShouldReturnNull()
         {
-            var dataSourceConfiguration = new DataSourceConfiguration { Name = "file1", FieldType = FieldType.Object };
+            var dataSourceConfiguration = new DataSourceConfiguration
+            {
+                Name = "file1",
+                FieldType = FieldType.Boolean
+            };
 
             var actual = _fileConfigValidator.Validate(dataSourceConfiguration);
 
@@ -29,7 +33,11 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
         [Test]
         public void WhenDataSourceConfigurationIsSetFileTypeWithNoValueThenShouldReturnValidationError()
         {
-            var dataSourceConfiguration = new DataSourceConfiguration { Name = "file1", FieldType = FieldType.File };
+            var dataSourceConfiguration = new DataSourceConfiguration
+            {
+                Name = "file1",
+                FieldType = FieldType.File
+            };
 
             var actual = _fileConfigValidator.Validate(dataSourceConfiguration);
 
@@ -40,8 +48,13 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
         [Test]
         public void WhenDataSourceConfigurationIsSetFileTypeWithValue()
         {
-            var file = new File { Name = "name", Path = "path" };
-            var dataSourceConfiguration = new DataSourceConfiguration { Name = "file1", FieldType = FieldType.File, Value = JsonConvert.SerializeObject(file) };
+            var file = new FileModel { Name = "name", Path = "path" };
+            var dataSourceConfiguration = new DataSourceConfiguration
+            {
+                Name = "file1",
+                FieldType = FieldType.File,
+                Value = JsonConvert.SerializeObject(file)
+            };
 
             var actual = _fileConfigValidator.Validate(dataSourceConfiguration);
 

@@ -1,5 +1,2 @@
-﻿{
-  "property1": "sample property 1",
-  "property2": "sample property 2"
-}
+﻿[{"property1": "sample property 1",  "property2": "sample property 2"}, { "property1": "sample property 3",  "property4": "sample property 4"}]
 

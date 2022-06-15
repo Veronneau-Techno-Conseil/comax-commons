@@ -2,6 +2,6 @@
 {
     public interface IFieldValidatorOptions : IFieldValidatorLookup
     {
-        void Add(IFieldValidator fieldValidator);
+        void Add(IFieldValidator validator);
     }
 }

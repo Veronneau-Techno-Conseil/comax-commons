@@ -3,9 +3,10 @@
     public class ValidatorLookup : IFieldValidatorOptions, IConfigValidatorOptions
     {
         private readonly Dictionary<string, IFieldValidator> _fieldValidators;
-        private readonly IList<IConfigValidator> _configValidators;
 
+        private readonly IList<IConfigValidator> _configValidators;
         public IList<IConfigValidator> ConfigValidators => _configValidators;
+
 
         public ValidatorLookup()
         {
@@ -13,14 +14,14 @@
             _configValidators = new List<IConfigValidator>();
         }
 
-        public void Add(IFieldValidator fieldValidator)
+        public void Add(IFieldValidator validator)
         {
-            _fieldValidators.Add(fieldValidator.Tag, fieldValidator);
+            _fieldValidators.Add(validator.Tag, validator);
         }
 
-        public void Add(IConfigValidator configValidator)
+        public void Add(IConfigValidator validator)
         {
-            _configValidators.Add(configValidator);
+            _configValidators.Add(validator);
         }
 
         public IFieldValidator? Get(string tag)

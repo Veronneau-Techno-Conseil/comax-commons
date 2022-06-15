@@ -36,7 +36,11 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
         [Test]
         public void WhenJObjectIsNullThenShouldReturnNull()
         {
-            var fieldMetaData = new FieldMetaData { FieldType = FieldType.Text, Name = "file1" };
+            var fieldMetaData = new FieldMetaData
+            {
+                FieldType = FieldType.Text,
+                FieldName = "file1"
+            };
             var actual = _requiredFieldValidator.Validate(fieldMetaData, null);
 
             actual.Should().BeNull();
@@ -45,20 +49,28 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
         [Test]
         public void WhenFieldIsRequired()
         {
-            var fieldMetaData = new FieldMetaData { FieldType = FieldType.Text, Name = "file1" };
+            var fieldMetaData = new FieldMetaData
+            {
+                FieldType = FieldType.Text,
+                FieldName = "file1"
+            };
 
             var obj = new JObject();
             obj.Add("file1", "some value");
 
             var actual = _requiredFieldValidator.Validate(fieldMetaData, obj);
-            
+
             actual.Should().BeNull();
         }
 
         [Test]
         public void WhenFieldIsRequiredButNotInJObjectThenShouldReturnValidationError()
         {
-            var fieldMetaData = new FieldMetaData { FieldType = FieldType.Text, Name = "file1" };
+            var fieldMetaData = new FieldMetaData
+            {
+                FieldType = FieldType.Text,
+                FieldName = "file1"
+            };
 
             var obj = new JObject();
             obj.Add("file2", "some value");

@@ -22,7 +22,6 @@
 		<None Remove="Attributes\" />
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="Extentions\" />
 		<Folder Include="Attributes\" />
 	</ItemGroup>
 </Project>

@@ -6,7 +6,7 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
     {
         IngestorType IngestorType { get; }
 
-        IList<DataSourceConfiguration> ConfigurationFields { get; }
+        Dictionary<string, DataSourceConfiguration> Configurations { get; }
 
         void Setup(SourceConfig? sourceConfig);
 

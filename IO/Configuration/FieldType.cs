@@ -8,7 +8,6 @@
         Lookup = 4,
         File = 5,
         Date = 6,
-        Boolean = 7,
-        Object = 8
+        Boolean = 7
     }
 }

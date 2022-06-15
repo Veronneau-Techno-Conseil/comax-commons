@@ -5,13 +5,13 @@ namespace CommunAxiom.Commons.Ingestion.Validators
 {
     public class FileConfigValidator : IConfigValidator
     {
-        public ValidationError Validate(DataSourceConfiguration config)
+        public ValidationError Validate(DataSourceConfiguration configuration)
         {
-            if (config.FieldType == FieldType.File)
+            if (configuration.FieldType == FieldType.File)
             {
                 try
                 {
-                    var file = JsonConvert.DeserializeObject<Configuration.File>(config.Value);
+                    var file = JsonConvert.DeserializeObject<FileModel>(configuration.Value);
 
                     if (file == null) throw new Exception();
                 }
@@ -20,7 +20,7 @@ namespace CommunAxiom.Commons.Ingestion.Validators
                     return new ValidationError
                     {
                         ErrorCode = "The file type is required to set file name and file path",
-                        FieldName = config.Name
+                        FieldName = configuration.Name
                     };
                 }
             }

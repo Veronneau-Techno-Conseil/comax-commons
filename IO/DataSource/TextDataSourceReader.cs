@@ -2,6 +2,7 @@
 using CommunAxiom.Commons.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.Validators;
 using Newtonsoft.Json;
+using CommunAxiom.Commons.Ingestion.Extentions;
 
 namespace CommunAxiom.Commons.Ingestion.DataSource
 {
@@ -10,10 +11,21 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
     {
         private readonly IConfigValidatorLookup _configValidatorLookup;
 
-        private IList<DataSourceConfiguration> _dataSourceConfigurations;
-        public IList<DataSourceConfiguration> ConfigurationFields => _dataSourceConfigurations;
+        private Dictionary<string, DataSourceConfiguration> _configurations;
+        public Dictionary<string, DataSourceConfiguration> Configurations => _configurations;
 
-        public IngestorType IngestorType => IngestorType.JSON;
+        public IngestorType IngestorType
+        {
+            get
+            {
+                if (_configurations == null && _configurations["content-type"] == null)
+                {
+                    throw new NullReferenceException("Configurations is NULL!");
+                }
+
+                return _configurations["content-type"].Value.ToEnum<IngestorType>();
+            }
+        }
 
         public TextDataSourceReader(IConfigValidatorLookup configValidatorLookup)
         {
@@ -22,14 +34,14 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 
         public Stream ReadData()
         {
-            if (_dataSourceConfigurations == null)
+            if (_configurations == null)
             {
                 throw new NullReferenceException("There is no data source configuration!");
             }
 
-            var dataSourceConfiguration = _dataSourceConfigurations.FirstOrDefault();
+            var dataSourceConfiguration = _configurations.FirstOrDefault(x => x.Key == "file-type").Value;
 
-            var file = JsonConvert.DeserializeObject<Configuration.File>(dataSourceConfiguration.Value);
+            var file = JsonConvert.DeserializeObject<FileModel>(dataSourceConfiguration.Value);
 
             if (file == null)
             {
@@ -40,30 +52,37 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 
         }
 
-        public void Setup(SourceConfig? sourceConfig)
+        public void Setup(SourceConfig? sourceConfig = null)
         {
-            List<DataSourceConfiguration> list = new List<DataSourceConfiguration>();
-            if (_dataSourceConfigurations == null)
+            Dictionary<string, DataSourceConfiguration> configurations = new Dictionary<string, DataSourceConfiguration>();
+
+            configurations.Add("content-type", new DataSourceConfiguration
             {
-                list.AddRange(sourceConfig.Configurations.Select(x => x.Value));
+                FieldType = FieldType.Lookup,
+                Value = "json",
+                Parameter = "['json', 'csv']"
+            });
+
+            if (sourceConfig != null)
+            {
+                foreach (var item in sourceConfig.Configurations)
+                {
+                    configurations.Add(item.Key, item.Value);
+                }
             }
-            _dataSourceConfigurations = list.ToArray();
+
+            _configurations = configurations;
         }
 
         public IEnumerable<ValidationError> ValidateConfiguration()
         {
-            foreach (var configuration in _dataSourceConfigurations)
+            foreach (var configuration in _configurations.Values)
             {
                 foreach (var validator in _configValidatorLookup.ConfigValidators)
                 {
                     yield return validator.Validate(configuration);
                 }
             }
-        }
-
-        public void ClearCofigurations()
-        {
-            _dataSourceConfigurations = null;
         }
     }
 }

@@ -6,7 +6,7 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
     {
         Task<IngestorResult> ParseAsync(Stream stream);
 
-        void Configure(IEnumerable<FieldMetaData> fieldMetaDatas);
+        void Configure(IEnumerable<FieldMetaData> fields);
     }
 }
 

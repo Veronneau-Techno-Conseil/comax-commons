@@ -15,14 +15,13 @@ namespace CommunAxiom.Commons.Ingestion
             _ingestionFactory = ingestorFactory;
         }
 
-        public Task<IngestorResult> Import(SourceConfig sourceConfig)
+        public Task<IngestorResult> Import(SourceConfig sourceConfig, IList<FieldMetaData> fieldMetaDatas)
         {
             var dataSourceReader = _sourceFactory.Create(sourceConfig.DataSourceType);
             dataSourceReader.Setup(sourceConfig);
             var stream = dataSourceReader.ReadData();
             var ingestor = _ingestionFactory.Create(dataSourceReader.IngestorType);
-            // TODO: review this code with Luc
-            // ingestor.Configure();
+            ingestor.Configure(fieldMetaDatas);
             return ingestor.ParseAsync(stream);
         }
     }
