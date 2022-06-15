@@ -8,8 +8,6 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 
         IList<DataSourceConfiguration> ConfigurationFields { get; }
 
-        IList<FieldMetaData> DataDescription { get; }
-
         void Setup(SourceConfig? sourceConfig);
 
         IEnumerable<ValidationError> ValidateConfiguration();

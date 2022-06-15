@@ -9,7 +9,7 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
     [IngestionType(IngestorType.JSON)]
     public class JsonIngestor : IngestorBase, IIngestor
     {
-        private IEnumerable<FieldMetaData>  _fieldMetaDatas;
+        private IEnumerable<FieldMetaData> _fieldMetaDatas;
         private readonly IFieldValidatorLookup _fieldValidatorLookup;
 
         public JsonIngestor(IFieldValidatorLookup fieldValidatorLookup)
@@ -43,11 +43,14 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
 
             foreach (var item in data)
             {
-                var result = Validate(item);
-                if (result != null)
+                foreach (var result in Validate(item))
                 {
-                    ingestorResult.Errors.Add((item, result));
+                    if (result != null)
+                    {
+                        ingestorResult.Errors.Add((item, result));
+                    }
                 }
+
             }
 
             ingestorResult.results = data;

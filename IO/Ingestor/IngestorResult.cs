@@ -5,7 +5,7 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
 {
     public class IngestorResult
     {
-        public IList<(JObject, IEnumerable<ValidationError>)> Errors { get; set; }
+        public IList<(JObject, ValidationError)> Errors { get; set; }
 
         public IList<JObject> results { get; set; }
     }

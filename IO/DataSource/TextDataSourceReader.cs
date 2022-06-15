@@ -14,14 +14,11 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
         public IList<DataSourceConfiguration> ConfigurationFields => _dataSourceConfigurations;
 
         public IngestorType IngestorType => IngestorType.JSON;
-        public IList<FieldMetaData> DataDescription => throw new NotImplementedException();
-
 
         public TextDataSourceReader(IConfigValidatorLookup configValidatorLookup)
         {
             _configValidatorLookup = configValidatorLookup;
         }
-
 
         public Stream ReadData()
         {
@@ -62,7 +59,6 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
                     yield return validator.Validate(configuration);
                 }
             }
-
         }
 
         public void ClearCofigurations()

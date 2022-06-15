@@ -7,9 +7,9 @@ namespace CommunAxiom.Commons.Ingestion
     public sealed class Importer
     {
         private readonly IDataSourceFactory _sourceFactory;
-        private readonly IngestorFactory _ingestionFactory;
+        private readonly IIngestorFactory _ingestionFactory;
 
-        public Importer(IDataSourceFactory sourceFactory, IngestorFactory ingestorFactory)
+        public Importer(IDataSourceFactory sourceFactory, IIngestorFactory ingestorFactory)
         {
             _sourceFactory = sourceFactory;
             _ingestionFactory = ingestorFactory;
@@ -21,6 +21,8 @@ namespace CommunAxiom.Commons.Ingestion
             dataSourceReader.Setup(sourceConfig);
             var stream = dataSourceReader.ReadData();
             var ingestor = _ingestionFactory.Create(dataSourceReader.IngestorType);
+            // TODO: review this code with Luc
+            // ingestor.Configure();
             return ingestor.ParseAsync(stream);
         }
     }
