@@ -1,0 +1,73 @@
+﻿@page "/create_portfolio"
+<h3>Create Portfolio</h3>
+
+@using CommunAxiom.Commons.Client.Contracts.Portfolio;
+@using CommunAxiom.Commons.ClientUI.Shared.Services.Portfolios
+@using Microsoft.Extensions.Options
+@using Microsoft.Extensions.Localization
+
+
+@inject HttpClient httpClient
+@inject IPortfolioService portfolioService
+@inject NavigationManager _navigationManager
+@inject IStringLocalizer<CreatePortfolio> _localizer
+
+
+<EditForm Model="@_portfolio" OnValidSubmit="@HandleValidSubmit">
+    <div class="form-group row">
+
+        <div class="field">
+            <label for="type" class="label"> @_localizer["Type"] </label>
+            <div class="control">
+                <InputSelect id="type" class="select" @bind-Value="_portfolio.TheType">
+                    <option selected disabled>@_localizer["SelectType"]</option>
+                    <option value="@_portfolio.PROJECT">@_portfolio.PROJECT</option>
+                    <option value="@_portfolio.DATABASE">@_portfolio.DATABASE</option>
+                </InputSelect>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="name" class="label"> @_localizer["Name"] </label>
+            <div class="control">
+                <InputText id="name" class="select" @bind-Value="_portfolio.Name" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="parent" class="label"> @_localizer["Parent"] </label>
+            <div class="control">
+                <InputSelect id="parent" class="select" @bind-Value="_portfolio.ParentId">
+                    <option selected disabled>@_localizer["SelectParent"]</option>
+                    @if (_portfolios != null)
+                    {
+                        @foreach (var portfolio in _portfolios)
+                        {
+                            <option value="@portfolio.ID"> @portfolio.Name </option>
+                        }
+                    }
+                </InputSelect>
+            </div>
+        </div>
+        <div>
+            <button type="submit" class="button">Create</button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    Portfolio _portfolio = new Portfolio();
+    List<Portfolio> _portfolios = new List<Portfolio>();
+
+    private async void HandleValidSubmit()
+    {
+        await portfolioService.CreatePortfolio(_portfolio);
+        StateHasChanged();
+        _navigationManager.NavigateTo("/list_portfolios");
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        _portfolios = (await portfolioService.GetAllPortfolios()).Portfolios;
+    }
+}

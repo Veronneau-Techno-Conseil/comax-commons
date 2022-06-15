@@ -12,11 +12,11 @@ namespace PortfolioGrain
     [GrainDirectory(GrainDirectoryName = "MyGrainDirectory")]
     public class Portfolios : Grain, IPortfolio
     {
-        private readonly IPersistentState<PortfolioDetails> _portfolioDetails;
+        private readonly IPersistentState<Portfolio> _portfolioDetails;
         private readonly IPersistentState<PortfoliosList> _portfolioList;
 
         public Portfolios(
-            [PersistentState("portfolios")] IPersistentState<PortfolioDetails> portfolioDetails,
+            [PersistentState("portfolios")] IPersistentState<Portfolio> portfolioDetails,
             [PersistentState("portfoliosList")] IPersistentState<PortfoliosList> portfoliosList)
         {
             _portfolioDetails = portfolioDetails;
@@ -43,26 +43,26 @@ namespace PortfolioGrain
             return res.Portfolios != null; //&& List !string.IsNullOrWhiteSpace(res.);
         }
 
-        public async Task<string> AddAPortfolio(PortfolioDetails portfolio)
+        public async Task<string> AddAPortfolio(Portfolio portfolio)
         {
             var portfoliosList = await GetListDetails();
             if (portfoliosList.Portfolios == null)
             {
-                portfoliosList.Portfolios = new List<PortfolioDetails>();
+                portfoliosList.Portfolios = new List<Portfolio>();
             }
             portfoliosList.Portfolios.Add(portfolio);
             await _portfolioList.WriteStateAsync();
             return "New Portfolio Added";
         }
 
-        public async Task<PortfolioDetails> GetAPortfolioDetails(string portfolioID)
+        public async Task<Portfolio> GetAPortfolioDetails(string portfolioID)
         {
             var PortfolioList = await GetListDetails();
             var Portfolio = PortfolioList.Portfolios.Where(x => x.ID == portfolioID).FirstOrDefault();
             return (Portfolio);
         }
 
-        public async Task<List<PortfolioDetails>> FilterPortfolios(string filter)
+        public async Task<List<Portfolio>> FilterPortfolios(string filter)
         {
             var PortfolioList = await GetListDetails();
             var FilteredList = (PortfolioList.Portfolios.Where(x => x.Name.Contains(filter)).ToList());

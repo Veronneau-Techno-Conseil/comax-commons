@@ -6,6 +6,6 @@ namespace CommunAxiom.Commons.Client.Contracts.Portfolio
 {
     public class PortfoliosList
     {
-        public List<PortfolioDetails> Portfolios { get; set; }
+        public List<Portfolio> Portfolios { get; set; }
     }
 }

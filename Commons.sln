@@ -71,9 +71,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SiloShared", "SiloShared\Si
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientUI.Client", "ClientUI.Client\ClientUI.Client.csproj", "{1CEEF1FE-6D2A-449F-9FD1-221770293084}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrontEnd.Server", "FrontEnd.Server\FrontEnd.Server.csproj", "{177CFEA0-FC88-4A14-850E-8809A965C0B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FrontEnd.Server", "FrontEnd.Server\FrontEnd.Server.csproj", "{177CFEA0-FC88-4A14-850E-8809A965C0B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountGrainTests", "AccountGrainTests\AccountGrainTests.csproj", "{CCDDAF76-0CC8-440D-85CC-D59107CBBC62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccountGrainTests", "AccountGrainTests\AccountGrainTests.csproj", "{CCDDAF76-0CC8-440D-85CC-D59107CBBC62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

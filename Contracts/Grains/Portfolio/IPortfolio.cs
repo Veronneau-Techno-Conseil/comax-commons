@@ -11,8 +11,8 @@ namespace CommunAxiom.Commons.Client.Contracts.Portfolio
         Task<string> CreatePortfoliosList();
         Task<PortfoliosList> GetListDetails();
         Task<bool> ListIsSet();
-        Task<string> AddAPortfolio(PortfolioDetails portfolio);
-        Task<PortfolioDetails> GetAPortfolioDetails(string portfolioID);
-        Task<List<PortfolioDetails>> FilterPortfolios(string filter);
+        Task<string> AddAPortfolio(Portfolio portfolio);
+        Task<Portfolio> GetAPortfolioDetails(string portfolioID);
+        Task<List<Portfolio>> FilterPortfolios(string filter);
     }
 }
