@@ -27,6 +27,10 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
             fieldValidatorManager.ConfigureFields(options =>
             {
                 options.Add(new RequiredFieldValidator());
+                options.Add(new NumberFieldValidator());
+                options.Add(new BooleanFieldValidator());
+                options.Add(new DateFieldValidator());
+                options.Add(new TextFieldValidator());
             });
 
             fieldValidatorManager.ConfigureConfigs(options =>
