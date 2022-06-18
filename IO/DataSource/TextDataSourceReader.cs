@@ -63,11 +63,16 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
                 Parameter = "['json', 'csv']"
             });
 
+            configurations.Add("file-type", new DataSourceConfiguration { FieldType = FieldType.File });
+
             if (sourceConfig != null)
             {
-                foreach (var item in sourceConfig.Configurations)
+                foreach (var item in configurations.Keys)
                 {
-                    configurations.Add(item.Key, item.Value);
+                    if (sourceConfig.Configurations.ContainsKey(item))
+                    {
+                        configurations[item] = sourceConfig.Configurations[item];
+                    }
                 }
             }
 
