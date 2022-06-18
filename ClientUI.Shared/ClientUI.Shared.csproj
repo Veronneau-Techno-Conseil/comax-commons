@@ -12,19 +12,19 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Localization" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="6.0.4" />
-	  <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
-	  <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.0" />
-    <PackageReference Include="Blazored.LocalStorage" Version="4.1.5" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-    <PackageReference Include="Blazored.Toast" Version="3.2.2" />
-    <PackageReference Include="BlazorPro.Spinkit" Version="1.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.4" />
-    <PackageReference Include="Radzen.Blazor" Version="3.11.12" />
-    <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="6.0.5" />
+	  <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+	  <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.5" />
+	<PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
+	<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+	<PackageReference Include="Blazored.Toast" Version="3.2.2" />
+	<PackageReference Include="BlazorPro.Spinkit" Version="1.2.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.5" />
+	<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.5" />
+	<PackageReference Include="Radzen.Blazor" Version="3.18.12" />
+	<PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.5" />
+	<PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
 	  <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="6.0.5" />
   </ItemGroup>
@@ -38,16 +38,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Services\StdMessageService.resx">
-      <Generator></Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="ViewModels\LoginViewModel.resx">
-      <Generator></Generator>
-    </EmbeddedResource>
+    <None Remove="JsonLocalizer\" />
+    <None Remove="Microsoft.Extensions.FileProviders.Embedded" />
+    <None Remove="Resources\LoginViewModel\en.json" />
+    <None Remove="Resources\LoginViewModel\fr.json" />
+    <None Remove="Resources\StdMessageService\en.json" />
+    <None Remove="Resources\StdMessageService\fr.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="JsonLocalizer\" />
-    <None Remove="Microsoft.Extensions.FileProviders.Embedded" />
+    <EmbeddedResource Include="Resources\LoginViewModel\en.json" />
+    <EmbeddedResource Include="Resources\LoginViewModel\fr.json" />
+    <EmbeddedResource Include="Resources\StdMessageService\en.json" />
+    <EmbeddedResource Include="Resources\StdMessageService\fr.json" />
   </ItemGroup>
 </Project>

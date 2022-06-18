@@ -29,8 +29,8 @@ namespace ClusterClient
             var b = new ClientBuilder()
                     .Configure<ClusterOptions>(options =>
                     {
-                        options.ClusterId = "dev";
-                        options.ServiceId = "CoreBlog";
+                        options.ClusterId = "0.0.1-a1";
+                        options.ServiceId = "CommonsClientCluster";
                     })
                     .ConfigureApplicationParts(parts =>
                     {

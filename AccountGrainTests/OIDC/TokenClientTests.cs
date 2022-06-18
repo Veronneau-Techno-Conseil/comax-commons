@@ -1,4 +1,5 @@
 ﻿using CommunAxiom.Commons.Client.Grains.AccountGrain;
+using CommunAxiom.Commons.Shared;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace AccountGrainTests.OIDC
             TokenClient tokenClient = new TokenClient(Context.Configuration);
             await tokenClient.Configure();
             Assert.IsNotNull(tokenClient.TokenMetadata);
-            Assert.IsNotNull(tokenClient.TokenMetadata.token_endpoint);
+            Assert.IsNotNull(tokenClient.TokenMetadata.TokenEndpoint);
         }
 
         [TestMethod]
