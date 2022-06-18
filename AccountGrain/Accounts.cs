@@ -6,7 +6,6 @@ using Orleans;
 using Orleans.Runtime;
 using CommunAxiom.Commons.Client.Contracts;
 using Microsoft.Extensions.Configuration;
-using CommunAxiom.Commons.Client.Grains.AccountGrain.InternalData;
 
 namespace CommunAxiom.Commons.Client.Grains.AccountGrain
 {

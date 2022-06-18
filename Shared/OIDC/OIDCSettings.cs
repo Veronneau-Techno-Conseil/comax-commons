@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CommunAxiom.Commons.Client.Contracts.Configuration
+namespace CommunAxiom.Commons.Shared.OIDC
 {
     public class OIDCSettings
     {

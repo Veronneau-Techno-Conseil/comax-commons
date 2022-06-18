@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CommunAxiom.Commons.Client.Grains.AccountGrain.InternalData
+namespace CommunAxiom.Commons.Shared.OIDC
 {
     public class TokenData
     {

@@ -1,4 +1,5 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Account;
+using CommunAxiom.Commons.Shared;
 using Microsoft.Extensions.Configuration;
 using Orleans.Runtime;
 using System;

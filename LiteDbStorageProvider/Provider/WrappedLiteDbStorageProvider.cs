@@ -40,7 +40,7 @@ namespace Comax.Commons.StorageProvider
 
         public void Participate(ISiloLifecycle lifecycle)
         {
-            lifecycle.Subscribe(OptionFormattingUtilities.Name<LiteDbStorageProvider>(_name),
+            lifecycle.Subscribe(OptionFormattingUtilities.Name<DefaultStorageProvider>(_name),
                                     ServiceLifecycleStage.RuntimeInitialize, Init);
         }
         public Task ClearStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)

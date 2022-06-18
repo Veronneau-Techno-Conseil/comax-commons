@@ -19,7 +19,6 @@ using System.Net.Http.Headers;
 using IdentityModel.OidcClient.Browser;
 using System.Threading;
 using Orleans.Streams;
-using CommunAxiom.Commons.Client.Contracts.Configuration;
 using RandomDataGenerator.FieldOptions;
 using JWT.Algorithms;
 using JWT;
@@ -28,6 +27,8 @@ using System.Linq;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using CommunAxiom.Commons.Shared.OIDC;
+using CommunAxiom.Commons.Shared.Configuration;
 
 namespace CommunAxiom.Commons.Client.Grains.AccountGrain
 {

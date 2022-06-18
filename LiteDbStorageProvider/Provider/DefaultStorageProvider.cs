@@ -15,18 +15,18 @@ using System.Threading.Tasks;
 
 namespace Comax.Commons.StorageProvider
 {
-    public class LiteDbStorageProvider : IGrainStorage, ILifecycleParticipant<ISiloLifecycle>
+    public class DefaultStorageProvider : IGrainStorage, ILifecycleParticipant<ISiloLifecycle>
     {
 
         private readonly string _name;
         private LiteDatabase _db;
-        private readonly ILogger<LiteDbStorageProvider> _logger;
+        private readonly ILogger<DefaultStorageProvider> _logger;
         private readonly LiteDbConfig _cfg;
 
         private ISerializationProvider _serializationProvider;
         private readonly IServiceProvider _serviceProvider;
 
-        public LiteDbStorageProvider(string name, ILogger<LiteDbStorageProvider> logger, LiteDbConfig liteDbConfig, IServiceProvider serviceProvider)
+        public DefaultStorageProvider(string name, ILogger<DefaultStorageProvider> logger, LiteDbConfig liteDbConfig, IServiceProvider serviceProvider)
         {
             _name = name;
             _logger = logger;
@@ -41,7 +41,7 @@ namespace Comax.Commons.StorageProvider
 
         public void Participate(ISiloLifecycle lifecycle)
         {
-            lifecycle.Subscribe(OptionFormattingUtilities.Name<LiteDbStorageProvider>(_name),
+            lifecycle.Subscribe(OptionFormattingUtilities.Name<DefaultStorageProvider>(_name),
                                     ServiceLifecycleStage.RuntimeInitialize, Init);
         }
         public async Task ClearStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)

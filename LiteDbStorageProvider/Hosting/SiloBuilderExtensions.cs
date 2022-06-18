@@ -27,8 +27,8 @@ namespace Comax.Commons.StorageProvider.Hosting
 
             services.TryAddSingleton<IGrainStorage>(sp => sp.GetServiceByName<IGrainStorage>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME));
             return services.AddSingletonNamedService<IGrainStorage>(name, (s,n)=>
-                                        new LiteDbStorageProvider(n, 
-                                                            s.GetRequiredService<ILogger<LiteDbStorageProvider>>(),
+                                        new DefaultStorageProvider(n, 
+                                                            s.GetRequiredService<ILogger<DefaultStorageProvider>>(),
                                                             s.GetRequiredService<IOptionsMonitor<LiteDbConfig>>().Get(name),
                                                             s))
                            .AddSingletonNamedService(name, (s, n) =>
