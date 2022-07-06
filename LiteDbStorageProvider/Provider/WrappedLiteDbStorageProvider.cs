@@ -98,7 +98,7 @@ namespace Comax.Commons.StorageProvider
                     _serializationProvider.Configure(_cfg.SerializationConfig);
                 }
 
-                _db = Common.GetOrAdd(_name);
+                _db = Common.GetOrAdd(_cfg.FileName);
                 await Task.Run(() => _grains = _db.GetCollection<GrainStorageModel>("grains"));
                 _grains.EnsureIndex(x => x.ETag, unique: true);
                 

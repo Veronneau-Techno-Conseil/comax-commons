@@ -7,6 +7,10 @@
     "Name": "LiteDbStorage",
     "FileName": "./SiloStore.db"
   },
+  "JObjectStore": {
+    "Name": "JObjectStore",
+    "FileName": "./SiloStore.db"
+  },
   "PubSubStore": {
     "Name": "PubSubStore",
     "FileName": "./PubSubStore.db"
