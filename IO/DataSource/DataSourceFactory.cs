@@ -21,7 +21,7 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 
             if (type == null)
             {
-                throw new ArgumentException($"No DataSourceReader type with name {Enum.GetName(sourceType)} could be found");
+                throw new ArgumentException($"No DataSourceReader type with name {Enum.GetName(typeof(DataSourceType), sourceType)} could be found");
             }
 
             var reader = _serviceProvider.GetService(type) as IDataSourceReader;
