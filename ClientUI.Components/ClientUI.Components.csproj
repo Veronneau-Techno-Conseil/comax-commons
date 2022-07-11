@@ -14,8 +14,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.5" />
-	  <PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.4" />
+<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.5" />
+	  <PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
 	  <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
   </ItemGroup>
@@ -25,20 +25,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\App\en.json" />
+    <EmbeddedResource Include="Resources\App\fr.json" />
+    <EmbeddedResource Include="Resources\Login\en.json" />
+    <EmbeddedResource Include="Resources\Login\fr.json" />
     <EmbeddedResource Include="Resources\MainMenu\en.json" />
     <EmbeddedResource Include="Resources\MainMenu\fr.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Authentication\Login.resx">
-      <Generator></Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Portfolio\PortfolioRes.fr.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Portfolio\PortfolioRes.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>PortfolioRes.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -47,6 +39,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Resources\App\en.json" />
+    <Content Remove="Resources\App\fr.json" />
+    <Content Remove="Resources\Login\en.json" />
+    <Content Remove="Resources\Login\fr.json" />
     <Content Remove="Resources\MainMenu\MainMenu-en.json" />
     <Content Remove="Resources\MainMenu\MainMenu-fr.json" />
   </ItemGroup>

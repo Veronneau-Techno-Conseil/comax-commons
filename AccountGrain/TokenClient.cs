@@ -12,6 +12,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
 {
     public class TokenClient
     {
+        public const string SCOPES_OFFLINE = "openid offline_access";
         const string WELL_KNOWN = ".well-known/openid-configuration";
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
