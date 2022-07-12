@@ -1,9 +1,8 @@
 ﻿using CommunAxiom.Commons.Ingestion.Configuration;
 using System.Collections.Generic;
 
-namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
+namespace CommunAxiom.Commons.Client.Contracts.IO
 {
-    // HACK: remove this class into Contract project.
     public class SourceState
     {
         public Dictionary<string, DataSourceConfiguration> Configurations { get; set; }

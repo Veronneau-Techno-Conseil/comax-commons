@@ -1,9 +1,11 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.Grains.Storage;
 using CommunAxiom.Commons.Client.Contracts.Ingestion;
+using CommunAxiom.Commons.Client.Contracts.IO;
 using CommunAxiom.Commons.Ingestion;
 using Newtonsoft.Json.Linq;
 using Orleans.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -36,32 +38,44 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
 
         public async Task Run()
         {
-            var dataSource = _grainFactory.GetGrain<IDatasource>(_grainKey);
-            var state = dataSource.GetState();
-            var result = _importer.Import(state.SourceConfig, state.fieldMetaDatas).GetAwaiter().GetResult();
-
-            var indexes = new List<string>();
-
-            for (int i = 0; i < result.Rows.Count; i++)
+            try
             {
-                var indetifier = $"{_grainKey}-{i}";
-                indexes.Add(indetifier);
-                var rowStorage = _grainFactory.GetGrain<IStorageGrain>(indetifier);
-                await rowStorage.SaveData(result.Rows[i]);
+                var dataSource = _grainFactory.GetGrain<IDatasource>(_grainKey);
+                var state = await dataSource.GetState();
+                var sourfceConfig = new Ingestion.Configuration.SourceConfig { Configurations = state.Configurations, DataSourceType = state.DataSourceType };
+
+                var result = await _importer.Import(sourfceConfig, state.Fields);
+
+                var indexes = new List<string>();
+
+                for (int i = 0; i < result.Rows.Count; i++)
+                {
+                    var indetifier = $"{_grainKey}-{i}";
+                    indexes.Add(indetifier);
+                    var rowStorage = _grainFactory.GetGrain<IStorageGrain>(indetifier);
+                    await rowStorage.SaveData(result.Rows[i]);
+                }
+
+                var storage = _grainFactory.GetGrain<IStorageGrain>($"{_grainKey}-index");
+
+                var temp = JObject.FromObject(indexes);
+                await storage.SaveData(temp);
+
+
+                // HACK: added code same for errors $"{_grainKey}-err-{i}"
+
+
+
+
+
+                // HACK: add history code here.
+                // date: UtcNow / success / errors:  serilize exception details
+            }
+            catch (Exception ex)
+            {
+
             }
 
-            var storage = _grainFactory.GetGrain<IStorageGrain>($"{_grainKey}-index");
-
-            var temp =  JObject.FromObject(indexes);
-            await storage.SaveData(temp);
-
-
-            // HACK: added code same for errors $"{_grainKey}-err-{i}"
-
-
-            // HACK: add history code here.
-            // date: UtcNow / success / errors:  serilize exception details
-            
         }
     }
 }

@@ -3,6 +3,7 @@ using Comax.Commons.StorageProvider.Models;
 using Comax.Commons.StorageProvider.Serialization;
 using LiteDB;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using Orleans;
 using Orleans.Providers;
 using Orleans.Runtime;
@@ -15,18 +16,19 @@ using System.Threading.Tasks;
 
 namespace Comax.Commons.StorageProvider
 {
-    public class DefaultStorageProvider : IGrainStorage, ILifecycleParticipant<ISiloLifecycle>
+    public class JObjectStorageProvider : IGrainStorage, ILifecycleParticipant<ISiloLifecycle>
     {
 
         private readonly string _name;
         private LiteDatabase _db;
-        private readonly ILogger<DefaultStorageProvider> _logger;
+        private readonly ILogger<JObjectStorageProvider> _logger;
         private readonly LiteDbConfig _cfg;
 
         private ISerializationProvider _serializationProvider;
         private readonly IServiceProvider _serviceProvider;
 
-        public DefaultStorageProvider(string name, ILogger<DefaultStorageProvider> logger, LiteDbConfig liteDbConfig, IServiceProvider serviceProvider)
+        
+        public JObjectStorageProvider(string name, ILogger<JObjectStorageProvider> logger, LiteDbConfig liteDbConfig, IServiceProvider serviceProvider)
         {
             _name = name;
             _logger = logger;
@@ -67,9 +69,9 @@ namespace Comax.Commons.StorageProvider
                 if (grain == null)
                     return;
 
-                dynamic obj = BsonMapper.Global.Deserialize(typeof(GrainStorageModel<>).MakeGenericType(grainState.Type), grain);
+                BaseGrainStorageModel obj = BsonMapper.Global.Deserialize<BaseGrainStorageModel>(grain);
 
-                grainState.State = obj.Contents;
+                grainState.State = JObject.Parse(LiteDB.JsonSerializer.Serialize(grain["Contents"]));
                 grainState.ETag = obj.ETag;
             });
         }
@@ -81,20 +83,24 @@ namespace Comax.Commons.StorageProvider
                 var blobName = GetBlobName(grainType, grainReference);
                 var collection = await CreateLiteCollection(grainState.Type.Name);
                 var grain = collection.Query().Where(x => x["ETag"].AsString == blobName).FirstOrDefault();
-                object obj;
+
+                BaseGrainStorageModel obj = new BaseGrainStorageModel();
                 if (grain == null)
                 {
-                    obj = Activator.CreateInstance(typeof(GrainStorageModel<>).MakeGenericType(grainState.Type));
                     Assign(obj, "Id", LiteDB.ObjectId.NewObjectId());
                 }
                 else
                 {
-                    obj = BsonMapper.Global.Deserialize(typeof(GrainStorageModel<>).MakeGenericType(grainState.Type), grain);
+                    obj = BsonMapper.Global.Deserialize<BaseGrainStorageModel>(grain);
                 }
-                Assign(obj, "ETag", blobName);
-                Assign(obj, "Contents", grainState.State);
 
-                var doc = BsonMapper.Global.Serialize(typeof(GrainStorageModel<>).MakeGenericType(grainState.Type), obj);
+                obj.ETag = blobName;
+                
+                var doc = BsonMapper.Global.Serialize(obj);
+                var jo = (JObject)grainState.State;
+
+                doc["Contents"] = LiteDB.JsonSerializer.Deserialize(jo.ToString());
+
                 collection.Upsert(doc.AsDocument);
             });
         }
