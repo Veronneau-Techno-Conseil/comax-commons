@@ -1,7 +1,7 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Grains.Storage;
 using Newtonsoft.Json.Linq;
-using Orleans.Providers;
 using Orleans.Runtime;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace StorageGrain
@@ -15,6 +15,11 @@ namespace StorageGrain
         public StorageGrain([PersistentState("storageGrain")] IPersistentState<JObject> storageState)
         {
             _storageState = storageState;
+        }
+
+        public Task<List<JObject>> GetData()
+        {
+            throw new System.NotImplementedException();
         }
 
         public Task SaveData(JObject obj)

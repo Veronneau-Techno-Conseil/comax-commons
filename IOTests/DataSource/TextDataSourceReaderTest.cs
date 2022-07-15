@@ -26,6 +26,12 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
             _configValidatorLookup = _mockRepository.Create<IConfigValidatorLookup>();
             _textDataSourceReader = new TextDataSourceReader(_configValidatorLookup.Object);
         }
+        
+        [TearDown]
+        public void TearDown()
+        {
+            _mockRepository.Verify();
+        }
 
         [Test]
         public void TextDataSourceReaderShouldHasIngestionTypeAttribute()

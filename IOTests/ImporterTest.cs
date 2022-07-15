@@ -35,6 +35,12 @@ namespace CommunAxiom.Commons.Ingestion.Tests
             _importer = new Importer(_dataSourceFactory.Object, _ingestorFactory.Object);
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _mockRepository.Verify();
+        }
+
         [Test]
         public async Task WhenImporterReturnRows()
         {

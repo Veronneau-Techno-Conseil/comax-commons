@@ -1,10 +1,6 @@
 ﻿using CommunAxiom.Commons.Client.Contracts;
 using Newtonsoft.Json.Linq;
 using Orleans.Runtime;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace TestContracts

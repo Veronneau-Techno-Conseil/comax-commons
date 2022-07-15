@@ -10,5 +10,4 @@ namespace CommunAxiom.Commons.Client.Contracts.Datasource
         Task<string> TestGrain(string Grain);
     }
 
-
 }

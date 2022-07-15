@@ -48,6 +48,7 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
 
                 var indexes = new List<string>();
 
+                // save rows
                 for (int i = 0; i < result.Rows.Count; i++)
                 {
                     var indetifier = $"{_grainKey}-{i}";
@@ -58,22 +59,23 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
 
                 var storage = _grainFactory.GetGrain<IStorageGrain>($"{_grainKey}-index");
 
-                var temp = JObject.FromObject(indexes);
+                var temp = JObject.FromObject(new { indexes = indexes });
                 await storage.SaveData(temp);
 
+                                // save errors
+                for (int i = 0; i < result.Errors.Count; i++)
+                {
+                    var indetifier = $"{_grainKey}-err-{i}";
+                    indexes.Add(indetifier);
+                    var rowStorage = _grainFactory.GetGrain<IStorageGrain>(indetifier);
+                    await rowStorage.SaveData(result.Errors[i].Item1);
+                }
 
-                // HACK: added code same for errors $"{_grainKey}-err-{i}"
-
-
-
-
-
-                // HACK: add history code here.
-                // date: UtcNow / success / errors:  serilize exception details
             }
             catch (Exception ex)
             {
-
+                // HACK: add history code here.
+                // date: UtcNow / success / errors:  serilize exception details
             }
 
         }
