@@ -1,4 +1,4 @@
-﻿using CommunAxiom.Commons.Client.Contracts.IO;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion;
 using Orleans.Runtime;
 using System.Threading.Tasks;
 
@@ -6,22 +6,22 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
 {
     public class Repo
     {
-        private readonly IPersistentState<SourceState>  _sourceItem;
-        public Repo(IPersistentState<SourceState> sourceItem)
+        private readonly IPersistentState<IngestionHistory>  _history;
+        public Repo(IPersistentState<IngestionHistory> history)
         {
-            _sourceItem = sourceItem;
+            _history = history;
         }
 
-        //public async Task<SourceState> Fetch()
-        //{
-        //    await _sourceItem.ReadStateAsync();
-        //    return _sourceItem.State;
-        //}
-
-        public async Task AddHistory(SourceState accountDetails)
+        public async Task<IngestionHistory> FetchHistory()
         {
-            _sourceItem.State = accountDetails;
-            await _sourceItem.WriteStateAsync();
+            await _history.ReadStateAsync();
+            return _history.State;
+        }
+
+        public async Task AddHistory(IngestionHistory newHistory)
+        {
+            _history.State = newHistory;
+            await _history.WriteStateAsync();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Ingestion;
-using CommunAxiom.Commons.Client.Contracts.IO;
 using CommunAxiom.Commons.Ingestion;
 using Orleans;
 using Orleans.Runtime;
@@ -11,13 +10,13 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
     {
         private readonly Business _business;
         
-        public Ingestions(Importer importer, [PersistentState("ingestions")] IPersistentState<SourceState> sourceState)
+        public Ingestions(Importer importer, [PersistentState("ingestion-history")] IPersistentState<IngestionHistory> history)
         {
             _business = new Business(importer, new GrianFactory(this.GrainFactory), this.GrainReference.GrainIdentity.PrimaryKeyString);
-
+            _business.Init(history);
         }
 
-        public Task<History> GetHistory()
+        public Task<IngestionHistory> GetHistory()
         {
             return _business.GetHistory();
         }
