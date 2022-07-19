@@ -22,8 +22,10 @@ namespace AccountGrainTests.OIDC
         }
 
         [TestMethod]
+        [Ignore]
         public async Task Authenticate()
         {
+            //TODO: create test account to support test clientid / secrets
             TokenClient tokenClient = new TokenClient(Context.Configuration);
             var (success, token) = await tokenClient.GetToken("convicia_magnosque_imperiis_monstruosi", "6b99f7a4-cee1-43a6-a960-e22db4df121a", "openid offline_access");
             Assert.IsTrue(success);

@@ -1,0 +1,13 @@
+﻿[
+  {
+    "Name": "sample1",
+    "FieldType": "File",
+    "Value": "sample value"
+  },
+  {
+    "Name": "sample2",
+    "FieldType": "Text",
+    "Value": "sample value"
+  }
+]
+

@@ -129,7 +129,7 @@ namespace Comax.Commons.StorageProvider
                     _serializationProvider.Configure(_cfg.SerializationConfig);
                 }
 
-                _db = Common.GetOrAdd(_name);
+                _db = Common.GetOrAdd(_cfg.FileName);
 
                 stopWatch.Stop();
                 _logger.LogInformation($"Initializing provider {_name} of type {this.GetType().Name} in stage { ServiceLifecycleStage.RuntimeInitialize } took {stopWatch.ElapsedMilliseconds} Milliseconds.");

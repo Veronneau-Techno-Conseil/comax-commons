@@ -1,0 +1,9 @@
+﻿[
+  {
+    "FieldName": "SampleFieldName",
+    "DisplayName": "sample1",
+    "FieldType": "File",
+    "Validators": { "Tag": "required" },
+  }
+]
+

@@ -1,15 +1,31 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Ingestion;
+using CommunAxiom.Commons.Ingestion;
 using Orleans;
-using System;
+using Orleans.Runtime;
 using System.Threading.Tasks;
 
-namespace IngestionGrain
+namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
 {
     public class Ingestions : Grain, IIngestion
     {
-        public Task<string> TestGrain(string Grain)
+        private readonly Business _business;
+        
+        public Ingestions(Importer importer, [PersistentState("ingestion-history")] IPersistentState<IngestionHistory> history)
         {
-            return Task.FromResult($"The {Grain} grain has been launched. Check it on the dashboard");
+            _business = new Business(importer, new GrianFactory(this.GrainFactory), this.GrainReference.GrainIdentity.PrimaryKeyString);
+            _business.Init(history);
         }
+
+        public Task<IngestionHistory> GetHistory()
+        {
+            return _business.GetHistory();
+        }
+
+        public Task Run()
+        {
+            _ = _business.Run();
+            return Task.CompletedTask;
+        }
+
     }
 }

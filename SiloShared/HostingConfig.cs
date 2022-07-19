@@ -22,7 +22,6 @@ namespace CommunAxiom.Commons.Client.SiloShared
 {
     public static class HostingConfig
     {
-        const string PubSubStore = "PubSubStore";
 
         public static IServiceCollection SetServerServices(this IServiceCollection sc)
         {
@@ -97,20 +96,22 @@ namespace CommunAxiom.Commons.Client.SiloShared
             services.AddOptions();
             services.SetJSONLiteDbSerializationProvider();
             services.Configure<LiteDbConfig>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, configuration.GetSection("LiteDbStorage"));
-            services.Configure<LiteDbConfig>(PubSubStore, configuration.GetSection(PubSubStore));
+            services.Configure<LiteDbConfig>(Contracts.Constants.Storage.PubSubStore, configuration.GetSection(Contracts.Constants.Storage.PubSubStore));
+            services.Configure<LiteDbConfig>(Contracts.Constants.Storage.JObjectStore, configuration.GetSection(Contracts.Constants.Storage.JObjectStore));
 
             services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, (svc, key) =>
             {
                 return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
             });
 
-            services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(PubSubStore, (svc, key) =>
+            services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(Contracts.Constants.Storage.PubSubStore, (svc, key) =>
             {
                 return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
             });
 
             services.AddLiteDbGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
-            services.AddWrappedLiteDbGrainStorage(PubSubStore);
+            services.AddWrappedLiteDbGrainStorage(Contracts.Constants.Storage.PubSubStore);
+            services.AddJObjectLiteDbGrainStorage(Contracts.Constants.Storage.JObjectStore);
 
             return services;
         }

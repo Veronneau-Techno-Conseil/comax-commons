@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LiteDbTests.Contracts
+namespace TestContracts
 {
-    public class ComplexChild
+    public class Flat
     {
         [BsonId]
         public ObjectId? ObjectId { get; set; }
@@ -16,6 +16,5 @@ namespace LiteDbTests.Contracts
         public long LongValue { get; set; }
         public bool BoolValue { get; set; }
         public byte[]? Content { get; set; }
-        public Flat? Flats { get; set; }
     }
 }
