@@ -1,73 +1,94 @@
 ﻿@page "/create_portfolio"
-<h3>Create Portfolio</h3>
 
-@using CommunAxiom.Commons.Client.Contracts.Portfolio;
-@using CommunAxiom.Commons.ClientUI.Shared.Services.Portfolios
+@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 @using Microsoft.Extensions.Options
 @using Microsoft.Extensions.Localization
 
-
-@inject HttpClient httpClient
-@inject IPortfolioService portfolioService
 @inject NavigationManager _navigationManager
 @inject IStringLocalizer<CreatePortfolio> _localizer
+@inject IPortfolioViewModel _portfolioViewModel
+@inject IToastService toastService
 
+<h3>@_localizer["CreatePortfolio"]</h3>
+<EditForm Model="@_portfolioViewModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <div>
+        <label> @_localizer["Type"] </label>
+        <select id="type" @bind="_portfolioViewModel.TheType">
+            <option selected disabled>@_localizer["SelectType"]</option>
+            <option value="@_portfolioViewModel.PROJECT">@_portfolioViewModel.PROJECT</option>
+            <option value="@_portfolioViewModel.DATABASE">@_portfolioViewModel.DATABASE</option>
+        </select>
+        <span asp-validation-for="Email" class="help is-danger"><ValidationMessage For="@(()=>_portfolioViewModel.TheType)"></ValidationMessage></span>
+    </div>
 
-<EditForm Model="@_portfolio" OnValidSubmit="@HandleValidSubmit">
-    <div class="form-group row">
+    <div>
+        <label> @_localizer["Name"] </label>
+        <input id="name" placeholder="@_localizer["Name"]" @bind="_portfolioViewModel.Name" />
+        <span asp-validation-for="Email" class="help is-danger"><ValidationMessage For="@(()=>_portfolioViewModel.Name)"></ValidationMessage></span>
+    </div>
 
-        <div class="field">
-            <label for="type" class="label"> @_localizer["Type"] </label>
-            <div class="control">
-                <InputSelect id="type" class="select" @bind-Value="_portfolio.TheType">
-                    <option selected disabled>@_localizer["SelectType"]</option>
-                    <option value="@_portfolio.PROJECT">@_portfolio.PROJECT</option>
-                    <option value="@_portfolio.DATABASE">@_portfolio.DATABASE</option>
-                </InputSelect>
-            </div>
-        </div>
+    <div>
+        <label> @_localizer["Parent"] </label>
+        <select id="parent" @bind="_portfolioViewModel.ParentId">
+            <option selected disabled>@_localizer["SelectParent"]</option>
+            @if (_portfolios != null)
+            {
+                @foreach (var portfolio in _portfolios)
+                {
+                    <option value="@portfolio.ID"> @portfolio.Name </option>
+                }
+            }
+        </select>
+    </div>
 
-        <div class="field">
-            <label for="name" class="label"> @_localizer["Name"] </label>
-            <div class="control">
-                <InputText id="name" class="select" @bind-Value="_portfolio.Name" />
-            </div>
-        </div>
-
-        <div class="field">
-            <label for="parent" class="label"> @_localizer["Parent"] </label>
-            <div class="control">
-                <InputSelect id="parent" class="select" @bind-Value="_portfolio.ParentId">
-                    <option selected disabled>@_localizer["SelectParent"]</option>
-                    @if (_portfolios != null)
-                    {
-                        @foreach (var portfolio in _portfolios)
-                        {
-                            <option value="@portfolio.ID"> @portfolio.Name </option>
-                        }
-                    }
-                </InputSelect>
-            </div>
-        </div>
-        <div>
-            <button type="submit" class="button">Create</button>
-        </div>
+    <div class="field level evenly">
+        <button type="submit" class="button">@_localizer["Create"]</button>
     </div>
 </EditForm>
 
 @code {
-    Portfolio _portfolio = new Portfolio();
     List<Portfolio> _portfolios = new List<Portfolio>();
+    bool IsUnique;
 
     private async void HandleValidSubmit()
     {
-        await portfolioService.CreatePortfolio(_portfolio);
-        StateHasChanged();
-        _navigationManager.NavigateTo("/list_portfolios");
+        if (!string.IsNullOrEmpty(_portfolioViewModel.Name))
+        {
+            IsUnique = await _portfolioViewModel.CheckIfUnique(
+            string.IsNullOrEmpty(_portfolioViewModel.Name) ? string.Empty : _portfolioViewModel.Name);
+        }
+        else
+        {
+            IsUnique = false;
+        }
+
+        if (IsUnique)
+        {
+            var portfolio = new Portfolio
+                {
+                    ID = Guid.NewGuid().ToString(),
+                    Name = _portfolioViewModel.Name,
+                    TheType = _portfolioViewModel.TheType,
+                    ParentId = _portfolioViewModel.ParentId
+                };
+            await _portfolioViewModel.CreatePortfolio(portfolio);
+            StateHasChanged();
+            _navigationManager.NavigateTo("/list_portfolios");
+        }
+        else
+        {
+            ShowUniquenessError();
+        }
+    }
+
+    private void ShowUniquenessError()
+    {
+        toastService.ShowError(_localizer["NameIsNotUnique"], "ERROR");
     }
 
     protected async override Task OnInitializedAsync()
     {
-        _portfolios = (await portfolioService.GetAllPortfolios()).Portfolios;
+        _portfolios = await _portfolioViewModel.GetPortfolios();
     }
 }

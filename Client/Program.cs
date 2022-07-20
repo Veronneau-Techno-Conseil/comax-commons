@@ -11,7 +11,6 @@ using CommunAxiom.Commons.ClientUI.Shared.Extensions;
 using CommunAxiom.Commons.ClientUI.Shared.JsonLocalizer;
 using CommunAxiom.Commons.ClientUI.Shared.Models;
 using CommunAxiom.Commons.ClientUI.Shared.Services;
-using CommunAxiom.Commons.ClientUI.Shared.Services.Portfolios;
 using ElectronNET.API;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -102,8 +101,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // adding application services
 builder.Services.SetBlazorApp(applicationSettingsSection.Get<ApplicationSettings>());
 
-//add services for grains
-builder.Services.AddScoped<IPortfolioService, PortfolioService>();
 
 #endregion
 

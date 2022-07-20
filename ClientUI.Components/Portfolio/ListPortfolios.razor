@@ -1,68 +1,60 @@
 ﻿@page "/list_portfolios"
-<h3>List Portfolios</h3>
 
-@using CommunAxiom.Commons.Client.Contracts.Portfolio;
-@using CommunAxiom.Commons.ClientUI.Shared.Services.Portfolios
+@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+@using Microsoft.Extensions.Options
+@using Microsoft.Extensions.Localization
 
-@inject HttpClient httpClient
-@inject IPortfolioService portfolioService
 @inject NavigationManager _navigationManager
-@inject IStringLocalizer<CreatePortfolio> _localizer
+@inject IStringLocalizer<ListPortfolios> _localizer
+@inject IPortfolioViewModel _portfolioViewModel;
 
+<h3>@_localizer["ListPortfolios"]</h3>
 <div>
     <div class="table-container">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Parent</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var portfolio in _portfolios)
-                {
+        @if (_portfolios != null)
+        {
+            <table class="table">
+                <thead>
                     <tr>
-                        <td> @portfolio.Name </td>
-                        <td> @portfolio.TheType</td>
-                        @*to investigate: there is no need to calculate the name
-                    using the parentId, seems that Orleans does this on its own*@
-                        <td> @portfolio.ParentId</td>
+                        <th>ID </th>
+                        <th>@_localizer["Name"] </th>
+                        <th>@_localizer["Type"] </th>
+                        @*<th>@_localizer["Parent"] </th>*@
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var portfolio in _portfolios)
+                    {
+                        <tr>
+                            <td> @portfolio.ID </td>
+                            <td> @portfolio.Name </td>
+                            <td> @portfolio.TheType </td>
+                            @*<td> @portfolio.ParentId </td>*@
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <h3>@_localizer["NoPortfoliosAdded"]</h3>
+        }
     </div>
     <div>
-        <a class="button" @onclick="@GoToCreatePortfolio" target=""> @_localizer["AddPortfolio"] </a>
+        <a class="button" @onclick="@GoToCreatePortfolio" target=""> @_localizer["Create"] </a>
     </div>
 </div>
 
 @code {
-    List<Portfolio> _portfolios = new List<Portfolio>();
+    private List<Portfolio> _portfolios = new List<Portfolio>();
 
     protected async override Task OnInitializedAsync()
     {
-        _portfolios = (await portfolioService.GetAllPortfolios()).Portfolios;
+        _portfolios = await _portfolioViewModel.GetPortfolios();
     }
 
     private void GoToCreatePortfolio()
     {
-         _navigationManager.NavigateTo("/create_portfolio");
+        _navigationManager.NavigateTo("/create_portfolio");
     }
-
-    ////The below function may be removed. it was made to get the portfolioname
-    ////but it was found that the Orleans is finding the name without any intervention
-    ////in linking the Ids
-    ////--------------------------------------------------------------------------------
-    //private async Task<string> GetPortfolioName(string portfolioID)
-    //{
-    //    var portfolioName = "";
-    //    if (portfolioID != null & portfolioID != "")
-    //    {
-    //        var portfolioDetails = await portfolioService.GetPortfolioDetails(portfolioID);
-    //        portfolioName = portfolioDetails == null ? "-" : portfolioDetails.Name;
-    //    }
-    //    return (portfolioName);
-    //}
 }
