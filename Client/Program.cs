@@ -10,6 +10,7 @@ using CommunAxiom.Commons.ClientUI.Server.SEO;
 using CommunAxiom.Commons.ClientUI.Shared.Extensions;
 using CommunAxiom.Commons.ClientUI.Shared.JsonLocalizer;
 using CommunAxiom.Commons.ClientUI.Shared.Models;
+using CommunAxiom.Commons.ClientUI.Shared.Services;
 using ElectronNET.API;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -99,6 +100,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // adding application services
 builder.Services.SetBlazorApp(applicationSettingsSection.Get<ApplicationSettings>());
+
 
 #endregion
 

@@ -19,7 +19,6 @@ using CommunAxiom.Commons.Client.Contracts.Account;
 using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.DataTransfer;
 using CommunAxiom.Commons.Client.Contracts.Ingestion;
-using CommunAxiom.Commons.Client.Contracts.Portfolio;
 using CommunAxiom.Commons.Client.Contracts.Project;
 using CommunAxiom.Commons.Client.Contracts.Replication;
 using Comax.Commons.StorageProvider.Hosting;

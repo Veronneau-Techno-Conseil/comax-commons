@@ -3,8 +3,8 @@ using CommunAxiom.Commons.Client.Contracts.Auth;
 using CommunAxiom.Commons.Client.Contracts.Dataset;
 using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.DataTransfer;
+using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
 using CommunAxiom.Commons.Client.Contracts.Ingestion;
-using CommunAxiom.Commons.Client.Contracts.Portfolio;
 using CommunAxiom.Commons.Client.Contracts.Project;
 using CommunAxiom.Commons.Client.Contracts.Replication;
 using CommunAxiom.Commons.Client.Grains.AccountGrain;
@@ -58,6 +58,8 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<IDataTransfer, DataTransfer>();
                     services.AddSingleton<IIngestion, Ingestions>();
                     services.AddSingleton<IPortfolio, Portfolios>();
+                    services.AddSingleton<PortfolioRepo, PortfolioRepo>();
+                    services.AddSingleton<PortfolioBusiness, PortfolioBusiness>();
                     services.AddSingleton<IProject, Projects>();
                     services.AddSingleton<IReplication, Replications>();
 

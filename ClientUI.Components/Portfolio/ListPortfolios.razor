@@ -1,0 +1,60 @@
+﻿@page "/list_portfolios"
+
+@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+@using Microsoft.Extensions.Options
+@using Microsoft.Extensions.Localization
+
+@inject NavigationManager _navigationManager
+@inject IStringLocalizer<ListPortfolios> _localizer
+@inject IPortfolioViewModel _portfolioViewModel;
+
+<h3>@_localizer["ListPortfolios"]</h3>
+<div>
+    <div class="table-container">
+        @if (_portfolios != null)
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID </th>
+                        <th>@_localizer["Name"] </th>
+                        <th>@_localizer["Type"] </th>
+                        @*<th>@_localizer["Parent"] </th>*@
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var portfolio in _portfolios)
+                    {
+                        <tr>
+                            <td> @portfolio.ID </td>
+                            <td> @portfolio.Name </td>
+                            <td> @portfolio.TheType </td>
+                            @*<td> @portfolio.ParentId </td>*@
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <h3>@_localizer["NoPortfoliosAdded"]</h3>
+        }
+    </div>
+    <div>
+        <a class="button" @onclick="@GoToCreatePortfolio" target=""> @_localizer["Create"] </a>
+    </div>
+</div>
+
+@code {
+    private List<Portfolio> _portfolios = new List<Portfolio>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        _portfolios = await _portfolioViewModel.GetPortfolios();
+    }
+
+    private void GoToCreatePortfolio()
+    {
+        _navigationManager.NavigateTo("/create_portfolio");
+    }
+}

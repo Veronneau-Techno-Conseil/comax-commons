@@ -1,12 +1,7 @@
 export class PortfolioModel {
-
-  public PortfolioID: string = '';
-  public PortfolioName: string = '';
-  public PortfolioAssociations!: PortfolioAssociationsModel[];
-
+  public ID: string = '';
+  public Name: string = '';
+  public Type: string = '';
+  public ParentId: string = ''
 }
 
-export class PortfolioAssociationsModel {
-  public AssociatedPortfolioID: string = '';
-  public RelationShipDescription: string = '';
-}

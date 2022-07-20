@@ -23,17 +23,18 @@ export class CreatePortfolioComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.PortfolioModel.PortfolioID = UUID.UUID()
+    this.PortfolioModel.ID = UUID.UUID()
     this.portfolio.CreatePortfolio(this.PortfolioModel).subscribe(response => {
       console.log("Created");
     });
-
   }
 
   InitializeForm(): void {
     this.PortfolioForm = this.fb.group({
-      PortfolioID: '',
-      PortfolioName: ''
+      ID: '',
+      Name: '',
+      Type: '',
+      ParentId: ''
     });
   }
 

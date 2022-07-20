@@ -1,0 +1,10 @@
+﻿{
+  "CreatePortfolio": "Créer Un Portefeuille",
+  "Type": "Type",
+  "SelectType": "Sélectionnez le type",
+  "Name": "Nom",
+  "Parent": "Parent",
+  "SelectParent": "Sélectionnez le parent",
+  "Create": "Créer",
+  "NameIsNotUnique": "Le nom du portefeuille n'est pas unique"
+}
