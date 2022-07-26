@@ -19,6 +19,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.Services
             _stringLocalizer = stringLocalizer;
             _toastService = toastService;
         }
+
         public string ErrorMessage(string code, string source, string failedAction)
         {
             switch (code)

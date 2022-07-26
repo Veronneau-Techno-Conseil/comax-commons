@@ -20,7 +20,17 @@ namespace CommunAxiom.Commons.Shared
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
         private readonly OIDCSettings _settings;
-        public DiscoveryDocumentResponse? TokenMetadata { get; private set; }
+        private DiscoveryDocumentResponse? _tokenMetadata = null;
+        public DiscoveryDocumentResponse TokenMetadata { get
+            {
+                if(_tokenMetadata == null)
+                {
+                    string url = _settings.Authority.TrimEnd('/') + '/';
+                    _tokenMetadata = _httpClient.GetDiscoveryDocumentAsync(url).GetAwaiter().GetResult();
+                }
+                return _tokenMetadata;
+            }
+        }
         private bool _configured;
         public TokenClient(IConfiguration configuration)
         {
@@ -34,9 +44,7 @@ namespace CommunAxiom.Commons.Shared
         {
             if (!_configured)
             {
-                string url = _settings.Authority.TrimEnd('/') + '/';
-                //TokenMetadata = await _httpClient.GetFromJsonAsync<TokenMetadata>($"{url}{WELL_KNOWN}");
-                TokenMetadata = await _httpClient.GetDiscoveryDocumentAsync(url);
+
                 _configured = true;
             }
         }
@@ -47,6 +55,7 @@ namespace CommunAxiom.Commons.Shared
             
             var res = await _httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
+                Address = TokenMetadata.TokenEndpoint,
                 ClientId = clientId,
                 ClientSecret = secret,
                 Scope = scope
@@ -70,7 +79,8 @@ namespace CommunAxiom.Commons.Shared
             await this.Configure();
 
             var res = await _httpClient.IntrospectTokenAsync(new TokenIntrospectionRequest
-            { 
+            {
+                Address = TokenMetadata.IntrospectionEndpoint,
                 ClientId = clientId,
                 ClientSecret = secret,
                 Token = token,
