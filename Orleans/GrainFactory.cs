@@ -3,11 +3,11 @@ using System;
 
 namespace CommunAxiom.Commons.Orleans
 {
-    public class GrianFactory : IGrainFactory
+    public class GrainFactory : IGrainFactory
     {
         private readonly o.IGrainFactory _grainFactory;
 
-        public GrianFactory(o.IGrainFactory grainFactory)
+        public GrainFactory(o.IGrainFactory grainFactory)
         {
             _grainFactory = grainFactory;
         }

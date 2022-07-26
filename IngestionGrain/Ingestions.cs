@@ -13,7 +13,7 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
         
         public Ingestions(Importer importer, [PersistentState("ingestion-history")] IPersistentState<IngestionHistory> history)
         {
-            _business = new Business(importer, new GrianFactory(this.GrainFactory), this.GrainReference.GrainIdentity.PrimaryKeyString);
+            _business = new Business(importer, new GrainFactory(this.GrainFactory), this.GrainReference.GrainIdentity.PrimaryKeyString);
             _business.Init(history);
         }
 
