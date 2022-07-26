@@ -1,6 +1,6 @@
-﻿using CommunAxiom.Commons.Ingestion.Configuration;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
 using CommunAxiom.Commons.Ingestion.Ingestor;
-using CommunAxiom.Commons.Ingestion.Validators;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;

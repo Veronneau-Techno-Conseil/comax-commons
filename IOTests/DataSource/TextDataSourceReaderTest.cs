@@ -1,5 +1,6 @@
-﻿using CommunAxiom.Commons.Ingestion.Attributes;
-using CommunAxiom.Commons.Ingestion.Configuration;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
+using CommunAxiom.Commons.Ingestion.Attributes;
 using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Validators;
 using FluentAssertions;
@@ -117,7 +118,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
             return sr.ReadToEnd();
         }
 
-        private string ReadAsString(Configuration.FileModel file)
+        private string ReadAsString(FileModel file)
         {
             using var expectedStream = new FileStream(Path.Combine(file.Path, file.Name), FileMode.Open, FileAccess.Read);
             return ReadAsString(expectedStream);

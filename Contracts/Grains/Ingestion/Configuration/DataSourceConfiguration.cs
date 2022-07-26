@@ -1,6 +1,7 @@
-﻿using CommunAxiom.Commons.Ingestion.Validators;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
+using System.Collections.Generic;
 
-namespace CommunAxiom.Commons.Ingestion.Configuration
+namespace CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration
 {
     public class DataSourceConfiguration
     {

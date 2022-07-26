@@ -1,4 +1,4 @@
-﻿using CommunAxiom.Commons.Ingestion.Configuration;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using System.Collections.Generic;
 
 namespace CommunAxiom.Commons.Client.Contracts.IO

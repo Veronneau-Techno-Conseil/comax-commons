@@ -1,4 +1,4 @@
-﻿namespace CommunAxiom.Commons.Ingestion.Configuration
+﻿namespace CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration
 {
     public enum DataSourceType
     {

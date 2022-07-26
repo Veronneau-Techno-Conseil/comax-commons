@@ -1,6 +1,7 @@
-﻿using NUnit.Framework;
-using FluentAssertions;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
 using CommunAxiom.Commons.Ingestion.Validators;
+using FluentAssertions;
+using NUnit.Framework;
 
 namespace CommunAxiom.Commons.Ingestion.Tests.Validators
 {

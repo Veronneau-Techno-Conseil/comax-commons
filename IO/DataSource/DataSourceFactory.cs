@@ -1,6 +1,6 @@
-﻿using System.Reflection;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.Attributes;
-using CommunAxiom.Commons.Ingestion.Configuration;
+using System.Reflection;
 
 namespace CommunAxiom.Commons.Ingestion.DataSource
 {

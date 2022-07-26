@@ -1,17 +1,19 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.Grains.Storage;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
 using CommunAxiom.Commons.Client.Contracts.IO;
 using CommunAxiom.Commons.Client.Grains.IngestionGrain;
 using CommunAxiom.Commons.Ingestion;
-using CommunAxiom.Commons.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Ingestor;
 using CommunAxiom.Commons.Ingestion.Validators;
+using CommunAxiom.Commons.Orleans;
+using FluentAssertions;
 using Moq;
 using Newtonsoft.Json;
-using NUnit.Framework;
-using FluentAssertions;
 using Newtonsoft.Json.Linq;
+using NUnit.Framework;
 
 namespace Ingestion.Grain.Tests
 {
@@ -86,7 +88,7 @@ namespace Ingestion.Grain.Tests
 
             _grainFactory.Setup(o => o.GetGrain<IDatasource>(grainKey, null)).Returns(_dataSource.Object);
 
-            var mockStorageGrain = new MockStorageGrain();
+            var mockStorageGrain = new MockStorageGrain("key");
 
             _grainFactory.Setup(o => o.GetGrain<IStorageGrain>(It.IsAny<string>(), null)).Returns(mockStorageGrain);
 
@@ -95,7 +97,7 @@ namespace Ingestion.Grain.Tests
 
             var data = await mockStorageGrain.GetData();
 
-            data.Count.Should().Be(3);
+            data["key"].Count.Should().Be(3);
 
             var row1 = JObject.Parse(@"{'property1': 'sample property 1', 'property2': 'sample property 2'}");
             var row2 = JObject.Parse(@"{ 'property1': 'sample property 1 - 1', 'property4': 'sample property 4'}");

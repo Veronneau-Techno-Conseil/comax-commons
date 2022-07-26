@@ -1,4 +1,4 @@
-﻿namespace CommunAxiom.Commons.Ingestion.Validators
+﻿namespace CommunAxiom.Commons.Client.Contracts.Ingestion.Validators
 {
     public interface IFieldValidatorLookup
     {

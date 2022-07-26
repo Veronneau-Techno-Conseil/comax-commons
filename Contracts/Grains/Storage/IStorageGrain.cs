@@ -7,7 +7,7 @@ namespace CommunAxiom.Commons.Client.Contracts.Grains.Storage
 {
     public interface IStorageGrain : IGrainWithStringKey
     {
-        Task SaveData(JObject obj);
-        Task<List<JObject>> GetData();
+        Task SaveData(JObject value);
+        Task<Dictionary<string, JObject>> GetData();
     }
 }

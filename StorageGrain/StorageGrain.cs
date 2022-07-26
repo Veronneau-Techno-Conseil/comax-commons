@@ -1,32 +1,31 @@
-﻿using CommunAxiom.Commons.Client.Contracts.Grains.Storage;
+﻿using CommunAxiom.Commons.Client.Contracts;
+using CommunAxiom.Commons.Client.Contracts.Grains.Storage;
 using Newtonsoft.Json.Linq;
+using Orleans;
 using Orleans.Runtime;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace StorageGrain
+namespace CommunAxiom.Commons.Client.Grains.StorageGrain
 {
-    // HACK: 
-    // [StorageProvider()]
-    public class StorageGrain : IStorageGrain
+    public class StorageGrain : Grain, IStorageGrain
     {
-        private readonly IPersistentState<JObject> _storageState;
-
-        public StorageGrain([PersistentState("storageGrain")] IPersistentState<JObject> storageState)
+        private readonly IPersistentState<Dictionary<string, JObject>> _storageState;
+        private readonly Repo _repo;
+        public StorageGrain([PersistentState("storageGrain", Constants.Storage.JObjectStore)] IPersistentState<Dictionary<string, JObject>> storageState)
         {
             _storageState = storageState;
+            _repo = new Repo(storageState);
         }
 
-        public Task<List<JObject>> GetData()
+        public Task<Dictionary<string, JObject>> GetData()
         {
-            throw new System.NotImplementedException();
+            return _repo.Fetch();
         }
 
-        public Task SaveData(JObject obj)
+        public Task SaveData(JObject value)
         {
-            _storageState.State = obj;
-            _ =  _storageState.WriteStateAsync();
-            return Task.CompletedTask;
+            return _repo.Add(this.IdentityString, value);
         }
     }
 }

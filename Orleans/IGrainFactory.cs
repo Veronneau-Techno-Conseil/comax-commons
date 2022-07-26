@@ -1,7 +1,7 @@
 ﻿using Orleans;
 using System;
 
-namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
+namespace CommunAxiom.Commons.Orleans
 {
     public interface IGrainFactory
     {

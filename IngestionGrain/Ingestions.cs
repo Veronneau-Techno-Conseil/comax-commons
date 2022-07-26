@@ -1,5 +1,6 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Ingestion;
 using CommunAxiom.Commons.Ingestion;
+using CommunAxiom.Commons.Orleans;
 using Orleans;
 using Orleans.Runtime;
 using System.Threading.Tasks;
