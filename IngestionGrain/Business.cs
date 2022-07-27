@@ -42,35 +42,36 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
             try
             {
                 var dataSource = _grainFactory.GetGrain<IDatasource>(_grainKey);
-                var state = await dataSource.GetState();
+                var state = await dataSource.GetConfig();
                 var sourfceConfig = new SourceConfig { Configurations = state.Configurations, DataSourceType = state.DataSourceType };
 
                 var result = await _importer.Import(sourfceConfig, state.Fields);
 
-                var indexes = new List<string>();
+                var index = new DataIndex();
+                
 
                 // save rows
                 for (int i = 0; i < result.Rows.Count; i++)
                 {
-                    var indetifier = $"{_grainKey}-{i}";
-                    indexes.Add(indetifier);
-                    var rowStorage = _grainFactory.GetGrain<IStorageGrain>(indetifier);
+                    var identifier = $"{_grainKey}-data-{i}";
+                    index.Index.Add(new DataIndexItem { Id = identifier});
+                    var rowStorage = _grainFactory.GetGrain<IStorageGrain>(identifier);
                     await rowStorage.SaveData(result.Rows[i]);
                 }
 
                 var storage = _grainFactory.GetGrain<IStorageGrain>($"{_grainKey}-index");
 
-                var temp = JObject.FromObject(new { indexes = indexes });
-                await storage.SaveData(temp);
-
                 // save errors
                 for (int i = 0; i < result.Errors.Count; i++)
                 {
-                    var indetifier = $"{_grainKey}-err-{i}";
-                    indexes.Add(indetifier);
-                    var rowStorage = _grainFactory.GetGrain<IStorageGrain>(indetifier);
+                    var identifier = $"{_grainKey}-err-{i}";
+                    index.Index.Add(new DataIndexItem { Id = identifier });
+                    var rowStorage = _grainFactory.GetGrain<IStorageGrain>(identifier);
                     await rowStorage.SaveData(result.Errors[i].Item1);
                 }
+
+                var temp = JObject.FromObject(index);
+                await storage.SaveData(temp);
 
                 await _repo.AddHistory(new() { CreateDateTime = DateTime.UtcNow, IsSuccessful = true });
             }

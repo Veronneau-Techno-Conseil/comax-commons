@@ -8,10 +8,10 @@ using CommunAxiom.Commons.Client.Contracts.Portfolio;
 using CommunAxiom.Commons.Client.Contracts.Project;
 using CommunAxiom.Commons.Client.Contracts.Replication;
 using CommunAxiom.Commons.Client.Grains.AccountGrain;
+using CommunAxiom.Commons.Client.Grains.DatasourceGrain;
 using CommunAxiom.Commons.Client.Grains.IngestionGrain;
 using CommunAxiom.Commons.Client.SiloShared;
 using DatasetGrain;
-using DatasourceGrain;
 using DataTransferGrain;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
@@ -80,7 +80,7 @@ namespace CommunAxiom.Commons.Client.Silo
 
         static void ConfigureIdentitty(IServiceCollection services)
         {
-            var configs = new Orleans.Security.IdentityServer4Info("https://localhost:5001/", "org1_node1", "846B62D0-DEF9-4215-A99D-86E6B8DAB342", "org1");
+            var configs = new IdentityServer4Info("https://localhost:5001/", "org1_node1", "846B62D0-DEF9-4215-A99D-86E6B8DAB342", "org1");
             
             services.AddOrleansClusteringAuthorization(configs,
                 config =>

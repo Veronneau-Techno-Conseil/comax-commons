@@ -10,6 +10,8 @@
 	  <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="3.6.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		<AssemblyName>CommunAxiom.Commons.Client.Grains.DatasourceGrain</AssemblyName>
+		<RootNamespace>CommunAxiom.Commons.Client.Grains.DatasourceGrain</RootNamespace>
     </PackageReference>
   </ItemGroup>
 

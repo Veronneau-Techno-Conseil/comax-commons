@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GrainTests.Shared\GrainTests.Shared.csproj" />
     <ProjectReference Include="..\IngestionGrain\IngestionGrain.csproj" />
   </ItemGroup>
 

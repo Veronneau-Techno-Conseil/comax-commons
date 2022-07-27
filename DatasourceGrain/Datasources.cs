@@ -1,21 +1,36 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.IO;
+using Newtonsoft.Json.Linq;
 using Orleans;
+using Orleans.Runtime;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DatasourceGrain
+namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
 {
     public class Datasources : Grain, IDatasource
     {
-        public Task<SourceState> GetState()
+        private readonly Business _business;
+        public Datasources([PersistentState("DataSource")]IPersistentState<SourceState> state)
         {
-            throw new NotImplementedException();
+            _business = new Business(new Repo(state));
         }
 
-        public Task<string> TestGrain(string Grain)
+        public Task<SourceState> GetConfig()
         {
-            return Task.FromResult($"The {Grain} grain has been launched. Check it on the dashboard");
+            return _business.ReadConfig();
         }
+
+        public async Task SetConfig(SourceState sourceState)
+        {
+            await _business.WriteConfig(sourceState);
+        }
+
+        public async Task DeleteConfig()
+        {
+            await _business.DeleteConfig();
+        }
+
     }
 }
