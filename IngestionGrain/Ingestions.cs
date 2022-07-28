@@ -2,11 +2,13 @@
 using CommunAxiom.Commons.Ingestion;
 using CommunAxiom.Commons.Orleans;
 using Orleans;
+using Orleans.Concurrency;
 using Orleans.Runtime;
 using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
 {
+    [Reentrant]
     public class Ingestions : Grain, IIngestion
     {
         private readonly Business _business;
