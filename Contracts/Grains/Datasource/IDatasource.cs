@@ -6,8 +6,9 @@ namespace CommunAxiom.Commons.Client.Contracts.Datasource
 {
     public interface IDatasource: IGrainWithStringKey
     {
-        Task<SourceState> GetState();
-        Task<string> TestGrain(string Grain);
+        Task<SourceState> GetConfig();
+        Task SetConfig(SourceState sourceState);
+        Task DeleteConfig();
     }
 
 }

@@ -10,22 +10,22 @@ namespace CommunAxiom.Commons.Client.Grains.StorageGrain
 {
     public class StorageGrain : Grain, IStorageGrain
     {
-        private readonly IPersistentState<Dictionary<string, JObject>> _storageState;
+        private readonly IPersistentState<JObject> _storageState;
         private readonly Repo _repo;
-        public StorageGrain([PersistentState("storageGrain", Constants.Storage.JObjectStore)] IPersistentState<Dictionary<string, JObject>> storageState)
+        public StorageGrain([PersistentState("storageGrain", Constants.Storage.JObjectStore)] IPersistentState<JObject> storageState)
         {
             _storageState = storageState;
             _repo = new Repo(storageState);
         }
 
-        public Task<Dictionary<string, JObject>> GetData()
+        public Task<JObject> GetData()
         {
             return _repo.Fetch();
         }
 
         public Task SaveData(JObject value)
         {
-            return _repo.Add(this.IdentityString, value);
+            return _repo.Save(value);
         }
     }
 }

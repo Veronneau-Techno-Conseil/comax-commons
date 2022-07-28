@@ -5,23 +5,24 @@ namespace Ingestion.Grain.Tests
 {
     public class MockStorageGrain : IStorageGrain
     {
-        public static Dictionary<string, JObject> _data;
+        public static Dictionary<string, JObject> _data = new Dictionary<string, JObject>();
         private string _key;
 
         public MockStorageGrain(string key)
         {
-            _data = new Dictionary<string, JObject>();
             _key = key;
         }
 
-        public Task<Dictionary<string, JObject>> GetData()
+        public Task<JObject> GetData()
         {
-            return Task.FromResult(_data);
+            if(_data == null || !_data.ContainsKey(_key))
+                return Task.FromResult<JObject>(null);
+            return Task.FromResult(_data[_key]);
         }
 
         public Task SaveData(JObject value)
         {
-            return Task.Run(() => _data.Add(_key, value));
+            return Task.Run(() => _data[_key] = value);
         }
     }
 }

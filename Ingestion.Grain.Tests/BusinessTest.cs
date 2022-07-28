@@ -1,5 +1,6 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.Grains.Storage;
+using CommunAxiom.Commons.Client.Contracts.Ingestion;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
 using CommunAxiom.Commons.Client.Contracts.IO;
@@ -10,6 +11,7 @@ using CommunAxiom.Commons.Ingestion.Ingestor;
 using CommunAxiom.Commons.Ingestion.Validators;
 using CommunAxiom.Commons.Orleans;
 using FluentAssertions;
+using GrainTests.Shared;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -84,26 +86,37 @@ namespace Ingestion.Grain.Tests
 
             _fieldValidatorLookup.Setup(x => x.Get("required-field")).Returns(new RequiredFieldValidator());
 
-            _dataSource.Setup(o => o.GetState()).ReturnsAsync(sourceState);
+            _dataSource.Setup(o => o.GetConfig()).ReturnsAsync(sourceState);
 
             _grainFactory.Setup(o => o.GetGrain<IDatasource>(grainKey, null)).Returns(_dataSource.Object);
 
-            var mockStorageGrain = new MockStorageGrain("key");
+            var mockIndexStorageGrain = new MockStorageGrain($"{grainKey}-index");
+            
+            _grainFactory.Setup(o => o.GetGrain<IStorageGrain>($"{grainKey}-index", null)).Returns(mockIndexStorageGrain);
+            _grainFactory.Setup(o => o.GetGrain<IStorageGrain>($"{grainKey}-data-0", null)).Returns(new MockStorageGrain($"{grainKey}-data-0"));
+            _grainFactory.Setup(o => o.GetGrain<IStorageGrain>($"{grainKey}-data-1", null)).Returns(new MockStorageGrain($"{grainKey}-data-1"));
 
-            _grainFactory.Setup(o => o.GetGrain<IStorageGrain>(It.IsAny<string>(), null)).Returns(mockStorageGrain);
-
+            _business.Init(new PersistentStorageMock<IngestionHistory>());
 
             await _business.Run();
 
-            var data = await mockStorageGrain.GetData();
+            var ix = await mockIndexStorageGrain.GetData();
+            var di = ix.ToObject<DataIndex>();
 
-            data["key"].Count.Should().Be(3);
+            di.Index.Count.Should().Be(2);
+            
+            List<JObject> rows = new List<JObject>();
+            foreach(var item in di.Index)
+            {
+                var mockRowGrain = new MockStorageGrain(item.Id);
+                rows.Add(await mockRowGrain.GetData());
+            }
+
 
             var row1 = JObject.Parse(@"{'property1': 'sample property 1', 'property2': 'sample property 2'}");
             var row2 = JObject.Parse(@"{ 'property1': 'sample property 1 - 1', 'property4': 'sample property 4'}");
-            var row3 = JObject.Parse(@"{ 'indexes': ['grain-key-test-0','grain-key-test-1'] }");
-            
-            data.Should().BeEquivalentTo(new List<JObject> { row1, row2, row3 });
+
+            rows.Should().BeEquivalentTo(new List<JObject> { row1, row2 });
 
         }
 
