@@ -12,11 +12,6 @@ using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
 {
-    public enum IngestionState
-    {
-        Started,
-        Finished
-    }
     public class Business
     {
         private Repo _repo;
@@ -24,7 +19,7 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
         private readonly Importer _importer;
         private readonly IGrainFactory _grainFactory;
         private readonly string _grainKey;
-        private string _state;
+        private IngestionState _ingestionState;
 
         public Business(Importer importer, IGrainFactory grainFactory, string grainKey)
         {
@@ -43,10 +38,8 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
             return _repo.FetchHistory();
         }
 
-        public async Task<IngestionState> Run()
+        public async Task Run()
         {
-            
-           
             try
             {
                 var dataSource = _grainFactory.GetGrain<IDatasource>(_grainKey);
