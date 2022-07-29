@@ -38,48 +38,64 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
             return _repo.FetchHistory();
         }
 
-        public async Task Run()
+        public async Task<IngestionState> Run()
         {
-            try
+            if (_ingestionState == IngestionState.Started)
             {
-                var dataSource = _grainFactory.GetGrain<IDatasource>(_grainKey);
-                var state = await dataSource.GetConfig();
-                var sourfceConfig = new SourceConfig { Configurations = state.Configurations, DataSourceType = state.DataSourceType };
+                return await Task.FromResult(IngestionState.InProcess);
+            }
 
-                var result = await _importer.Import(sourfceConfig, state.Fields);
-
-                var index = new DataIndex();
-                
-
-                // save rows
-                for (int i = 0; i < result.Rows.Count; i++)
+            return await Task.Run(async () =>
+            {
+                try
                 {
-                    var identifier = $"{_grainKey}-data-{i}";
-                    index.Index.Add(new DataIndexItem { Id = identifier});
-                    var rowStorage = _grainFactory.GetGrain<IStorageGrain>(identifier);
-                    await rowStorage.SaveData(result.Rows[i]);
+                    _ingestionState = IngestionState.Started;
+
+                    var dataSource = _grainFactory.GetGrain<IDatasource>(_grainKey);
+                    var state = await dataSource.GetConfig();
+                    var sourfceConfig = new SourceConfig { Configurations = state.Configurations, DataSourceType = state.DataSourceType };
+
+                    var result = await _importer.Import(sourfceConfig, state.Fields);
+
+                    var index = new DataIndex();
+
+
+                    // save rows
+                    for (int i = 0; i < result.Rows.Count; i++)
+                    {
+                        var identifier = $"{_grainKey}-data-{i}";
+                        index.Index.Add(new DataIndexItem { Id = identifier });
+                        var rowStorage = _grainFactory.GetGrain<IStorageGrain>(identifier);
+                        await rowStorage.SaveData(result.Rows[i]);
+                    }
+
+                    var storage = _grainFactory.GetGrain<IStorageGrain>($"{_grainKey}-index");
+
+                    // save errors
+                    for (int i = 0; i < result.Errors.Count; i++)
+                    {
+                        var identifier = $"{_grainKey}-err-{i}";
+                        index.Index.Add(new DataIndexItem { Id = identifier });
+                        var rowStorage = _grainFactory.GetGrain<IStorageGrain>(identifier);
+                        await rowStorage.SaveData(result.Errors[i].Item1);
+                    }
+
+                    var temp = JObject.FromObject(index);
+                    await storage.SaveData(temp);
+
+                    await _repo.AddHistory(new() { CreateDateTime = DateTime.UtcNow, IsSuccessful = true });
+                }
+                catch (Exception ex)
+                {
+                    await _repo.AddHistory(new() { CreateDateTime = DateTime.UtcNow, IsSuccessful = true, Exception = ex });
+                }
+                finally
+                {
+                    _ingestionState = IngestionState.Completed;
                 }
 
-                var storage = _grainFactory.GetGrain<IStorageGrain>($"{_grainKey}-index");
-
-                // save errors
-                for (int i = 0; i < result.Errors.Count; i++)
-                {
-                    var identifier = $"{_grainKey}-err-{i}";
-                    index.Index.Add(new DataIndexItem { Id = identifier });
-                    var rowStorage = _grainFactory.GetGrain<IStorageGrain>(identifier);
-                    await rowStorage.SaveData(result.Errors[i].Item1);
-                }
-
-                var temp = JObject.FromObject(index);
-                await storage.SaveData(temp);
-
-                await _repo.AddHistory(new() { CreateDateTime = DateTime.UtcNow, IsSuccessful = true });
-            }
-            catch (Exception ex)
-            {
-                await _repo.AddHistory(new() { CreateDateTime = DateTime.UtcNow, IsSuccessful = true, Exception = ex });
-            }
+                return _ingestionState;
+            });
 
         }
     }

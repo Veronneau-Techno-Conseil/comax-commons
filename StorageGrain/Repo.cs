@@ -21,7 +21,6 @@ namespace CommunAxiom.Commons.Client.Grains.StorageGrain
 
         public async Task Save(JObject value)
         {
-
             _state.State = value;
             await _state.WriteStateAsync();
         }

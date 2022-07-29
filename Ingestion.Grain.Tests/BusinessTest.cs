@@ -98,7 +98,9 @@ namespace Ingestion.Grain.Tests
 
             _business.Init(new PersistentStorageMock<IngestionHistory>());
 
-            await _business.Run();
+            var status  = await _business.Run();
+
+            status.Should().Be(IngestionState.Completed);
 
             var ix = await mockIndexStorageGrain.GetData();
             var di = ix.ToObject<DataIndex>();

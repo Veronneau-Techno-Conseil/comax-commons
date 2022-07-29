@@ -24,10 +24,9 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
             return _business.GetHistory();
         }
 
-        public Task Run()
+        public Task<IngestionState> Run()
         {
-            _ = _business.Run();
-            return Task.CompletedTask;
+            return _business.Run();
         }
 
     }

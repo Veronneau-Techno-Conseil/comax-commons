@@ -2,7 +2,9 @@
 {
     public enum IngestionState
     {
+        NotStarted, 
         Started,
-        Finished
+        InProcess,
+        Completed
     }
 }
