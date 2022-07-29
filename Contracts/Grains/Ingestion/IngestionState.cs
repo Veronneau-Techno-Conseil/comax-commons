@@ -1,4 +1,4 @@
-﻿namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
+﻿namespace CommunAxiom.Commons.Client.Contracts.Ingestion
 {
     public enum IngestionState
     {
