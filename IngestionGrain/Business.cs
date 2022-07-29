@@ -7,7 +7,6 @@ using CommunAxiom.Commons.Orleans;
 using Newtonsoft.Json.Linq;
 using Orleans.Runtime;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
@@ -53,7 +52,12 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
 
                     var dataSource = _grainFactory.GetGrain<IDatasource>(_grainKey);
                     var state = await dataSource.GetConfig();
-                    var sourfceConfig = new SourceConfig { Configurations = state.Configurations, DataSourceType = state.DataSourceType };
+
+                    var sourfceConfig = new SourceConfig
+                    {
+                        Configurations = state.Configurations,
+                        DataSourceType = state.DataSourceType
+                    };
 
                     var result = await _importer.Import(sourfceConfig, state.Fields);
 
@@ -83,11 +87,20 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
                     var temp = JObject.FromObject(index);
                     await storage.SaveData(temp);
 
-                    await _repo.AddHistory(new() { CreateDateTime = DateTime.UtcNow, IsSuccessful = true });
+                    await _repo.AddHistory(new()
+                    {
+                        CreateDateTime = DateTime.UtcNow,
+                        IsSuccessful = true
+                    });
                 }
                 catch (Exception ex)
                 {
-                    await _repo.AddHistory(new() { CreateDateTime = DateTime.UtcNow, IsSuccessful = true, Exception = ex });
+                    await _repo.AddHistory(new()
+                    {
+                        CreateDateTime = DateTime.UtcNow,
+                        IsSuccessful = false,
+                        Exception = ex
+                    });
                 }
                 finally
                 {
