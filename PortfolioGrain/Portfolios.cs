@@ -1,44 +1,49 @@
 ﻿using System;
 using Orleans;
-using CommunAxiom.Commons.Client.Contracts.Portfolio;
 using System.Threading.Tasks;
 using Orleans.GrainDirectory;
 using Orleans.Runtime;
+using System.Collections.Generic;
+using System.Linq;
+using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
+using Microsoft.Extensions.Configuration;
 
 namespace PortfolioGrain
 {
-    [GrainDirectory(GrainDirectoryName = "MyGrainDirectory")]
-    public class Portfolios: Grain, IPortfolio
+    public class Portfolios : Grain, IPortfolio
     {
-        public Portfolios([PersistentState("portfolios")] IPersistentState<PortfolioDetails> portfolioDetails)
+        private readonly PortfolioBusiness _portfolioBusiness;
+        public Portfolios(IConfiguration configuration, PortfolioBusiness portfolioBusiness, 
+            [PersistentState("portfolios")] IPersistentState<Portfolio> portDetails,
+            [PersistentState("portfoliosList")] IPersistentState<PortfoliosList> portList)
         {
-            _portfolioDetails = portfolioDetails;
+            _portfolioBusiness = portfolioBusiness;
+            _portfolioBusiness.Init(portDetails, portList);
         }
 
-        private readonly IPersistentState<PortfolioDetails> _portfolioDetails;
-
-        public async Task<string> CreatePortfolio(PortfolioDetails portfolio)
+        public async Task AddAPortfolio(Portfolio portfolio)
         {
-            _portfolioDetails.State = portfolio;
-            await _portfolioDetails.WriteStateAsync();
-            return "The PortfolioID has been created with ID: " + this.IdentityString + " and details: \nPortfolioID:" + _portfolioDetails.State.PortfolioID + "\nName: " + _portfolioDetails.State.PortfolioName;
+            await _portfolioBusiness.AddAPortfolio(portfolio);
         }
 
-        Task<string> IPortfolio.TestGrain(string Grain)
+        public async Task<IEnumerable<Portfolio>> GetPortfoliosList()
         {
-            return Task.FromResult($"The {Grain} grain has been launched. Check it on the dashboard");
+            return await _portfolioBusiness.GetList();
         }
 
-        public async Task<PortfolioDetails> GetDetails()
+        public async Task<IEnumerable<Portfolio>> FilterPortfolios(string filter)
         {
-            await _portfolioDetails.ReadStateAsync();
-            return _portfolioDetails.State;
+            return await _portfolioBusiness.FilterPortfolios(filter);
         }
 
-        public async Task<bool> IsSet()
+        public async Task<Portfolio> GetAPortfolioDetails(string portfolioID)
         {
-            var res = await GetDetails();
-            return res != null && !string.IsNullOrWhiteSpace(res.PortfolioID);
+            return await _portfolioBusiness.GetAPortfolioDetails(portfolioID);
+        }
+
+        public async Task<bool> CheckIfUnique(string name)
+        {
+            return await _portfolioBusiness.CheckIfUnique(name);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using ClusterClient;
+using ClusterClient;
 using CommunAxiom.Commons.Client.Silo.System;
 using CommunAxiom.Commons.Client.SiloShared;
 using CommunAxiom.Commons.Client.SiloShared.System;

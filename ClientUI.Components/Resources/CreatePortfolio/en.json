@@ -1,0 +1,10 @@
+﻿{
+  "CreatePortfolio": "Create Portfolio",
+  "Type": "Type",
+  "SelectType": "Select Type",
+  "Name": "Name",
+  "Parent": "Parent",
+  "SelectParent": "Select Parent",
+  "Create": "Create",
+  "NameIsNotUnique": "Portfolio Name is not Unique"
+}

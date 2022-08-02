@@ -40,8 +40,26 @@
                     </NavLink>
                 }
 
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <NavLink class="navbar-item" Match="NavLinkMatch.All" @onclick="()=> portfolioSubMenu = !portfolioSubMenu">
+                        @_localizer["Portfolio"]
+                    </NavLink>
+                    @if (portfolioSubMenu)
+                    {
+                        <div div class="navbar-dropdown">
+                            <NavLink class="navbar-item" href="create_portfolio" Match="NavLinkMatch.All">
+                                @_localizer["CreatePortfolio"]
+                            </NavLink>
+
+                            <NavLink class="navbar-item" href="list_portfolios" Match="NavLinkMatch.All">
+                                @_localizer["Portfolios"]
+                            </NavLink>
+                        </div>
+                    }
+                </div>
+
                 <NavLink class="navbar-item" href="about" Match="NavLinkMatch.All">
-                    @_localizer["About"]                    
+                    @_localizer["About"]
                 </NavLink>
             </div>
 
@@ -88,6 +106,8 @@
 
     private void BurgerClick()
     {
-        
+
     }
+
+    private bool portfolioSubMenu;
 }

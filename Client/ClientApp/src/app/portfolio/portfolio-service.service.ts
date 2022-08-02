@@ -14,8 +14,10 @@ export class PortfolioServiceService {
 
   CreatePortfolio(portfolio: PortfolioModel): Observable<any> {
     let params = new HttpParams()
-      .set('portfolio_ID', portfolio.PortfolioID)
-      .set('name', portfolio.PortfolioName);
-    return this.http.post(this.CommonsURL + "api/portfolio/create/" + portfolio.PortfolioID, portfolio)
+      .set('ID', portfolio.ID)
+      .set('name', portfolio.Name)
+      .set('type', portfolio.Type)
+      .set('parentId', portfolio.ParentId);
+    return this.http.post(this.CommonsURL + "api/portfolio/create/" + portfolio.ID, portfolio)
   }
 }
