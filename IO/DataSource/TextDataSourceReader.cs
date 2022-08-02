@@ -1,8 +1,8 @@
-﻿using CommunAxiom.Commons.Ingestion.Attributes;
-using CommunAxiom.Commons.Ingestion.Configuration;
-using CommunAxiom.Commons.Ingestion.Validators;
-using Newtonsoft.Json;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
+using CommunAxiom.Commons.Ingestion.Attributes;
 using CommunAxiom.Commons.Ingestion.Extentions;
+using Newtonsoft.Json;
 
 namespace CommunAxiom.Commons.Ingestion.DataSource
 {

@@ -1,6 +1,6 @@
-﻿using System.Reflection;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.Attributes;
-using CommunAxiom.Commons.Ingestion.Configuration;
+using System.Reflection;
 
 namespace CommunAxiom.Commons.Ingestion.DataSource
 {
@@ -21,7 +21,7 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 
             if (type == null)
             {
-                throw new ArgumentException($"No DataSourceReader type with name {Enum.GetName(sourceType)} could be found");
+                throw new ArgumentException($"No DataSourceReader type with name {Enum.GetName(typeof(DataSourceType), sourceType)} could be found");
             }
 
             var reader = _serviceProvider.GetService(type) as IDataSourceReader;

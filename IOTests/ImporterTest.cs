@@ -1,4 +1,5 @@
-﻿using CommunAxiom.Commons.Ingestion.Configuration;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
 using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Ingestor;
 using CommunAxiom.Commons.Ingestion.Validators;
@@ -33,6 +34,12 @@ namespace CommunAxiom.Commons.Ingestion.Tests
             _fieldValidatorLookup = new Mock<IFieldValidatorLookup>();
 
             _importer = new Importer(_dataSourceFactory.Object, _ingestorFactory.Object);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _mockRepository.Verify();
         }
 
         [Test]

@@ -1,4 +1,5 @@
-﻿using CommunAxiom.Commons.Ingestion.Configuration;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
 using Newtonsoft.Json.Linq;
 
 namespace CommunAxiom.Commons.Ingestion.Validators
