@@ -1,5 +1,6 @@
 ﻿using Blazored.Toast.Services;
 using CommunAxiom.Commons.Client.Contracts;
+using CommunAxiom.Commons.Shared;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
