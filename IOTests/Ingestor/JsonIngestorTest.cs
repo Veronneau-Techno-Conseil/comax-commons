@@ -1,6 +1,6 @@
-﻿using CommunAxiom.Commons.Ingestion.Attributes;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
+using CommunAxiom.Commons.Ingestion.Attributes;
 using CommunAxiom.Commons.Ingestion.Ingestor;
-using CommunAxiom.Commons.Ingestion.Validators;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;

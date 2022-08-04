@@ -1,4 +1,4 @@
-﻿using CommunAxiom.Commons.Ingestion.Configuration;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Ingestor;
 

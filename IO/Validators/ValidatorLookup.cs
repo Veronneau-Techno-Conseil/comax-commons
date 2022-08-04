@@ -1,4 +1,6 @@
-﻿namespace CommunAxiom.Commons.Ingestion.Validators
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
+
+namespace CommunAxiom.Commons.Ingestion.Validators
 {
     public class ValidatorLookup : IFieldValidatorOptions, IConfigValidatorOptions
     {
