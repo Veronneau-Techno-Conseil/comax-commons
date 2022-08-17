@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Comax.Commons.Shared.RulesEngine
 {
-    public class RulesEngine
+    public abstract class RulesEngine<TParam>
     {
         protected readonly IServiceProvider _serviceProvider;
         public RulesEngine(IServiceProvider serviceProvider)
@@ -27,15 +27,27 @@ namespace Comax.Commons.Shared.RulesEngine
 
         public void AddRule(string executor, params IConfigField[] configFields)
         {
-            if (configFields.Length != FieldCount)
+            if (configFields.Length != FieldCount && _rulesTable != null && _rulesTable.Count > 0)
                 throw new ArgumentException("ConfigFields need to have the same number of items as configured in the RulesEngine");
+
+            if (_rulesTable == null)
+            {
+                _rulesTable = new List<RulesRow>();
+                FieldCount = configFields.Length;
+            }
 
             //TODO: type check each fields against the first row
 
             _rulesTable.Add(new RulesRow { Executor = executor, ConfigFields = configFields });
         }
 
-        public virtual OperationResult Validate(params object[] values)
+        public OperationResult Validate(TParam param)
+        {
+            var objs = this.ExtractValues(param);
+            return this.Validate(objs);
+        }
+
+        protected virtual OperationResult Validate(params object[] values)
         {
             if(values == null || values.Length == 0)
                 return new OperationResult {  Error = OperationResult.ERR_UNEXP_NULL, Detail = "values", IsError = true};
@@ -46,8 +58,17 @@ namespace Comax.Commons.Shared.RulesEngine
             return new OperationResult { IsError = false };
         }
 
-        public async Task Process(params object[] values)
+        /// <summary>
+        /// Extracts data required by the rules table of the busienss rules engine. Should return the same number of items as the number of configFields for executors
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public abstract object[] ExtractValues(TParam param);
+
+        public async Task Process(TParam param)
         {
+            var values = this.ExtractValues(param);
+
             var operationResult = this.Validate(values);
             if (operationResult.IsError)
             {
@@ -73,8 +94,8 @@ namespace Comax.Commons.Shared.RulesEngine
                 }
                 if (shouldExecute)
                 {
-                    var executor = this._serviceProvider.GetServiceByName<IExecutor>(rule.Executor);
-                    await executor.Execute(values);
+                    var executor = this._serviceProvider.GetServiceByName<IExecutor<TParam>>(rule.Executor);
+                    await executor.Execute(param);
                 }
             }
         }

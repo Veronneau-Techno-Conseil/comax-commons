@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Comax.Commons.Shared.RulesEngine
 {
-    public class RuleField<T>
+    public class RuleField<T>: IConfigField
     {
 
         public Func<T, bool> Check { get; set; }
@@ -42,8 +42,8 @@ namespace Comax.Commons.Shared.RulesEngine
         public IConfigField[] ConfigFields { get; set; }
     }
 
-    public interface IExecutor
+    public interface IExecutor<TParam>
     {
-        Task Execute(params object[] args);
+        Task Execute(TParam param);
     }
 }
