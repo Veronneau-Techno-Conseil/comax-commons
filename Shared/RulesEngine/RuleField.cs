@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Comax.Commons.Shared.RulesEngine
+﻿namespace CommunAxiom.Commons.Shared.RuleEngine
 {
     public class RuleField<T>: IConfigField
     {

@@ -1,15 +1,11 @@
-﻿using CommunAxiom.Commons.Shared;
-using Neleus.DependencyInjection.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Neleus.DependencyInjection.Extensions;
 
-namespace Comax.Commons.Shared.RulesEngine
+namespace CommunAxiom.Commons.Shared.RuleEngine
 {
-    public abstract class RulesEngine<TParam>
+    public abstract class RuleEngine<TParam>
     {
         protected readonly IServiceProvider _serviceProvider;
-        public RulesEngine(IServiceProvider serviceProvider)
+        public RuleEngine(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
