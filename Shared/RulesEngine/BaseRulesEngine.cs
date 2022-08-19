@@ -1,17 +1,16 @@
-﻿using Neleus.DependencyInjection.Extensions;
-
-namespace CommunAxiom.Commons.Shared.RuleEngine
+﻿namespace CommunAxiom.Commons.Shared.RuleEngine
 {
     public abstract class RuleEngine<TParam>
     {
         protected readonly IServiceProvider _serviceProvider;
+
         public RuleEngine(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
-        private List<RulesRow> _rulesTable;
-        public IReadOnlyList<RulesRow> RulesTable
+        private List<RulesRow<TParam>> _rulesTable;
+        public IReadOnlyList<RulesRow<TParam>> RulesTable
         {
             get
             {
@@ -21,20 +20,20 @@ namespace CommunAxiom.Commons.Shared.RuleEngine
 
         public int FieldCount { get; set; }
 
-        public void AddRule(string executor, params IConfigField[] configFields)
+        public void AddRule(IExecutor<TParam> executor, params IConfigField[] configFields)
         {
             if (configFields.Length != FieldCount && _rulesTable != null && _rulesTable.Count > 0)
                 throw new ArgumentException("ConfigFields need to have the same number of items as configured in the RulesEngine");
 
             if (_rulesTable == null)
             {
-                _rulesTable = new List<RulesRow>();
+                _rulesTable = new List<RulesRow<TParam>>();
                 FieldCount = configFields.Length;
             }
 
             //TODO: type check each fields against the first row
 
-            _rulesTable.Add(new RulesRow { Executor = executor, ConfigFields = configFields });
+            _rulesTable.Add(new RulesRow<TParam> { Executor = executor, ConfigFields = configFields });
         }
 
         public OperationResult Validate(TParam param)
@@ -90,8 +89,7 @@ namespace CommunAxiom.Commons.Shared.RuleEngine
                 }
                 if (shouldExecute)
                 {
-                    var executor = this._serviceProvider.GetServiceByName<IExecutor<TParam>>(rule.Executor);
-                    await executor.Execute(param);
+                    await rule.Executor.Execute(param);
                 }
             }
         }

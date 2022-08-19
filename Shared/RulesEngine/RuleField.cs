@@ -1,4 +1,6 @@
-﻿namespace CommunAxiom.Commons.Shared.RuleEngine
+﻿using Orleans.Streams;
+
+namespace CommunAxiom.Commons.Shared.RuleEngine
 {
     public class RuleField<T>: IConfigField
     {
@@ -32,9 +34,9 @@
         bool Ignore { get; set; }
     }
 
-    public class RulesRow
+    public class RulesRow<TParam>
     {
-        public string Executor { get; set; }
+        public IExecutor<TParam> Executor { get; set; }
         public IConfigField[] ConfigFields { get; set; }
     }
 

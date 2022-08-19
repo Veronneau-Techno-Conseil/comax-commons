@@ -108,5 +108,10 @@ namespace ClusterClient
         {
             return _clusterClient.Close();
         }
+
+        public IStreamProvider GetStreamProvider(string name)
+        {
+            return _clusterClient.GetStreamProvider(name);
+        }
     }
 }

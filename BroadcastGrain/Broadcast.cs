@@ -1,4 +1,5 @@
-﻿using CommunAxiom.Commons.Client.Contracts.Broadcast;
+﻿using CommunAxiom.Commons.Client.Contracts;
+using CommunAxiom.Commons.Client.Contracts.Broadcast;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using Orleans;
 using System;
@@ -12,7 +13,7 @@ namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
 
         public Broadcast(IServiceProvider serviceProvider)
         {
-            engine = new BroadcastRulesEngine(serviceProvider);
+            engine = new BroadcastRulesEngine(serviceProvider, this.GetStreamProvider(Constants.DefaultStream));
         }
 
         public Task Notify(Message message)

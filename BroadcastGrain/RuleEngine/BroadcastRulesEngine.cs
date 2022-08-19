@@ -1,13 +1,15 @@
 ﻿using CommunAxiom.Commons.Shared.RuleEngine;
+using Orleans.Streams;
 using System;
 
 namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
 {
     public class BroadcastRulesEngine : RuleEngine<Message>
     {
-        public BroadcastRulesEngine(IServiceProvider serviceProvider) : base(serviceProvider)
+        public BroadcastRulesEngine(IServiceProvider serviceProvider, IStreamProvider streamProvider) : base(serviceProvider)
         {
-            AddRule("LocalEventStreamExecutor",
+
+            AddRule(new LocalEventStreamExecutor(streamProvider),
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("com://local/data/{dsid}") },
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("usr://{dsid}") },
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToLower().Equals("local") },
@@ -15,7 +17,7 @@ namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals("PARTNERS") }
             );
 
-            AddRule("LocalEventStreamExecutor",
+            AddRule(new LocalEventStreamExecutor(streamProvider),
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("com://local/data/{dsid}") },
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("usr://{dsid}") },
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToLower().Equals("local") },
@@ -23,7 +25,7 @@ namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals("PARTNERS") }
            );
             
-           AddRule("OrchestratorEventStreamExecutor",
+           AddRule(new OrchestratorEventStreamExecutor(streamProvider),
                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("com://local/data/{dsid}") },
                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("usr://{dsid}") },
                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToLower().Equals("com://*") },

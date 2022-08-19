@@ -29,5 +29,6 @@ namespace CommunAxiom.Commons.Client.Contracts.ComaxSystem
         Task Close();
         Task<StreamSubscriptionHandle<SystemEvent>> SubscribeSystem(Func<SystemEvent, StreamSequenceToken, Task> fn, Func<Exception, Task> funcError, Func<Task> onCompleted);
         Task<(StreamSubscriptionHandle<AuthorizationInstructions>, AsyncEnumerableStream<AuthorizationInstructions>)> SubscribeAuth(Guid streamId);
+        IStreamProvider GetStreamProvider(string name);
     }
 }

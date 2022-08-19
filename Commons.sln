@@ -103,7 +103,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrainTests.Shared", "GrainT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BroadcastGrain", "BroadcastGrain\BroadcastGrain.csproj", "{CF7E364B-94F8-40E5-B79A-221929DE3111}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterEventStream", "ClusterEventStream\ClusterEventStream.csproj", "{C1F32B7A-033F-4EDC-8C26-4F35426D5347}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClusterEvent", "ClusterEventStream\ClusterEvent.csproj", "{C1F32B7A-033F-4EDC-8C26-4F35426D5347}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
