@@ -5,7 +5,7 @@ using Orleans.Streams;
 
 namespace CommunAxiom.Commons.Client.ClusterEventStream.Extentions
 {
-    public static class StreamProviderExtentions
+    public static class EventStreamExtentions
     {
         public static IAsyncStream<Message> GetEventStream(this IStreamProvider streamProvider)
         {
