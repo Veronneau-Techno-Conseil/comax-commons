@@ -7,7 +7,7 @@ namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
     {
         public BroadcastRulesEngine(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            AddRule("IngestionStartedExecutor",
+            AddRule("LocalEventStreamExecutor",
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("com://local/data/{dsid}") },
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("usr://{dsid}") },
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToLower().Equals("local") },
@@ -15,21 +15,21 @@ namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals("PARTNERS") }
             );
 
-            AddRule("IngestionEndExecutor",
+            AddRule("LocalEventStreamExecutor",
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("com://local/data/{dsid}") },
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("usr://{dsid}") },
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToLower().Equals("local") },
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals("INGESTION_END") },
                 new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals("PARTNERS") }
            );
-
-            AddRule("NewDataVersionExecutor",
-                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("com://local/data/{dsid}") },
-                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("usr://{dsid}") },
-                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToLower().Equals("local") },
-                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals("NEW_DATA_VERSION") },
-                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals("PARTNERS") }
-            );
+            
+           AddRule("OrchestratorEventStreamExecutor",
+               new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("com://local/data/{dsid}") },
+               new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("usr://{dsid}") },
+               new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToLower().Equals("com://*") },
+               new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals("NEW_DATA_VERSION") },
+               new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals("PARTNERS") }
+           );
 
         }
 

@@ -9,7 +9,8 @@ namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
         public static void AddIngestion(this IServiceCollection services)
         {
             services.AddTransient<ExecutorTargets>();
-            services.AddByName<IExecutor<Message>>().Add("ExecutorTargets", typeof(IngestionStartedExecutor)).Build();
+            services.AddByName<IExecutor<Message>>().Add("ExecutorTargets", typeof(LocalEventStreamExecutor)).Build();
+            services.AddByName<IExecutor<Message>>().Add("ExecutorTargets", typeof(OrchestratorEventStreamExecutor)).Build();
         }
     }
 }
