@@ -5,6 +5,7 @@ using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.DataTransfer;
 using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
+using CommunAxiom.Commons.Client.Contracts.Grains.Scheduler;
 using CommunAxiom.Commons.Client.Contracts.Ingestion;
 using CommunAxiom.Commons.Client.Contracts.Project;
 using CommunAxiom.Commons.Client.Contracts.Replication;
@@ -71,6 +72,11 @@ namespace ClusterClient
         public IReplication GetReplication()
         {
             return _clusterClient.GetGrain<IReplication>(Guid.Empty);
+        }
+
+        public IScheduler GetScheduler(int schedulerID)
+        {
+            return _clusterClient.GetGrain<IScheduler>(schedulerID);
         }
 
         public async Task<StreamSubscriptionHandle<SystemEvent>> SubscribeSystem(Func<SystemEvent, StreamSequenceToken, Task> fn, Func<Exception, Task> funcError, Func<Task> onCompleted)

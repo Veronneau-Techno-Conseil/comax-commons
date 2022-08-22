@@ -4,6 +4,7 @@ using CommunAxiom.Commons.Client.Contracts.Dataset;
 using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.DataTransfer;
 using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
+using CommunAxiom.Commons.Client.Contracts.Grains.Scheduler;
 using CommunAxiom.Commons.Client.Contracts.Ingestion;
 using CommunAxiom.Commons.Client.Contracts.Project;
 using CommunAxiom.Commons.Client.Contracts.Replication;
@@ -21,6 +22,7 @@ using Orleans.Security.Clustering;
 using PortfolioGrain;
 using ProjectGrain;
 using ReplicationGrain;
+using SchedulerGrain;
 using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.Silo
@@ -62,6 +64,9 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<PortfolioBusiness, PortfolioBusiness>();
                     services.AddSingleton<IProject, Projects>();
                     services.AddSingleton<IReplication, Replications>();
+                    services.AddSingleton<IScheduler, Scheduler>();
+                    services.AddSingleton<SchedulerBusiness, SchedulerBusiness>();
+                    services.AddSingleton<SchedulerRepo, SchedulerRepo>();
 
                 })
                 //configure application parts for each grain
@@ -72,7 +77,8 @@ namespace CommunAxiom.Commons.Client.Silo
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Ingestions).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Portfolios).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Projects).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Replications).Assembly).WithReferences());
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Replications).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Scheduler).Assembly).WithReferences());
 
             var silo = builder.Build();
             await silo.StartAsync();
