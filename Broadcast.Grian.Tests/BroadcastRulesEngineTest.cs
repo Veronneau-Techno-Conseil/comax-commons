@@ -110,13 +110,5 @@ namespace Broadcast.Grian.Tests
             result.IsError.Should().BeFalse();
         }
 
-        [Test]
-        public void WhenMessageValuesIncorrectValidateShouldReturnError()
-        {
-            var message = new Message { From = "com://local" };
-
-            var result = _broadcastRulesEngine.Process(message);
-
-        }
     }
 }
