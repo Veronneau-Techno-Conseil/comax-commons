@@ -1,14 +1,7 @@
-﻿using CommunAxiom.Commons.Client.Contracts.Datasource;
-using CommunAxiom.Commons.Client.Contracts.Grains.Storage;
-using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
-using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Client.Contracts.IO;
 using CommunAxiom.Commons.Client.Grains.DatasourceGrain;
-using FluentAssertions;
 using GrainTests.Shared;
-using Moq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Orleans.Runtime;
 
@@ -20,9 +13,7 @@ namespace Ingestion.Grain.Tests
 
         [Test]
         public async Task RunWhenNoErrors()
-        {
-            SourceState storedSourceState = null;
-            
+        {           
             IPersistentState<SourceState> store = new PersistentStorageMock<SourceState>(); ;
             
             var business = new Business(new Repo(store));

@@ -2,23 +2,22 @@
 using CommunAxiom.Commons.Client.Contracts.Broadcast;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using Orleans;
-using System;
 using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
 {
     public class Broadcast : Grain, IBroadcast
     {
-        private readonly BroadcastRulesEngine engine;
+        private readonly BroadcastRulesEngine _broadcastRulesEngine;
 
-        public Broadcast(IServiceProvider serviceProvider)
+        public Broadcast()
         {
-            engine = new BroadcastRulesEngine(serviceProvider, this.GetStreamProvider(Constants.DefaultStream));
+            _broadcastRulesEngine = new BroadcastRulesEngine(this.GetStreamProvider(Constants.DefaultStream));
         }
 
         public Task Notify(Message message)
         {
-            return engine.Process(message);
+            return _broadcastRulesEngine.Process(message);
         }
     }
 

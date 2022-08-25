@@ -2,13 +2,6 @@
 {
     public abstract class RuleEngine<TParam>
     {
-        protected readonly IServiceProvider _serviceProvider;
-
-        public RuleEngine(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
-
         private List<RulesRow<TParam>> _rulesTable;
         public IReadOnlyList<RulesRow<TParam>> RulesTable
         {

@@ -6,7 +6,7 @@ namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
 {
     public class BroadcastRulesEngine : RuleEngine<Message>
     {
-        public BroadcastRulesEngine(IServiceProvider serviceProvider, IStreamProvider streamProvider) : base(serviceProvider)
+        public BroadcastRulesEngine(IStreamProvider streamProvider)
         {
 
             AddRule(new LocalEventStreamExecutor(streamProvider),

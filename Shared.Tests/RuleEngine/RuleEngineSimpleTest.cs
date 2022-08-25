@@ -10,24 +10,10 @@ namespace Shared.Tests.RulesEngine
     [TestFixture]
     public class RuleEngineSimpleTest
     {
-        private IServiceProvider _serviceProvider;
-
-        [OneTimeSetUp]
-        public void TestSetup()
-        {
-            ServiceCollection servicesCollection = new ServiceCollection();
-            servicesCollection.AddTransient<LocalExecutor>();
-            servicesCollection.AddTransient<PublicExecutor>();
-            servicesCollection.AddByName<IExecutor<Message>>().Add("LocalExecutor", typeof(LocalExecutor))
-                                                                .Add("PublicExecutor", typeof(PublicExecutor))
-                                                                .Build();
-            _serviceProvider = servicesCollection.BuildServiceProvider();
-        }
-
         [Test]
         public async Task TestRulesEngine()
         {
-            MessageRulesEngineMock messageRulesEngineMock = new MessageRulesEngineMock(_serviceProvider);
+            MessageRulesEngineMock messageRulesEngineMock = new MessageRulesEngineMock();
 
             var message = new MessageMock
             {

@@ -6,7 +6,7 @@ namespace Shared.Tests.RulesEngine.Mock
 {
     public class MessageRulesEngineMock : RuleEngine<MessageMock>
     {
-        public MessageRulesEngineMock(IServiceProvider serviceProvider): base(serviceProvider)
+        public MessageRulesEngineMock()
         {
             this.AddRule(new PublicExecutor(),
             /* from: call from commons */ new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith("com://") },
