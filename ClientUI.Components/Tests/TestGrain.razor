@@ -4,6 +4,7 @@
 
 @inject ITestViewModel _testViewModel
 @inject IJSRuntime JsRuntime
+@inject NavigationManager _navigationManager
 
 <h3>TestGrain</h3>
 
@@ -105,10 +106,11 @@
             {
                 ID = Guid.NewGuid().ToString(),
                 DataSourceID = Guid.NewGuid().ToString(),
-                CronExpression = "5 5 5 * *"
+                CronExpression = "10 * * * * *"
             };
         await _testViewModel.CreateScheduler(scheduler);
         StateHasChanged();
+        _navigationManager.NavigateTo("test_grain");
     }
 
     protected async override Task OnInitializedAsync()

@@ -75,5 +75,13 @@ namespace SchedulerGrain
             }
             return await Task.FromResult<Schedulers>(null);
         }
+
+        public async Task UpdateScheduler(string schedulerID)
+        {
+            if (schedulerID != null)
+            {
+                await _schedulerRepo.UpdateScheduler(schedulerID);
+            }
+        }
     }
 }
