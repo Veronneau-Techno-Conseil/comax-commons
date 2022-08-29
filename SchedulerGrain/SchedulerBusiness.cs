@@ -76,12 +76,22 @@ namespace SchedulerGrain
             return await Task.FromResult<Schedulers>(null);
         }
 
-        public async Task UpdateScheduler(string schedulerID)
+        public async Task UpdateScheduler(string schedulerID, string cronExpression)
         {
             if (schedulerID != null)
             {
-                await _schedulerRepo.UpdateScheduler(schedulerID);
+                await _schedulerRepo.UpdateScheduler(schedulerID, cronExpression);
             }
+        }
+
+        public async Task<IEnumerable<Schedulers>> GetDueSchedulersList()
+        {
+            var ListCreated = await CheckSchedulerslist();
+            if (ListCreated != true)
+            {
+                await CreateSchedulersList();
+            }
+            return await _schedulerRepo.GetDueSchedulers();
         }
     }
 }

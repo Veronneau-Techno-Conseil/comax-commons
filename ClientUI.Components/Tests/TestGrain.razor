@@ -106,7 +106,8 @@
             {
                 ID = Guid.NewGuid().ToString(),
                 DataSourceID = Guid.NewGuid().ToString(),
-                CronExpression = "10 * * * * *"
+                CronExpression = "10 * * * * *",
+                StartDate = DateTime.UtcNow,
             };
         await _testViewModel.CreateScheduler(scheduler);
         StateHasChanged();

@@ -47,15 +47,12 @@ namespace SchedulerGrain
             {
                 schedulersList.Schedulers = new List<Schedulers>();
             }
-
             //calculate the next occurrence based on the expression and the current timing
             //the cronos library has been userd here and can be reached at the below link:
             //https://github.com/HangfireIO/Cronos#adding-seconds-to-an-expression 
             var parsedScheduler = scheduler;
             CronExpression cron = CronExpression.Parse(scheduler.CronExpression, CronFormat.IncludeSeconds);
             parsedScheduler.NextExecutionTime = (DateTime)cron.GetNextOccurrence(DateTime.UtcNow);
-
-            //concat the parsedScheduler with next occurence to the list
             schedulersList.Schedulers = schedulersList.Schedulers.Concat(new[] { parsedScheduler });
             await _schedulersList.WriteStateAsync();
         }
@@ -63,27 +60,23 @@ namespace SchedulerGrain
         public async Task<Schedulers> GetASchedulerDetails(string schedulerID)
         {
             var schedulersList = await GetSchedulersList();
-            var scheduler = schedulersList.Schedulers.AsQueryable().Where(x => x.ID == schedulerID).FirstOrDefault();
-            return (scheduler);
+            return schedulersList.Schedulers.AsQueryable().Where(x => x.ID == schedulerID).FirstOrDefault();
         }
 
-        public async Task UpdateScheduler(string schedulerID)
+        public async Task UpdateScheduler(string schedulerID, string cronExpression)
         {
             var schedulersList = await GetSchedulersList();
-
-            var nextExecution = DateTime.UtcNow.AddSeconds(10);
+            var cron = CronExpression.Parse(cronExpression, CronFormat.IncludeSeconds);
+            var nextExecution = cron.GetNextOccurrence(DateTime.UtcNow);
             foreach (var scheduler in schedulersList.Schedulers.Where(x => x.ID == schedulerID))
-                scheduler.NextExecutionTime = nextExecution;
+                scheduler.NextExecutionTime = (DateTime)nextExecution;
             await _schedulersList.WriteStateAsync();
+        }
 
-            //to view the updated list
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.ForegroundColor = ConsoleColor.White;
-            foreach (var scheduler in schedulersList.Schedulers)
-            {
-                Console.WriteLine("\nID: " + scheduler.ID + " Expression: " +
-                    scheduler.CronExpression + " Next Execution: " + scheduler.NextExecutionTime);
-            }
+        public async Task<IEnumerable<Schedulers>> GetDueSchedulers()
+        {
+            var schedulersList = await GetSchedulersList();
+            return (IEnumerable<Schedulers>)schedulersList.Schedulers.AsQueryable().Where(x => x.NextExecutionTime <= DateTime.UtcNow);
         }
     }
 }

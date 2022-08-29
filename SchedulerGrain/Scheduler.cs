@@ -10,7 +10,7 @@ using Orleans.Concurrency;
 using Orleans.Providers;
 using Orleans.Runtime.Services;
 using Cronos;
-
+using CommunAxiom.Commons.Client.Contracts.Ingestion;
 
 namespace SchedulerGrain
 {
@@ -18,7 +18,8 @@ namespace SchedulerGrain
     public class Scheduler : Grain, IScheduler
     {
         private readonly SchedulerBusiness _schedulerBusiness;
-        private IDisposable _timer, _scheduler;
+        private IDisposable _timer, _checkEachSecond;
+        private IIngestion ingestion;
 
         public Scheduler(IConfiguration configuration, SchedulerBusiness schedulerBusiness,
             [PersistentState("scheduler")] IPersistentState<Schedulers> scheduler,
@@ -31,19 +32,16 @@ namespace SchedulerGrain
         public override Task OnActivateAsync()
         {
             _timer = RegisterTimer(x => DelayIt(), true, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(10));
-            LaunchSavedSchedulers();
+            _checkEachSecond = RegisterTimer(x => CheckAndLaunchSchedulers(), true, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10)); // to serve approach 2
             return base.OnActivateAsync();
         }
 
-        public async void LaunchSavedSchedulers()
+        public async Task CheckAndLaunchSchedulers()
         {
-            var schedulers = await GetAllSchedulers();
+            var schedulers = await GetDueSchedulers();
             if (schedulers != null)
             {
-                foreach (var scheduler in schedulers)
-                {
-                    RegisterScheduler(scheduler.ID, scheduler.CronExpression);
-                }
+                await ExecuteScheduledJob(schedulers);
             }
         }
 
@@ -58,7 +56,6 @@ namespace SchedulerGrain
 
         public async Task AddAScheduler(Schedulers scheduler)
         {
-            RegisterScheduler(scheduler.ID, scheduler.CronExpression);
             await _schedulerBusiness.AddAScheduler(scheduler);
         }
 
@@ -67,31 +64,28 @@ namespace SchedulerGrain
             return await _schedulerBusiness.GetSchedulersList();
         }
 
+        public async Task<IEnumerable<Schedulers>> GetDueSchedulers()
+        {
+            return await _schedulerBusiness.GetDueSchedulersList();
+        }
+
         public async Task<Schedulers> GetAScheduler(string schedulerId)
         {
             return await _schedulerBusiness.GetASchedulerDetails(schedulerId);
         }
 
-        public void RegisterScheduler(string schedulerID, string cronExpression)
+        public async Task ExecuteScheduledJob(IEnumerable<Schedulers> schedulers)
         {
-            //change the parameter 3 in the below function and replace it with the difference between next execution and now in seconds
-            //change the last parameter in the below function and replace it with seconds calculated from cron expression
-            var startAfter = ((CronExpression.Parse(cronExpression, CronFormat.IncludeSeconds).GetNextOccurrence(DateTime.UtcNow)) - DateTime.UtcNow).Value.TotalSeconds;
-            _scheduler = RegisterTimer(x => ManageScheduler(schedulerID), true, TimeSpan.FromSeconds(startAfter), TimeSpan.FromSeconds(10));
-        }
+            foreach (var scheduler in schedulers)
+            {
+                //call the ingestion here
+                Console.BackgroundColor = ConsoleColor.DarkGreen;
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("\nCall " + scheduler.ID + " at: " + DateTime.Now.ToString() + "\n");
 
-        public async Task ManageScheduler(string schedulerID)
-        {
-            //replace the below with the call sent to the ingestion grain
-            Console.BackgroundColor = ConsoleColor.DarkGreen;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("\nCall the ingestion function from here. The scheduler with ID: "
-                + schedulerID + " is now executed and time is: " + DateTime.Now.ToString() + "\n");
-
-            //to update the schedulers list
-            await _schedulerBusiness.UpdateScheduler(schedulerID);
-
-            //we should also send a call from broadcast manager to update the schedulers list in the dashboard
+                //await ingestion.Run();
+                await _schedulerBusiness.UpdateScheduler(scheduler.ID, scheduler.CronExpression);
+            }
         }
     }
 }
