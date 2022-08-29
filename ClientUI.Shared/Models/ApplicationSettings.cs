@@ -1,4 +1,4 @@
-﻿using CommunAxiom.Commons.Client.Contracts.Configuration;
+﻿using CommunAxiom.Commons.Shared.OIDC;
 using System;
 using System.Collections.Generic;
 using System.Linq;

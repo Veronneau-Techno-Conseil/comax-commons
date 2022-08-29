@@ -1,6 +1,7 @@
 ﻿using CommunAxiom.Commons.Client.Contracts;
 using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
-using CommunAxiom.Commons.Client.Contracts.Configuration;
+using CommunAxiom.Commons.Shared.Configuration;
+using CommunAxiom.Commons.Shared.OIDC;
 using Microsoft.Extensions.Configuration;
 using Orleans.Security;
 using System;

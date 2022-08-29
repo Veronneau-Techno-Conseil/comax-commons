@@ -40,7 +40,7 @@ namespace Comax.Commons.StorageProvider
 
         public void Participate(ISiloLifecycle lifecycle)
         {
-            lifecycle.Subscribe(OptionFormattingUtilities.Name<LiteDbStorageProvider>(_name),
+            lifecycle.Subscribe(OptionFormattingUtilities.Name<DefaultStorageProvider>(_name),
                                     ServiceLifecycleStage.RuntimeInitialize, Init);
         }
         public Task ClearStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
@@ -98,7 +98,7 @@ namespace Comax.Commons.StorageProvider
                     _serializationProvider.Configure(_cfg.SerializationConfig);
                 }
 
-                _db = Common.GetOrAdd(_name);
+                _db = Common.GetOrAdd(_cfg.FileName);
                 await Task.Run(() => _grains = _db.GetCollection<GrainStorageModel>("grains"));
                 _grains.EnsureIndex(x => x.ETag, unique: true);
                 
