@@ -7,19 +7,19 @@ using NUnit.Framework;
 namespace Broadcast.Grian.Tests
 {
     [TestFixture]
-    public class LocalEventStreamExecutorTest
+    public class OrchestratorEventStreamExecutorTest
     {
-        private readonly LocalEventStreamExecutor _localEventStreamExecutor;
+        private readonly OrchestratorEventStreamExecutor _orchestratorEventStreamExecutor;
         private readonly MessageStreamProvider _messageStreamProvider;
         
-        public LocalEventStreamExecutorTest()
+        public OrchestratorEventStreamExecutorTest()
         {
             _messageStreamProvider = new MessageStreamProvider();
-            _localEventStreamExecutor = new LocalEventStreamExecutor(_messageStreamProvider);
+            _orchestratorEventStreamExecutor = new OrchestratorEventStreamExecutor(_messageStreamProvider);
         }
 
         [Test]
-        public async Task LocalEventStreamExecutor()
+        public async Task OrchestratorEventStreamExecutor()
         {
             var stream = _messageStreamProvider.GetStream<Message>(Guid.Empty, null);
 
@@ -35,7 +35,7 @@ namespace Broadcast.Grian.Tests
                 Scope = "PARTNERS"
             };
 
-            await _localEventStreamExecutor.Execute(message);
+            await _orchestratorEventStreamExecutor.Execute(message);
 
             streamObserver.Message.Should().BeEquivalentTo(message);
         }
