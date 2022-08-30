@@ -1,5 +1,6 @@
 ﻿using System;
 using CommunAxiom.Commons.Client.Contracts;
+using CommunAxiom.Commons.Orleans;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using Orleans.Streams;
 

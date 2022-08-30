@@ -30,6 +30,7 @@ using System.Security.Claims;
 using CommunAxiom.Commons.Shared.OIDC;
 using CommunAxiom.Commons.Shared.Configuration;
 using CommunAxiom.Commons.Shared;
+using CommunAxiom.Commons.Orleans;
 
 namespace CommunAxiom.Commons.Client.Grains.AccountGrain
 {

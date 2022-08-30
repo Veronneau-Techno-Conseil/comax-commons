@@ -7,6 +7,13 @@
 	  <SpaRoot>$(MSBuildProjectDirectory)/</SpaRoot>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Helper\**" />
+    <Content Remove="Helper\**" />
+    <EmbeddedResource Remove="Helper\**" />
+    <None Remove="Helper\**" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />
@@ -38,7 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helper\" />
     <Folder Include="Resources\MainMenu\" />
   </ItemGroup>
 

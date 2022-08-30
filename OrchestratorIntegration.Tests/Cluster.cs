@@ -1,4 +1,5 @@
 ﻿using Comax.Commons.Orchestrator;
+using Comax.Commons.Orchestrator.Contracts.ComaxSystem;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -28,7 +29,6 @@ namespace OrchestratorIntegration.Tests
         public async Task RunAfterAnyTests()
         {
             await MainSilo.StopSilo();
-
         }
 
         public static void SetupTests()
@@ -40,7 +40,7 @@ namespace OrchestratorIntegration.Tests
             ServiceCollection sc = new ServiceCollection();
             sc.AddSingleton<IConfiguration>(Configuration);
             sc.AddLogging(lb => lb.AddConsole());
-
+            ServiceProvider = sc.BuildServiceProvider();
         }
     }
 }

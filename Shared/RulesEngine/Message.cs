@@ -8,5 +8,6 @@
         public string Type { get; set; }
         public string Scope { get; set; }
         public string Payload { get; set; }
+        public string Subject { get; set; }
     }
 }

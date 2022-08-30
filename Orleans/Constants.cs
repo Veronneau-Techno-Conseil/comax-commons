@@ -2,11 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Comax.Commons.Orchestrator.Contracts
+namespace CommunAxiom.Commons.Orleans
 {
     public static class Constants
     {
         public const string DefaultStream = "Default";
         public const string DefaultNamespace = "Default";
+
+        public static class Storage
+        {
+            public const string PubSubStore = "PubSubStore";
+            public const string JObjectStore = "JObjectStore";
+        }
     }
 }

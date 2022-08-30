@@ -21,6 +21,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
+	  <ProjectReference Include="..\Orleans\Orleans.csproj" />
 	</ItemGroup>
 
 </Project>

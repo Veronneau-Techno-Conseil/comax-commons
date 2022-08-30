@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\LiteDbStorageProvider\LiteDbStorageProvider.csproj" />
+    <ProjectReference Include="..\Orleans\Orleans.csproj" />
   </ItemGroup>
 
 </Project>

@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using CommunAxiom.Commons.Client.SiloShared.System;
+using CommunAxiom.Commons.Orleans;
 
 namespace CommunAxiom.Commons.Client.SiloShared
 {
@@ -96,22 +97,22 @@ namespace CommunAxiom.Commons.Client.SiloShared
             services.AddOptions();
             services.SetJSONLiteDbSerializationProvider();
             services.Configure<LiteDbConfig>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, configuration.GetSection("LiteDbStorage"));
-            services.Configure<LiteDbConfig>(Contracts.Constants.Storage.PubSubStore, configuration.GetSection(Contracts.Constants.Storage.PubSubStore));
-            services.Configure<LiteDbConfig>(Contracts.Constants.Storage.JObjectStore, configuration.GetSection(Contracts.Constants.Storage.JObjectStore));
+            services.Configure<LiteDbConfig>(Constants.Storage.PubSubStore, configuration.GetSection(Constants.Storage.PubSubStore));
+            services.Configure<LiteDbConfig>(Constants.Storage.JObjectStore, configuration.GetSection(Constants.Storage.JObjectStore));
 
             services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, (svc, key) =>
             {
                 return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
             });
 
-            services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(Contracts.Constants.Storage.PubSubStore, (svc, key) =>
+            services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(Constants.Storage.PubSubStore, (svc, key) =>
             {
                 return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
             });
 
             services.AddLiteDbGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
-            services.AddWrappedLiteDbGrainStorage(Contracts.Constants.Storage.PubSubStore);
-            services.AddJObjectLiteDbGrainStorage(Contracts.Constants.Storage.JObjectStore);
+            services.AddWrappedLiteDbGrainStorage(Constants.Storage.PubSubStore);
+            services.AddJObjectLiteDbGrainStorage(Constants.Storage.JObjectStore);
 
             return services;
         }
