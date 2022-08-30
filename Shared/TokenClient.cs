@@ -47,6 +47,7 @@ namespace CommunAxiom.Commons.Shared
             
             var res = await _httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
             {
+                Address = TokenMetadata.TokenEndpoint,
                 ClientId = clientId,
                 ClientSecret = secret,
                 Scope = scope
