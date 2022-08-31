@@ -11,6 +11,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
+using CommunAxiom.Commons.Shared;
 
 namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
 {

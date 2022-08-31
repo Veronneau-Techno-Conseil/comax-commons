@@ -8,6 +8,7 @@ using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
 using CommunAxiom.Commons.Client.Contracts.Ingestion;
 using CommunAxiom.Commons.Client.Contracts.Project;
 using CommunAxiom.Commons.Client.Contracts.Replication;
+using CommunAxiom.Commons.Orleans;
 using CommunAxiom.Commons.Shared;
 using Orleans;
 using Orleans.Streams;
@@ -107,6 +108,11 @@ namespace ClusterClient
         public Task Close()
         {
             return _clusterClient.Close();
+        }
+
+        public IStreamProvider GetStreamProvider(string name)
+        {
+            return _clusterClient.GetStreamProvider(name);
         }
     }
 }

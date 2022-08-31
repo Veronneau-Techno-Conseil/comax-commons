@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using CommunAxiom.Commons.ClientUI.Shared.Models;
 using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
+using CommunAxiom.Commons.Shared;
 
 namespace CommunAxiom.Commons.ClientUI.Server.Controllers
 {

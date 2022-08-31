@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Comax.Commons.Orchestrator
 {
-    internal static class MainSilo
+    public static class MainSilo
     {
         static ISiloHost _silo;
 

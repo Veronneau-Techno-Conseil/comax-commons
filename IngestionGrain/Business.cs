@@ -1,4 +1,5 @@
-﻿using CommunAxiom.Commons.Client.Contracts.Datasource;
+﻿using CommunAxiom.Commons.Client.Contracts.Broadcast;
+using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.Grains.Storage;
 using CommunAxiom.Commons.Client.Contracts.Ingestion;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
@@ -50,6 +51,17 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
                 {
                     _ingestionState = IngestionState.Started;
 
+                    var broadcast = _grainFactory.GetGrain<IBroadcast>(_grainKey);
+                    await broadcast.Notify(new Shared.RuleEngine.Message
+                    {
+                        From = "com://local/data/{dsid}",
+                        FromOwner = "ust://{usrid}",
+                        To = "local",
+                        Type = "INGESTION_STARTED",
+                        Scope = "local",
+                        Payload = null
+                    });
+
                     var dataSource = _grainFactory.GetGrain<IDatasource>(_grainKey);
                     var state = await dataSource.GetConfig();
 
@@ -92,6 +104,16 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
                         CreateDateTime = DateTime.UtcNow,
                         IsSuccessful = true
                     });
+
+                    await broadcast.Notify(new Shared.RuleEngine.Message
+                    {
+                        From = "com://local/data/{dsid}",
+                        FromOwner = "ust://{usrid}",
+                        To = "com://*",
+                        Type = "NEW_DATA_VERSION",
+                        Scope = "local",
+                        Payload = null
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -101,10 +123,23 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
                         IsSuccessful = false,
                         Exception = ex
                     });
+
+                    // TODO: added a notification when error happen
                 }
                 finally
                 {
                     _ingestionState = IngestionState.Completed;
+
+                    var broadcast = _grainFactory.GetGrain<IBroadcast>(_grainKey);
+                    await broadcast.Notify(new Shared.RuleEngine.Message
+                    {
+                        From = "com://local/data/{dsid}",
+                        FromOwner = "ust://{usrid}",
+                        To = "local",
+                        Type = "INGESTION_END",
+                        Scope = "local",
+                        Payload = null
+                    });
                 }
 
                 return _ingestionState;

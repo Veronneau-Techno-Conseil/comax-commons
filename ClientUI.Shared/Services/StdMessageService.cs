@@ -1,5 +1,6 @@
 ﻿using Blazored.Toast.Services;
 using CommunAxiom.Commons.Client.Contracts;
+using CommunAxiom.Commons.Shared;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.Services
             _stringLocalizer = stringLocalizer;
             _toastService = toastService;
         }
+
         public string ErrorMessage(string code, string source, string failedAction)
         {
             switch (code)

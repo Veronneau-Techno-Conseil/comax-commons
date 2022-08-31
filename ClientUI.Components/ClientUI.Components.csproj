@@ -7,15 +7,22 @@
 	  <SpaRoot>$(MSBuildProjectDirectory)/</SpaRoot>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Helper\**" />
+    <Content Remove="Helper\**" />
+    <EmbeddedResource Remove="Helper\**" />
+    <None Remove="Helper\**" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.5" />
-<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.5" />
-	  <PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.8" />
+<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.8" />
+	  <PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
 	  <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
   </ItemGroup>
@@ -38,7 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helper\" />
     <Folder Include="Resources\MainMenu\" />
   </ItemGroup>
 

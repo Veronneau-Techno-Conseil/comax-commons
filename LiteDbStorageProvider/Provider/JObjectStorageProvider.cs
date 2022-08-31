@@ -67,7 +67,10 @@ namespace Comax.Commons.StorageProvider
                 var collection = await CreateLiteCollection(grainState.Type.Name);
                 var grain = collection.Query().Where(x => x["ETag"].AsString == blobName).FirstOrDefault();
                 if (grain == null)
+                {
+                    grainState.RecordExists = false;
                     return;
+                }
 
                 BaseGrainStorageModel obj = BsonMapper.Global.Deserialize<BaseGrainStorageModel>(grain);
 

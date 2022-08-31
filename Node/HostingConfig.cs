@@ -16,6 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Comax.Commons.Orchestrator.Contracts;
+using CommunAxiom.Commons.Orleans;
 
 namespace Comax.Commons.Orchestrator
 {

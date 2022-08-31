@@ -1,4 +1,5 @@
 ﻿using CommunAxiom.Commons.Client.Contracts;
+using CommunAxiom.Commons.Orleans;
 using Newtonsoft.Json.Linq;
 using Orleans.Runtime;
 using System.Threading.Tasks;
