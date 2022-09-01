@@ -1,21 +1,23 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Grains.Scheduler;
+using CommunAxiom.Commons.Client.Contracts.Ingestion;
 using Microsoft.Extensions.Configuration;
 using Orleans.Runtime;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using CommunAxiom.Commons.Orleans;
+using Cronos;
 
 namespace SchedulerGrain
 {
     public class SchedulerBusiness
     {
-        private readonly IConfiguration _configuration;
         private SchedulerRepo _schedulerRepo;
+        private readonly IGrainFactory _grainFactory;
 
-        public SchedulerBusiness(IConfiguration configuration)
+        public SchedulerBusiness(IGrainFactory grainFactory)
         {
-            this._configuration = configuration;
+            _grainFactory = grainFactory;
         }
 
         public void Init(IPersistentState<Schedulers> scheduler, IPersistentState<SchedulersList> schedulersList)
@@ -62,6 +64,7 @@ namespace SchedulerGrain
                 {
                     await CreateSchedulersList();
                 }
+                scheduler.NextExecutionTime = await CalculateNextExecution(scheduler.CronExpression);
                 await _schedulerRepo.AddAScheduler(scheduler);
             }
         }
@@ -76,22 +79,31 @@ namespace SchedulerGrain
             return await Task.FromResult<Schedulers>(null);
         }
 
-        public async Task UpdateScheduler(string schedulerID, string cronExpression)
+        public async Task ExecuteAndUpdateScheduled()
         {
-            if (schedulerID != null)
-            {
-                await _schedulerRepo.UpdateScheduler(schedulerID, cronExpression);
-            }
-        }
-
-        public async Task<IEnumerable<Schedulers>> GetDueSchedulersList()
-        {
-            var ListCreated = await CheckSchedulerslist();
-            if (ListCreated != true)
+            var listCreated = await CheckSchedulerslist();
+            if (listCreated != true)
             {
                 await CreateSchedulersList();
             }
-            return await _schedulerRepo.GetDueSchedulers();
+            var dueSchedulers = await _schedulerRepo.GetDueSchedulers();
+            foreach (var scheduler in dueSchedulers)
+            {
+                //call ingestion grain here
+                var ingestionGrain = _grainFactory.GetGrain<IIngestion>(scheduler.DataSourceID);
+                await ingestionGrain.Run();
+
+                //Update next occurrence
+                var nextExecution = await CalculateNextExecution(scheduler.CronExpression);
+                await _schedulerRepo.UpdateNextOccurrence(scheduler.ID, nextExecution);
+            }
+        }
+
+        public async Task<DateTime> CalculateNextExecution(string cronExpression)
+        {
+            //calculate next execution with Cronos: https://github.com/HangfireIO/Cronos#adding-seconds-to-an-expression 
+            var cron = CronExpression.Parse(cronExpression, CronFormat.IncludeSeconds);
+            return (DateTime)cron.GetNextOccurrence(DateTime.UtcNow);
         }
     }
 }

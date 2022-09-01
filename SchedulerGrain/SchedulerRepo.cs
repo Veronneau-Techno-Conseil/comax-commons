@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using CommunAxiom.Commons.Client.Contracts.Grains.Scheduler;
 using System.Linq;
-using Cronos;
+using Orleans;
+using CommunAxiom.Commons.Client.Contracts.Ingestion;
+using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 
 namespace SchedulerGrain
 {
@@ -47,13 +49,7 @@ namespace SchedulerGrain
             {
                 schedulersList.Schedulers = new List<Schedulers>();
             }
-            //calculate the next occurrence based on the expression and the current timing
-            //the cronos library has been userd here and can be reached at the below link:
-            //https://github.com/HangfireIO/Cronos#adding-seconds-to-an-expression 
-            var parsedScheduler = scheduler;
-            CronExpression cron = CronExpression.Parse(scheduler.CronExpression, CronFormat.IncludeSeconds);
-            parsedScheduler.NextExecutionTime = (DateTime)cron.GetNextOccurrence(DateTime.UtcNow);
-            schedulersList.Schedulers = schedulersList.Schedulers.Concat(new[] { parsedScheduler });
+            schedulersList.Schedulers = schedulersList.Schedulers.Concat(new[] { scheduler });
             await _schedulersList.WriteStateAsync();
         }
 
@@ -63,20 +59,19 @@ namespace SchedulerGrain
             return schedulersList.Schedulers.AsQueryable().Where(x => x.ID == schedulerID).FirstOrDefault();
         }
 
-        public async Task UpdateScheduler(string schedulerID, string cronExpression)
-        {
-            var schedulersList = await GetSchedulersList();
-            var cron = CronExpression.Parse(cronExpression, CronFormat.IncludeSeconds);
-            var nextExecution = cron.GetNextOccurrence(DateTime.UtcNow);
-            foreach (var scheduler in schedulersList.Schedulers.Where(x => x.ID == schedulerID))
-                scheduler.NextExecutionTime = (DateTime)nextExecution;
-            await _schedulersList.WriteStateAsync();
-        }
-
         public async Task<IEnumerable<Schedulers>> GetDueSchedulers()
         {
             var schedulersList = await GetSchedulersList();
-            return (IEnumerable<Schedulers>)schedulersList.Schedulers.AsQueryable().Where(x => x.NextExecutionTime <= DateTime.UtcNow);
+            var filteredSchedulers = schedulersList.Schedulers.AsQueryable().Where(x => x.NextExecutionTime.ToUniversalTime() <= DateTime.UtcNow);
+            return filteredSchedulers;
+        }
+
+        public async Task UpdateNextOccurrence(string schedulerID, DateTime nextOccurrence)
+        {
+            var schedulersList = await GetSchedulersList();
+            foreach (var oldScheduler in schedulersList.Schedulers.Where(x => x.ID == schedulerID))
+                oldScheduler.NextExecutionTime = (DateTime)nextOccurrence;
+            await _schedulersList.WriteStateAsync();
         }
     }
 }
