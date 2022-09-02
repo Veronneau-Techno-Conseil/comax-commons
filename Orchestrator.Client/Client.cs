@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Comax.Commons.Orchestrator.Contracts.UriRegistry;
 
 namespace Comax.Commons.Orchestrator.Client
 {
@@ -29,6 +30,10 @@ namespace Comax.Commons.Orchestrator.Client
             return _clusterClient.GetGrain<IMailbox>(id);
         }
 
+        public IUriRegistry GetUriRegistry(string id)
+        {
+            return _clusterClient.GetGrain<IUriRegistry>(id);
+        }
         public void Dispose()
         {
             try

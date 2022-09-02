@@ -25,6 +25,7 @@
     <ProjectReference Include="..\LiteDbStorageProvider\LiteDbStorageProvider.csproj" />
     <ProjectReference Include="..\MailboxGrain\MailboxGrain.csproj" />
     <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
+    <ProjectReference Include="..\UriRegistryGrain\UriRegistryGrain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
