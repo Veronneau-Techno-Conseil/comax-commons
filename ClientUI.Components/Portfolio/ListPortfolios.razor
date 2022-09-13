@@ -1,4 +1,8 @@
 ﻿@page "/list_portfolios"
+@inject NavigationManager _navigationManager
+@using Blazorise
+@using Blazorise.TreeView;
+
 
 @using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 @using Microsoft.Extensions.Options
@@ -6,55 +10,338 @@
 
 @inject NavigationManager _navigationManager
 @inject IStringLocalizer<ListPortfolios> _localizer
-@inject IPortfolioViewModel _portfolioViewModel;
 
-<h3>@_localizer["ListPortfolios"]</h3>
-<div>
-    <div class="table-container">
-        @if (_portfolios != null)
-        {
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID </th>
-                        <th>@_localizer["Name"] </th>
-                        <th>@_localizer["Type"] </th>
-                        @*<th>@_localizer["Parent"] </th>*@
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var portfolio in _portfolios)
+<div class="container.is-fullhd">
+    <div class="columns">
+        <div class="column">
+            <div class="card">
+                <div class="card-content">
+                    <div class="content">
+                        <TreeView Nodes="Items"
+                                  Expanded="true"
+                                  GetChildNodes="@(item => item.Children)"
+                                  HasChildNodes="@(item => item.Children?.Any() == true)"
+                                  @bind-SelectedNode="selectedNode"
+                                  @bind-ExpandedNodes="ExpandedNodes">
+                            <NodeContent>
+                                <img class="icon-25" src="@StyleForIcon(context.Type)" />
+                                <span class="ml-2 mr-2 has-text-weight-bold icon-pos">  @context.Text </span>
+                                @if (context.Type != NodeType.Dataset)
+                                {
+                                    <img class="icon-25" src="_content/ClientUI.Components/icons/Add.png" @onclick="(() => ShowModal(context))" />
+                                }
+                            </NodeContent>
+                        </TreeView>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="column is-two-thirds">
+            <div class="card">
+                <div class="card-content">
+                    <div class="content">
+                        <h4 class="mb-4"> Dataset 4 </h4>
+                        <div class="columns">
+                            <div class="column">
+                                <label>Description</label>
+                                <img class="icon-25 is-pulled-right" src="_content/ClientUI.Components/icons/Save.png" />
+                                <article class="mt-2 message is-warning">
+                                    <div class="message-body">
+                                        This is long description of <strong>Dataset</strong>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
+                        <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+                            <Items>
+                                <Tab Name="home">Input data structure</Tab>
+                                <Tab Name="profile">Transformations</Tab>
+                                <Tab Name="messages">Version history</Tab>
+                            </Items>
+                            <Content>
+                                <TabPanel Name="home">
+                                    <h6>Data source</h6>
+                                    <div class="columns">
+                                        <div class="column is-one-fifth">
+                                            <label>Source Type</label>
+
+                                            <select class="select">
+                                                @foreach (var srource in sources)
+                                                {
+                                                    <option value=@srource>@srource</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="column">
+                                            <label>Filename</label>
+                                            <div style="display:flex">
+                                                <input class="input is-primary" type="text" placeholder="Primary input" value="C:\somefile.json" />
+                                                <img style="top: 6px;left: 6px;" class="icon-25" src="_content/ClientUI.Components/icons/Open.png" />
+                                            </div>
+                                        </div>
+                                        <div class="column is-two-quarters"> </div>
+                                    </div>
+                                    <h6>Versioning strategy</h6>
+                                    <div class="columns">
+                                        <div class="column is-one-fifth">
+                                            <label>Strategy</label>
+                                            <div class="dropdown">
+                                                <div class="dropdown-trigger">
+                                                    <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                                                        <span> Upsert / DS per import / Incremental</span>
+                                                        <span class="icon is-small">
+                                                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                                <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                                                    <div class="dropdown-content">
+                                                        <a href="#" class="dropdown-item">
+                                                            Dropdown item
+                                                        </a>
+                                                        <a class="dropdown-item">
+                                                            Other dropdown item
+                                                        </a>
+                                                        <a href="#" class="dropdown-item is-active">
+                                                            Active dropdown item
+                                                        </a>
+                                                        <a href="#" class="dropdown-item">
+                                                            Other dropdown item
+                                                        </a>
+                                                        <hr class="dropdown-divider">
+                                                        <a href="#" class="dropdown-item">
+                                                            With a divider
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <h6>Data description </h6>
+                                    <div class="columns">
+                                        <div class="column">
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        <TableHeaderCell>Name</TableHeaderCell>
+                                                        <TableHeaderCell>Type</TableHeaderCell>
+                                                        <TableHeaderCell>Description</TableHeaderCell>
+                                                        <TableHeaderCell><img class="icon-25" src="_content/ClientUI.Components/icons/Add.png" /></TableHeaderCell>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    <TableRow>
+                                                        <TableRowCell>[].Id</TableRowCell>
+                                                        <TableRowCell>integer</TableRowCell>
+                                                        <TableRowCell>Identifier of the entry</TableRowCell>
+                                                        <TableRowCell><img class="icon-25" src="_content/ClientUI.Components/icons/Delete.png" /></TableRowCell>
+                                                    </TableRow>
+                                                    <TableRow>
+                                                        <TableRowCell>[].name</TableRowCell>
+                                                        <TableRowCell>string</TableRowCell>
+                                                        <TableRowCell>Name of the entry</TableRowCell>
+                                                        <TableRowCell><img class="icon-25" src="_content/ClientUI.Components/icons/Delete.png" /></TableRowCell>
+                                                    </TableRow>
+                                                    <TableRow>
+                                                        <TableRowCell>[].addr.address</TableRowCell>
+                                                        <TableRowCell>string</TableRowCell>
+                                                        <TableRowCell>Street address</TableRowCell>
+                                                        <TableRowCell><img class="icon-25" src="_content/ClientUI.Components/icons/Delete.png" /></TableRowCell>
+                                                    </TableRow>
+                                                    <TableRow>
+                                                        <TableRowCell>[].addr.city</TableRowCell>
+                                                        <TableRowCell>string</TableRowCell>
+                                                        <TableRowCell>city</TableRowCell>
+                                                        <TableRowCell><img class="icon-25" src="_content/ClientUI.Components/icons/Delete.png" /></TableRowCell>
+                                                    </TableRow>
+                                                </TableBody>
+                                            </Table>
+                                        </div>
+                                    </div>
+
+                                </TabPanel>
+                                <TabPanel Name="profile">
+                                    Content for profile.
+                                </TabPanel>
+                                <TabPanel Name="messages">
+                                    Content for messages.
+                                </TabPanel>
+                            </Content>
+                        </Tabs>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <Modal ref="modalRef">
+        <ModalContent Centered>
+            <ModalHeader>
+                <ModalTitle>Add a node</ModalTitle>
+            </ModalHeader>
+            <ModalBody>
+                <Field>
+                    <FieldLabel>Name</FieldLabel>
+                    <input class="input is-primary" type="text" placeholder="Name..." value="@Title" @onchange="@(e => { Title = e.Value.ToString(); })">
+                </Field>
+
+                <select class="select" style="width:100%;" @onchange="onChangeNodeType">
+                    @foreach (var template in templates)
                     {
-                        <tr>
-                            <td> @portfolio.ID </td>
-                            <td> @portfolio.Name </td>
-                            <td> @portfolio.TheType </td>
-                            @*<td> @portfolio.ParentId </td>*@
-                        </tr>
+                        <option value=@template>@template</option>
                     }
-                </tbody>
-            </table>
-        }
-        else
-        {
-            <h3>@_localizer["NoPortfoliosAdded"]</h3>
-        }
-    </div>
-    <div>
-        <a class="button" @onclick="@GoToCreatePortfolio" target=""> @_localizer["Create"] </a>
-    </div>
+                </select>
+
+            </ModalBody>
+            <ModalFooter>
+                <button class="button is-light" @onclick="onCancel" >Cancel</button>
+                <button class="button is-success" @onclick="onSave">Save</button>
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
+
 </div>
 
 @code {
+    private string Title { get; set; }
+    private string SelectedString { get; set; }
+
+
+    List<string> sources = new List<string>() { "JSON File", "CSV file" };
+    List<string> templates = new List<string>() { "Folder", "Project", "Dataset" };
+
+    void onChangeNodeType(ChangeEventArgs args)
+    {
+        SelectedString = args.Value.ToString();
+    }
+
+    public string SelectedTitle { get; set; }
+
+    private string StyleForIcon(NodeType node)
+    {
+        var nodeName = node.GetDisplayDescription();
+        return $"_content/ClientUI.Components/icons/{nodeName}.png";
+    }
+
+    string selectedTab = "home";
+
+    private Task OnSelectedTabChanged(string name)
+    {
+        selectedTab = name;
+
+        return Task.CompletedTask;
+    }
+    public enum NodeType
+    {
+        Folder,
+        Dataset,
+        Project
+    }
+    public class Item
+    {
+        public string Text { get; set; }
+        public NodeType Type { get; set; }
+        public IList<Item> Children { get; set; }
+    }
+
+    IList<Item> Items = new[]
+    {
+        new Item {
+            Text = "Root",
+            Type = NodeType.Folder,
+            Children = new List<Item> {
+                new Item { Type = NodeType.Folder, Text = "Folder 1" },
+                new Item {
+                    Text = "Folder 2",
+                    Type = NodeType.Folder,
+                    Children = new List<Item>
+                    {
+                        new Item {Type = NodeType.Dataset, Text = "Dataset 1" },
+                        new Item { Type = NodeType.Dataset, Text = "Dataset 2" }
+                    }
+                },
+                new Item {
+                    Text = "Folder 3",
+                    Type = NodeType.Folder,
+                    Children = new List<Item>
+                    {
+                        new Item {
+                            Text = "Project 1",
+                            Type = NodeType.Project,
+                            Children = new List<Item> {
+                                new Item { Type = NodeType.Dataset, Text = "Dataset 3"}
+                            }
+                        },
+                        new Item { Type = NodeType.Dataset, Text = "Dataset 4" }
+                    }
+                },
+                new Item {  Type = NodeType.Folder, Text = "Empty Folder" },
+            },
+        }
+    };
+
+    IList<Item> ExpandedNodes = new List<Item>();
+    Item selectedNode;
+
+
+    // reference to the modal component
+    private Modal? modalRef;
+
+    private bool cancelClose;
+    private Item SelectedItem { get; set; }
+    private Task ShowModal(Item item)
+    {
+        this.SelectedItem = item;
+        return modalRef.Show();
+    }
+
+    public Task onSave()
+    {
+        if (this.SelectedItem.Children == null)
+        {
+            this.SelectedItem.Children = new List<Item>();
+        }
+
+        Enum.TryParse(this.SelectedString, out NodeType selectedNodeType);
+
+        this.SelectedItem.Children.Add(new Item { Text = this.Title, Type = selectedNodeType });
+
+        this.SelectedString = string.Empty;
+        this.Title = string.Empty;
+
+        cancelClose = false;
+
+        return modalRef.Hide();
+    }
+
+    public Task onCancel()
+    {
+        this.SelectedString = string.Empty;
+        this.Title = string.Empty;
+
+        cancelClose = true;
+        return modalRef.Hide();
+    }
+
+    private Task OnModalClosing(ModalClosingEventArgs e)
+    {
+        // just set Cancel to prevent modal from closing
+        e.Cancel = cancelClose
+            || e.CloseReason != CloseReason.UserClosing;
+
+        return Task.CompletedTask;
+    }
+
     private List<Portfolio> _portfolios = new List<Portfolio>();
 
     protected async override Task OnInitializedAsync()
     {
-        _portfolios = await _portfolioViewModel.GetPortfolios();
+
     }
 
     private void GoToCreatePortfolio()
     {
         _navigationManager.NavigateTo("/create_portfolio");
     }
+
 }

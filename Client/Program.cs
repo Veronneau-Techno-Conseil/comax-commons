@@ -1,29 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Blazorise;
+using Blazorise.Bulma;
+using Blazorise.Icons.FontAwesome;
 using ClusterClient;
 using CommunAxiom.Commons.ClientUI.Server.Models;
 using CommunAxiom.Commons.ClientUI.Server.SEO;
 using CommunAxiom.Commons.ClientUI.Shared.Extensions;
-using CommunAxiom.Commons.ClientUI.Shared.JsonLocalizer;
 using CommunAxiom.Commons.ClientUI.Shared.Models;
-using CommunAxiom.Commons.ClientUI.Shared.Services;
-using ElectronNET.API;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
-using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 //namespace CommunAxiom.Commons.ClientUI;
 
@@ -47,6 +35,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
+builder.Services.AddBlazorise(options =>
+{
+    options.Immediate = true;
+});
+
+builder.Services.AddBulmaProviders();
+builder.Services.AddFontAwesomeIcons();
+
 builder.Services.AddCors(option =>
 {
     option.AddDefaultPolicy(cp =>

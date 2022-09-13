@@ -28,6 +28,7 @@
                 <AuthorizeView>
                     <Authorized>
                         <NavLink class="navbar-item" href="dashboard" Match="NavLinkMatch.All">
+                            <img class="icon-25" src="_content/ClientUI.Components/icons/Home.png" />
                             @_localizer["Dashboard"]
                         </NavLink>
                     </Authorized>
@@ -36,12 +37,14 @@
                 @if (_environment.IsDevelopment())
                 {
                     <NavLink class="navbar-item" href="test_grain" Match="NavLinkMatch.All">
+                        <img class="icon-25" src="_content/ClientUI.Components/icons/Commons.png" />
                         @_localizer["Test grains"]
                     </NavLink>
                 }
 
                 <div class="navbar-item has-dropdown is-hoverable">
                     <NavLink class="navbar-item" Match="NavLinkMatch.All" @onclick="()=> portfolioSubMenu = !portfolioSubMenu">
+                        <img class="icon-25" src="_content/ClientUI.Components/icons/Portfolio.png" />
                         @_localizer["Portfolio"]
                     </NavLink>
                     @if (portfolioSubMenu)
@@ -59,6 +62,7 @@
                 </div>
 
                 <NavLink class="navbar-item" href="about" Match="NavLinkMatch.All">
+                    <img class="icon-25" src="_content/ClientUI.Components/icons/Commons.png" />
                     @_localizer["About"]
                 </NavLink>
             </div>
