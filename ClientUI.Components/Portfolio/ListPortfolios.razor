@@ -1,13 +1,12 @@
 ﻿@page "/list_portfolios"
-@inject NavigationManager _navigationManager
+
 @using Blazorise
 @using Blazorise.TreeView;
-
-
 @using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 @using Microsoft.Extensions.Options
 @using Microsoft.Extensions.Localization
 
+@inject NavigationManager _navigationManager
 @inject NavigationManager _navigationManager
 @inject IStringLocalizer<ListPortfolios> _localizer
 
@@ -18,7 +17,6 @@
                 <div class="card-content">
                     <div class="content">
                         <TreeView Nodes="Items"
-                                  Expanded="true"
                                   GetChildNodes="@(item => item.Children)"
                                   HasChildNodes="@(item => item.Children?.Any() == true)"
                                   @bind-SelectedNode="selectedNode"
@@ -174,7 +172,7 @@
         </div>
     </div>
 
-    <Modal ref="modalRef">
+    <Modal @ref="modalRef">
         <ModalContent Centered>
             <ModalHeader>
                 <ModalTitle>Add a node</ModalTitle>
@@ -194,7 +192,7 @@
 
             </ModalBody>
             <ModalFooter>
-                <button class="button is-light" @onclick="onCancel" >Cancel</button>
+                <button class="button is-light" @onclick="onCancel">Cancel</button>
                 <button class="button is-success" @onclick="onSave">Save</button>
             </ModalFooter>
         </ModalContent>
@@ -244,7 +242,7 @@
         public IList<Item> Children { get; set; }
     }
 
-    IList<Item> Items = new[]
+    IList<Item> Items = new List<Item>
     {
         new Item {
             Text = "Root",
@@ -254,8 +252,7 @@
                 new Item {
                     Text = "Folder 2",
                     Type = NodeType.Folder,
-                    Children = new List<Item>
-                    {
+                    Children = new List<Item> {
                         new Item {Type = NodeType.Dataset, Text = "Dataset 1" },
                         new Item { Type = NodeType.Dataset, Text = "Dataset 2" }
                     }
@@ -263,8 +260,7 @@
                 new Item {
                     Text = "Folder 3",
                     Type = NodeType.Folder,
-                    Children = new List<Item>
-                    {
+                    Children = new List<Item> {
                         new Item {
                             Text = "Project 1",
                             Type = NodeType.Project,
@@ -281,6 +277,7 @@
     };
 
     IList<Item> ExpandedNodes = new List<Item>();
+    
     Item selectedNode;
 
 
@@ -334,10 +331,9 @@
 
     private List<Portfolio> _portfolios = new List<Portfolio>();
 
-    protected async override Task OnInitializedAsync()
-    {
-
-    }
+        protected async override Task OnInitializedAsync()
+        {
+        }
 
     private void GoToCreatePortfolio()
     {
