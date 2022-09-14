@@ -1,6 +1,6 @@
 ﻿using Comax.Commons.Orchestrator.Contracts;
 using Comax.Commons.Orchestrator.Contracts.ComaxSystem;
-
+using CommunAxiom.Commons.Orleans;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -31,12 +31,12 @@ namespace Comax.Commons.Orchestrator.Client
                     .Configure<ClusterOptions>(options =>
                     {
                         options.ClusterId = "0.0.1-a1";
-                        options.ServiceId = "CommonsClientCluster";
+                        options.ServiceId = "OrchestratorCluster";
                     })
                     .ConfigureApplicationParts(parts =>
                     {
                         parts.AddFromApplicationBaseDirectory();
-                    }).UseLocalhostClustering(30000)
+                    }).UseLocalhostClustering(30001)
                     .AddSimpleMessageStreamProvider(Constants.DefaultStream);
             return b;
         }

@@ -1,4 +1,5 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Remote;
+using CommunAxiom.Commons.Shared;
 using Orleans;
 using System;
 using System.Collections.Generic;

@@ -1,0 +1,16 @@
+{
+  "OIDC": {
+    "Authority": "https://accounts.communaxiom.org/",
+    "Scopes": "openid offline_access roles profile email",
+    "ClientId": "",
+    "Secret":  ""
+  },
+  "LiteDbStorage": {
+    "Name": "LiteDbStorage",
+    "FileName": "./SiloStore.db"
+  },
+  "PubSubStore": {
+    "Name": "PubSubStore",
+    "FileName": "./PubSubStore.db"
+  }
+}

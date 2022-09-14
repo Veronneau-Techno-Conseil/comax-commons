@@ -1,4 +1,5 @@
-﻿using CommunAxiom.Commons.Client.Contracts.Datasource;
+﻿using CommunAxiom.Commons.Client.Contracts.Broadcast;
+using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.Grains.Storage;
 using CommunAxiom.Commons.Client.Contracts.Ingestion;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
@@ -30,6 +31,7 @@ namespace Ingestion.Grain.Tests
         private Mock<IConfigValidatorLookup> _configValidatorLookup;
         private Mock<IFieldValidatorLookup> _fieldValidatorLookup;
         private Mock<IDatasource> _dataSource;
+        private Mock<IBroadcast> _broadcast;
         private const string grainKey = "grain-key-test";
 
         [SetUp]
@@ -42,6 +44,7 @@ namespace Ingestion.Grain.Tests
             _configValidatorLookup = new Mock<IConfigValidatorLookup>();
             _fieldValidatorLookup = new Mock<IFieldValidatorLookup>();
             _dataSource = new Mock<IDatasource>();
+            _broadcast = new Mock<IBroadcast>();
 
             var importer = new Importer(_dataSourceFactory.Object, _ingestorFactory.Object);
             _business = new Business(importer, _grainFactory.Object, grainKey);
@@ -89,6 +92,7 @@ namespace Ingestion.Grain.Tests
             _dataSource.Setup(o => o.GetConfig()).ReturnsAsync(sourceState);
 
             _grainFactory.Setup(o => o.GetGrain<IDatasource>(grainKey, null)).Returns(_dataSource.Object);
+            _grainFactory.Setup(o => o.GetGrain<IBroadcast>(grainKey, null)).Returns(_broadcast.Object);
 
             var mockIndexStorageGrain = new MockStorageGrain($"{grainKey}-index");
             

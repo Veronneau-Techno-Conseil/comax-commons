@@ -38,7 +38,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
                     return AccountState.ClientMismatch;
 
                 //Throttle force refresh
-                if ((forceRefresh && (details.LastRefresh == null || details.LastRefresh?.AddMinutes(2) < DateTime.Now)) || DateTime.UtcNow > details.NextRefresh)
+                if ((forceRefresh && (details.LastRefresh == null || details.LastRefresh?.ToUniversalTime().AddMinutes(2) < DateTime.UtcNow)) || DateTime.UtcNow > details.NextRefresh?.ToUniversalTime())
                 {
                     await this.UpdateClientCredentials(details);
                 }

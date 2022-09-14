@@ -61,7 +61,10 @@ namespace Comax.Commons.StorageProvider
                 var blobName = GetBlobName(grainType, grainReference);
                 var blob = _grains.Query().Where(x => x.ETag == blobName).FirstOrDefault();
                 if (blob == null)
+                {
+                    grainState.RecordExists = false;
                     return;
+                }
                 grainState.State = _serializationProvider.Deserialize(blob.Contents, grainState.Type);
                 grainState.ETag = blob.ETag;
             });
