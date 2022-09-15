@@ -36,7 +36,7 @@ namespace PortfolioGrain
             return await _portfolioBusiness.FilterPortfolios(filter);
         }
 
-        public async Task<Portfolio> GetAPortfolioDetails(string portfolioID)
+        public async Task<Portfolio> GetAPortfolioDetails(Guid portfolioID)
         {
             return await _portfolioBusiness.GetAPortfolioDetails(portfolioID);
         }

@@ -1,14 +1,16 @@
-﻿@page "/list_portfolios"
+﻿@page "/portfolio"
 
 @using Blazorise
 @using Blazorise.TreeView;
 @using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 @using Microsoft.Extensions.Options
 @using Microsoft.Extensions.Localization
+@using System.Linq;
 
+@inject IPortfolioViewModel _portfolioViewModel
 @inject NavigationManager _navigationManager
-@inject NavigationManager _navigationManager
-@inject IStringLocalizer<ListPortfolios> _localizer
+@inject IStringLocalizer<Portfolio> _localizer
+@inject IToastService toastService
 
 <div class="container.is-fullhd">
     <div class="columns">
@@ -16,15 +18,15 @@
             <div class="card">
                 <div class="card-content">
                     <div class="content">
-                        <TreeView Nodes="Items"
+                        <TreeView Nodes="PortfolioList"
                                   GetChildNodes="@(item => item.Children)"
                                   HasChildNodes="@(item => item.Children?.Any() == true)"
-                                  @bind-SelectedNode="selectedNode"
-                                  @bind-ExpandedNodes="ExpandedNodes">
+                                  @bind-SelectedNode="selectedPortfolio"
+                                  @bind-ExpandedNodes="ExpandedPortfolio">
                             <NodeContent>
-                                <img class="icon-25" src="@StyleForIcon(context.Type)" />
+                                <img class="icon-25" src="@_portfolioViewModel.GetIcon(context.Type)" />
                                 <span class="ml-2 mr-2 has-text-weight-bold icon-pos">  @context.Text </span>
-                                @if (context.Type != NodeType.Dataset)
+                                @if (context.Type != PortfolioType.Dataset)
                                 {
                                     <img class="icon-25" src="_content/ClientUI.Components/icons/Add.png" @onclick="(() => ShowModal(context))" />
                                 }
@@ -64,9 +66,9 @@
                                             <label>Source Type</label>
 
                                             <select class="select">
-                                                @foreach (var srource in sources)
+                                                @foreach (var datasource in _portfolioViewModel.GetDatasources())
                                                 {
-                                                    <option value=@srource>@srource</option>
+                                                    <option value=@datasource>@datasource</option>
                                                 }
                                             </select>
                                         </div>
@@ -172,28 +174,28 @@
         </div>
     </div>
 
-    <Modal @ref="modalRef">
+    <Modal @ref="modalRefefence">
         <ModalContent Centered>
             <ModalHeader>
-                <ModalTitle>Add a node</ModalTitle>
+                <ModalTitle>@_localizer["AddPortfolio"]</ModalTitle>
             </ModalHeader>
             <ModalBody>
                 <Field>
-                    <FieldLabel>Name</FieldLabel>
-                    <input class="input is-primary" type="text" placeholder="Name..." value="@Title" @onchange="@(e => { Title = e.Value.ToString(); })">
+                    <FieldLabel>@_localizer["PortfolioName"]</FieldLabel>
+                    <input class="input is-primary" type="text" placeholder="Name..." value="@modalViewModel.Name" @onchange="@(e => { modalViewModel.Name = e.Value.ToString(); })">
                 </Field>
 
-                <select class="select" style="width:100%;" @onchange="onChangeNodeType">
-                    @foreach (var template in templates)
+                <select class="select" style="width:100%;" @onchange="onChangeType">
+                    @foreach (var type in types)
                     {
-                        <option value=@template>@template</option>
+                        <option value=@type>@type</option>
                     }
                 </select>
 
             </ModalBody>
             <ModalFooter>
-                <button class="button is-light" @onclick="onCancel">Cancel</button>
-                <button class="button is-success" @onclick="onSave">Save</button>
+                <button class="button is-light" @onclick="onModalCancel">@_localizer["Cancel"]</button>
+                <button class="button is-success" @onclick="onModalSave">@_localizer["Save"]</button>
             </ModalFooter>
         </ModalContent>
     </Modal>
@@ -201,139 +203,83 @@
 </div>
 
 @code {
-    private string Title { get; set; }
-    private string SelectedString { get; set; }
 
+    private string selectedTab = "home";
+    private PortfolioTreeViewItem selectedPortfolio;
+    private IEnumerable<PortfolioTreeViewItem> PortfolioList;
+    private IList<PortfolioTreeViewItem> ExpandedPortfolio = new List<PortfolioTreeViewItem>();
+    private PortfolioModel modalViewModel = new PortfolioModel();
+    private List<string> types;
 
-    List<string> sources = new List<string>() { "JSON File", "CSV file" };
-    List<string> templates = new List<string>() { "Folder", "Project", "Dataset" };
-
-    void onChangeNodeType(ChangeEventArgs args)
+    private void onChangeType(ChangeEventArgs args)
     {
-        SelectedString = args.Value.ToString();
+        modalViewModel.Type = args.Value.ToString();
     }
-
-    public string SelectedTitle { get; set; }
-
-    private string StyleForIcon(NodeType node)
-    {
-        var nodeName = node.GetDisplayDescription();
-        return $"_content/ClientUI.Components/icons/{nodeName}.png";
-    }
-
-    string selectedTab = "home";
 
     private Task OnSelectedTabChanged(string name)
     {
         selectedTab = name;
-
         return Task.CompletedTask;
     }
-    public enum NodeType
-    {
-        Folder,
-        Dataset,
-        Project
-    }
-    public class Item
-    {
-        public string Text { get; set; }
-        public NodeType Type { get; set; }
-        public IList<Item> Children { get; set; }
-    }
-
-    IList<Item> Items = new List<Item>
-    {
-        new Item {
-            Text = "Root",
-            Type = NodeType.Folder,
-            Children = new List<Item> {
-                new Item { Type = NodeType.Folder, Text = "Folder 1" },
-                new Item {
-                    Text = "Folder 2",
-                    Type = NodeType.Folder,
-                    Children = new List<Item> {
-                        new Item {Type = NodeType.Dataset, Text = "Dataset 1" },
-                        new Item { Type = NodeType.Dataset, Text = "Dataset 2" }
-                    }
-                },
-                new Item {
-                    Text = "Folder 3",
-                    Type = NodeType.Folder,
-                    Children = new List<Item> {
-                        new Item {
-                            Text = "Project 1",
-                            Type = NodeType.Project,
-                            Children = new List<Item> {
-                                new Item { Type = NodeType.Dataset, Text = "Dataset 3"}
-                            }
-                        },
-                        new Item { Type = NodeType.Dataset, Text = "Dataset 4" }
-                    }
-                },
-                new Item {  Type = NodeType.Folder, Text = "Empty Folder" },
-            },
-        }
-    };
-
-    IList<Item> ExpandedNodes = new List<Item>();
-    
-    Item selectedNode;
 
 
     // reference to the modal component
-    private Modal? modalRef;
-
+    private Modal? modalRefefence;
     private bool cancelClose;
-    private Item SelectedItem { get; set; }
-    private Task ShowModal(Item item)
+
+    private PortfolioTreeViewItem SelectedPortfolio { get; set; }
+
+    private Task ShowModal(PortfolioTreeViewItem currentPortfolio)
     {
-        this.SelectedItem = item;
-        return modalRef.Show();
+        this.SelectedPortfolio = currentPortfolio;
+        return modalRefefence.Show();
     }
 
-    public Task onSave()
+    private async Task onModalSave()
     {
-        if (this.SelectedItem.Children == null)
+
+        // TODO: check the name of portfolio
+        //if (string.IsNullOrEmpty(modalViewModel.Name))
+        //{
+        //    toastService.ShowError(_localizer["NameIsRequired"], "ERROR");
+        //    return;
+        //}
+
+        await _portfolioViewModel.CreatePortfolio(new PortfolioModel
         {
-            this.SelectedItem.Children = new List<Item>();
-        }
-
-        Enum.TryParse(this.SelectedString, out NodeType selectedNodeType);
-
-        this.SelectedItem.Children.Add(new Item { Text = this.Title, Type = selectedNodeType });
-
-        this.SelectedString = string.Empty;
-        this.Title = string.Empty;
-
+            ID = Guid.NewGuid(),
+            Name = modalViewModel.Name,
+            ParentId = this.SelectedPortfolio.Id,
+            Type = this.modalViewModel.Type
+        });
+        ClearModel();
+        this.PortfolioList = await _portfolioViewModel.GetPortfolios();
         cancelClose = false;
-
-        return modalRef.Hide();
+        await modalRefefence.Hide();
     }
 
-    public Task onCancel()
+    private async Task onModalCancel()
     {
-        this.SelectedString = string.Empty;
-        this.Title = string.Empty;
-
+        ClearModel();
         cancelClose = true;
-        return modalRef.Hide();
+        await modalRefefence.Hide();
     }
 
-    private Task OnModalClosing(ModalClosingEventArgs e)
+
+    private void ClearModel()
     {
-        // just set Cancel to prevent modal from closing
-        e.Cancel = cancelClose
-            || e.CloseReason != CloseReason.UserClosing;
-
-        return Task.CompletedTask;
+        modalViewModel.ID = Guid.Empty;
+        modalViewModel.ParentId = Guid.Empty;
+        modalViewModel.Name = string.Empty;
+        this.modalViewModel.Type = this.types[0];
     }
 
-    private List<Portfolio> _portfolios = new List<Portfolio>();
-
-        protected async override Task OnInitializedAsync()
-        {
-        }
+    protected async override Task OnInitializedAsync()
+    {
+        this.types = _portfolioViewModel.GetPortfolioTypes();
+        this.modalViewModel.Type = this.types[0];
+        PortfolioList = await _portfolioViewModel.GetPortfolios();
+    }
 
     private void GoToCreatePortfolio()
     {

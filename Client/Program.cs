@@ -2,6 +2,7 @@ using Blazorise;
 using Blazorise.Bulma;
 using Blazorise.Icons.FontAwesome;
 using ClusterClient;
+using CommunAxiom.Commons.ClientUI.Server.Helper;
 using CommunAxiom.Commons.ClientUI.Server.Models;
 using CommunAxiom.Commons.ClientUI.Server.SEO;
 using CommunAxiom.Commons.ClientUI.Shared.Extensions;
@@ -12,24 +13,6 @@ using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-
-//namespace CommunAxiom.Commons.ClientUI;
-
-//public class Program
-//{
-//    public static void Main(string[] args)
-//    {
-//        CreateHostBuilder(args).Build().Run();
-//    }
-
-//    public static IHostBuilder CreateHostBuilder(string[] args) =>
-//        Host.CreateDefaultBuilder(args)
-//            .ConfigureWebHostDefaults(webBuilder =>
-//            {
-//                webBuilder.UseStartup<Startup>();
-//                webBuilder.UseElectron(args);
-//            });
-//}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,7 +52,7 @@ builder.Services.Configure<ApplicationSettings>(options =>
 // SEO Services
 builder.Services.AddScoped<MetadataTransferService>();
 builder.Services.AddMemoryCache();
-builder.Services.AddSingleton<CommunAxiom.Commons.ClientUI.Server.Helper.ITempData, CommunAxiom.Commons.ClientUI.Server.Helper.TempStorage>();
+builder.Services.AddSingleton<ITempData, TempStorage>();
 builder.Services.SetupOrleansClient();
 
 builder.Services.AddControllers();
@@ -78,6 +61,7 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "BlazingChat.WebAPI", Version = "v1" });
 });
 builder.Services.AddSignalR();
+
 builder.Services.AddDbContextFactory<LoggingContext>(options => options.UseSqlite("Name=LoggingDb"));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -113,8 +97,6 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
-
 
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BlazingChat.WebAPI v1"));

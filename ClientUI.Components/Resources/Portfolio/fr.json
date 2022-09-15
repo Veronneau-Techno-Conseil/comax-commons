@@ -3,5 +3,10 @@
   "Name": "Nom",
   "Type": "Type",
   "NoPortfoliosAdded": "Aucun Portefeuille Ajouté Pour le Moment",
-  "Create": "Créer"
+  "Create": "Créer",
+
+  "AddPortfolio": "Create Portfolio",
+  "PortfolioName": "Name",
+  "Save": "Save",
+  "Cancel": "Cancel"
 }

@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace CommunAxiom.Commons.Client.Contracts.Grains.Portfolio
+namespace CommunAxiom.Commons.ClientUI.Shared.Models
 {
-    public class Portfolio
-    {
+	public class PortfolioModel
+	{
         public Guid ID { get; set; }
         public string Type { get; set; }
         public string Name { get; set; }
         public Guid ParentId { get; set; }
     }
 }
+

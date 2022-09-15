@@ -7,6 +7,10 @@
 	  <SpaRoot>$(MSBuildProjectDirectory)/</SpaRoot>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>1701;1702;8618;8602;8603;8601;8625</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Helper\**" />
     <Content Remove="Helper\**" />
@@ -38,14 +42,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\App\en.json" />
     <EmbeddedResource Include="Resources\App\fr.json" />
-    <EmbeddedResource Include="Resources\ListPortfolios\en.json" />
-    <EmbeddedResource Include="Resources\ListPortfolios\fr.json" />
+    <EmbeddedResource Include="Resources\Portfolio\en.json" />
+    <EmbeddedResource Include="Resources\Portfolio\fr.json" />
     <EmbeddedResource Include="Resources\Login\en.json" />
     <EmbeddedResource Include="Resources\Login\fr.json" />
     <EmbeddedResource Include="Resources\MainMenu\en.json" />
     <EmbeddedResource Include="Resources\MainMenu\fr.json" />
-    <EmbeddedResource Include="Resources\CreatePortfolio\en.json" />
-    <EmbeddedResource Include="Resources\CreatePortfolio\fr.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,8 +63,6 @@
     <Content Remove="Resources\Login\fr.json" />
     <Content Remove="Resources\MainMenu\MainMenu-en.json" />
     <Content Remove="Resources\MainMenu\MainMenu-fr.json" />
-    <Content Remove="Resources\CreatePortfolio\en.json" />
-    <Content Remove="Resources\CreatePortfolio\fr.json" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Resources\" />
