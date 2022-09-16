@@ -1,10 +1,47 @@
 ﻿@attribute [Authorize]
 @page "/dashboard"
 @page "/"
+
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager _navigationManager
+@implements IAsyncDisposable
+
+
 <h3>Dashboard</h3>
 
+<ul id="notificationsList">
+    @foreach (var notification in notifications)
+    {
+        <li>@notification</li>
+    }
+</ul>
 
 
 @code {
+    private HubConnection? hubConnection;
+    private List<string> notifications = new List<string>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/systemhub"))
+            .Build();
+
+        hubConnection.On<string, string>("ReceiveNotification", (title, body) =>
+        {
+            var encodedMsg = $"{title}: {body}";
+            notifications.Add(encodedMsg);
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
 }

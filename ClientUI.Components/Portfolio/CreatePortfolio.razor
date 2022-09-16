@@ -3,6 +3,7 @@
 @using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 @using Microsoft.Extensions.Options
 @using Microsoft.Extensions.Localization
+@using Microsoft.AspNetCore.SignalR.Client
 
 @inject NavigationManager _navigationManager
 @inject IStringLocalizer<CreatePortfolio> _localizer
@@ -48,8 +49,19 @@
 </EditForm>
 
 @code {
+    private HubConnection? hubConnection;
     List<Portfolio> _portfolios = new List<Portfolio>();
     bool IsUnique;
+
+    protected async override Task OnInitializedAsync()
+    {
+        _portfolios = await _portfolioViewModel.GetPortfolios();
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/systemhub"))
+            .Build();
+        await hubConnection.StartAsync();
+    }
 
     private async void HandleValidSubmit()
     {
@@ -73,6 +85,7 @@
                     ParentId = _portfolioViewModel.ParentId
                 };
             await _portfolioViewModel.CreatePortfolio(portfolio);
+            await SendNotification(portfolio.Name);
             StateHasChanged();
             _navigationManager.NavigateTo("/list_portfolios");
         }
@@ -87,8 +100,11 @@
         toastService.ShowError(_localizer["NameIsNotUnique"], "ERROR");
     }
 
-    protected async override Task OnInitializedAsync()
+    private async Task SendNotification(string portfolioName)
     {
-        _portfolios = await _portfolioViewModel.GetPortfolios();
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("SendNotification", "From Portfolio", ("Portfolio " + portfolioName + " has  been created").ToString());
+        }
     }
 }

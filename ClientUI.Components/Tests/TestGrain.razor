@@ -1,52 +1,107 @@
 ﻿@page "/test_grain"
+
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager _navigationManager
+@implements IAsyncDisposable
+
+
+
 <h3>TestGrain</h3>
 
 <p> Press on each button to launch its corresponding grain</p>
 
 <div>
-  <div>
-    <a class="button" target="_blank" href="/api/account/get">
-        Account Grain
-    </a>
-  </div>
+    <div>
+        <a class="button" target="_blank" href="/api/account/get">
+            Account Grain
+        </a>
+    </div>
 
-  <div>
-    <a class="button" target="_blank" href="/api/Datasource">
-        Datasource Grain
-    </a>
-  </div>
+    <div>
+        <a class="button" target="_blank" href="/api/Datasource">
+            Datasource Grain
+        </a>
+    </div>
 
-  <div>
-    <a class="button" target="_blank" href="/api/DataTransfer">
-        DataTransfer Grain
-    </a>
+    <div>
+        <a class="button" target="_blank" href="/api/DataTransfer">
+            DataTransfer Grain
+        </a>
 
-  </div>
+    </div>
 
-  <div>
-    <a class="button" target="_blank" href="/api/Ingestion">
-        Ingestion Grain
-    </a>
-  </div>
+    <div>
+        <a class="button" target="_blank" href="/api/Ingestion">
+            Ingestion Grain
+        </a>
+    </div>
 
-  <div>
-    <a class="button" target="_blank" href="/api/Portfolio">
-        Portfolio Grain
-    </a>
-  </div>
+    <div>
+        <a class="button" target="_blank" href="/api/Portfolio">
+            Portfolio Grain
+        </a>
+    </div>
 
-  <div>
-    <a class="button" target="_blank" href="/api/Project">
-        Project Grain
-    </a>
-  </div>
+    <div>
+        <a class="button" target="_blank" href="/api/Project">
+            Project Grain
+        </a>
+    </div>
 
-  <div>
-    <a class="button" target="_blank" href="/api/Replication">
-        Replication Grain
-    </a>
-  </div>
+    <div>
+        <a class="button" target="_blank" href="/api/Replication">
+            Replication Grain
+        </a>
+    </div>
 
 </div>
 
 
+
+<div class="form-group">
+    <label>
+        Message:
+        <input @bind="notificationBody" size="50" />
+    </label>
+</div>
+<button @onclick="Send" disabled="@(!IsConnected)">Send</button>
+<hr>
+<ul id="notificationsList">
+    @foreach (var notification in notifications)
+    {
+        <li>@notification</li>
+    }
+</ul>
+
+@code {
+    private HubConnection? hubConnection;
+    private List<string> notifications = new List<string>();
+    private string? notificationBody;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/systemhub"))
+            .Build();
+        await hubConnection.StartAsync();
+    }
+
+    private async Task Send()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("SendNotification", "From Test", notificationBody);
+        }
+    }
+
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}
