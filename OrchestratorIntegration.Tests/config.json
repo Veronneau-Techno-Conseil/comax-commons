@@ -1,16 +1,30 @@
 {
   "OIDC": {
-    "Authority": "https://accounts.communaxiom.org/",
+    "Authority": "https://localhost:5002/",
     "Scopes": "openid offline_access roles profile email",
     "ClientId": "",
-    "Secret":  ""
+    "Secret": ""
+  },
+  "ClientOIDC": {
+    "Authority": "https://localhost:5002/",
+    "Scopes": "openid offline_access roles profile email",
+    "ClientId": "odit_legantur_epicuro_ferentur",
+    "Secret": "66151b2b-3ad0-4a2b-b345-f840ef582bcf"
   },
   "LiteDbStorage": {
     "Name": "LiteDbStorage",
     "FileName": "./SiloStore.db"
   },
+  "JObjectStore": {
+    "Name": "JObjectStore",
+    "FileName": "./SiloStore.db"
+  },
   "PubSubStore": {
     "Name": "PubSubStore",
     "FileName": "./PubSubStore.db"
+  },
+  "TestUser": {
+    "username": "test@comax.org",
+    "password": "Tester123!"
   }
 }

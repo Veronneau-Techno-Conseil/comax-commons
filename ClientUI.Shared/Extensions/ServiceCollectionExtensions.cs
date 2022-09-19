@@ -37,12 +37,17 @@ namespace CommunAxiom.Commons.ClientUI.Shared.Extensions
 
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
             services.AddScoped<IAccessTokenService, WebAppAccessTokenService>();
+            services.AddScoped<IHttpClientConfig, HttpClientConfig>();
+
+            // transactional named http clients
+            var clientConfigurator = void (IServiceProvider serviceProvider, HttpClient client) =>
+            {
+                client.BaseAddress = new Uri(applicationSettings.BaseAddress);
+            };
 
             // configuring http clients
             services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(applicationSettings.BaseAddress) });
 
-            // transactional named http clients
-            var clientConfigurator = void (HttpClient client) => client.BaseAddress = new Uri(applicationSettings.BaseAddress);
 
             //services.AddHttpClient<IProfileViewModel, ProfileViewModel>("ProfileViewModelClient", clientConfigurator);
             //services.AddHttpClient<IContactsViewModel, ContactsViewModel>("ContactsViewModelClient", clientConfigurator);
@@ -52,6 +57,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.Extensions
             //// authentication http clients
             services.AddHttpClient<ISessionViewModel, SessionViewModel>("LoginViewModelClient", clientConfigurator);
             services.AddHttpClient<IPortfolioViewModel, PortfolioViewModel>("CreatePortfolioViewMode", clientConfigurator);
+
             //services.AddHttpClient<IRegisterViewModel, RegisterViewModel>("RegisterViewModelClient", clientConfigurator);
 
             // logging

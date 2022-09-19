@@ -1,5 +1,6 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Account;
 using CommunAxiom.Commons.Shared;
+using CommunAxiom.Commons.Shared.OIDC;
 using Microsoft.Extensions.Configuration;
 using Orleans.Runtime;
 using System;
@@ -66,7 +67,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             //todo: Complete token maintenance / status
             TokenClient tokenClient = new TokenClient(_configuration);
             
-            var (isSuccess, data) = await tokenClient.GetToken(details.ClientID, details.ClientSecret, TokenClient.SCOPES_OFFLINE);
+            var (isSuccess, data) = await tokenClient.AuthenticateClient(details.ClientID, details.ClientSecret, TokenClient.SCOPES_OFFLINE);
             if (!isSuccess)
             {
                 details.State = AccountState.AuthenticationError;

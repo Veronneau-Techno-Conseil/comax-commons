@@ -3,7 +3,7 @@ using System;
 
 namespace CommunAxiom.Commons.Orleans
 {
-    public interface IGrainFactory
+    public interface IComaxGrainFactory
     {
         /// <summary>
         /// Gets a reference to a grain.

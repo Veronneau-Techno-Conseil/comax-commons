@@ -1,4 +1,6 @@
 ﻿@page "/test_grain"
+@inject HttpClient httpClient;
+@inject IHttpClientConfig httpClientConfig;
 <h3>TestGrain</h3>
 
 <p> Press on each button to launch its corresponding grain</p>
@@ -7,6 +9,12 @@
   <div>
     <a class="button" target="_blank" href="/api/account/get">
         Account Grain
+    </a>
+  </div>
+
+  <div>
+    <a class="button" target="_blank" @onclick='()=> click("/api/account/security_check")'>
+        Account Grain Security Check
     </a>
   </div>
 
@@ -50,3 +58,14 @@
 </div>
 
 
+@code{
+
+
+    async Task click(string url)
+    {
+        await httpClientConfig.Configure(httpClient);
+
+        await httpClient.GetAsync(url);
+    }
+
+}

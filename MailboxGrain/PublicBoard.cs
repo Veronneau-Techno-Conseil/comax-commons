@@ -1,6 +1,7 @@
 ﻿using Comax.Commons.Orchestrator.Contracts;
 using Comax.Commons.Orchestrator.Contracts.Mailbox;
 using CommunAxiom.Commons.Orleans;
+using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using Microsoft.Extensions.Logging;
 using Orleans;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Comax.Commons.Orchestrator.MailboxGrain
 {
+    [AuthorizeClaim]
     public class PublicBoard : Grain, IPublicBoard
     {
         private readonly ObserverManager<IPublicBoardObserver> _subsManager;
@@ -29,7 +31,7 @@ namespace Comax.Commons.Orchestrator.MailboxGrain
 
         public Task Broadcast(Message message)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task Subscribe(IPublicBoardObserver publicBoardObserver, Guid latestMsg)

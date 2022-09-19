@@ -16,10 +16,10 @@ var host = Host.CreateDefaultBuilder(args)
     .SetConfiguration(out var cfg)
     .ConfigureServices((host, sc) =>
     {
+        sc.AddLogging(lb => lb.AddConsole());
         sc.SetServerServices();
         sc.SetupOrleansClient();
         sc.AddTransient<IClusterManagement, ClusterManagement>();
-        sc.AddLogging(lb => lb.AddConsole());
     }).Build();
 var cm = host.Services.GetService<IClusterManagement>();
 

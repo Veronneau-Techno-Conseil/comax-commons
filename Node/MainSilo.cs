@@ -1,12 +1,14 @@
 ﻿
 using Comax.Commons.Orchestrator.Contracts.Mailbox;
 using Comax.Commons.Orchestrator.MailboxGrain;
+using Comax.Commons.Shared.OIDC;
+using CommunAxiom.Commons.Orleans.Security;
+using CommunAxiom.Commons.Shared.OIDC;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Hosting;
-using Orleans.Security;
-using Orleans.Security.Clustering;
 using System.Threading.Tasks;
 
 namespace Comax.Commons.Orchestrator
@@ -30,12 +32,15 @@ namespace Comax.Commons.Orchestrator
                 .UseDashboard()
                 .ConfigureServices(services =>
                 {
-                    ConfigureIdentitty(services, conf);
-
                     services.SetStorage(conf);
 
                     //register singleton services for each grain/interface
                     services.AddSingleton<IMailbox, Mailbox>();
+                    services.AddSingleton<IPublicBoard, PublicBoard>();
+
+                    services.AddSingleton<ISettingsProvider, OrchestratorSettingsProvider>();
+                    services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
+                    services.AddSingleton<IIncomingGrainCallFilter, AccessControlFilter>();
 
                 })
                 //configure application parts for each grain
@@ -46,18 +51,6 @@ namespace Comax.Commons.Orchestrator
             _silo = silo;
             IsSiloStarted = true;
             _ = _silo.Stopped.ContinueWith(t => IsSiloStarted = false);
-        }
-
-        static void ConfigureIdentitty(IServiceCollection services, IConfiguration configuration)
-        {
-            var configs = new Orleans.Security.IdentityServer4Info("https://accounts.communaxiom.org/", configuration["OIDC:ClientId"], configuration["OIDC:Secret"], "Orchestrator");
-
-            services.AddOrleansClusteringAuthorization(configs,
-                config =>
-                {
-                    config.ConfigureAuthorizationOptions = Security.ConfigurePolicyOptions;
-                    config.TracingEnabled = true;
-                });
         }
 
         public static async Task StopSilo()
