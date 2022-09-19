@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Hosting;
 using System.Threading.Tasks;
+using Comax.Commons.Orchestrator.Contracts.UriRegistry;
+using Comax.Commons.Orchestrator.UriRegistryGrain;
 
 namespace Comax.Commons.Orchestrator
 {
@@ -42,9 +44,13 @@ namespace Comax.Commons.Orchestrator
                     services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
                     services.AddSingleton<IIncomingGrainCallFilter, AccessControlFilter>();
 
+                    //registering singleton service for UriRegistry grain
+                    services.AddSingleton<IUriRegistry, UriRegistry>();
+
                 })
                 //configure application parts for each grain
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Mailbox).Assembly).WithReferences());
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Mailbox).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts=>parts.AddApplicationPart(typeof(UriRegistry).Assembly).WithReferences());
 
             var silo = builder.Build();
             await silo.StartAsync();
