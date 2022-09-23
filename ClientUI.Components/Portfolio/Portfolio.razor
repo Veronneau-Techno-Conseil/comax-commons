@@ -2,15 +2,6 @@
 
 @using Blazorise
 @using Blazorise.TreeView;
-@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
-@using Microsoft.Extensions.Options
-@using Microsoft.Extensions.Localization
-@using System.Linq;
-
-@inject IPortfolioViewModel _portfolioViewModel
-@inject NavigationManager _navigationManager
-@inject IStringLocalizer<Portfolio> _localizer
-@inject IToastService toastService
 
 <div class="container.is-fullhd">
     <div class="columns">
@@ -18,17 +9,17 @@
             <div class="card">
                 <div class="card-content">
                     <div class="content">
-                        <TreeView Nodes="PortfolioList"
+                        <TreeView Nodes="_portfolioListResult"
                                   GetChildNodes="@(item => item.Children)"
                                   HasChildNodes="@(item => item.Children?.Any() == true)"
                                   @bind-SelectedNode="selectedPortfolio"
-                                  @bind-ExpandedNodes="ExpandedPortfolio">
+                                  @bind-ExpandedNodes="_expandedPortfolio">
                             <NodeContent>
-                                <img class="icon-25" src="@_portfolioViewModel.GetIcon(context.Type)" />
-                                <span class="ml-2 mr-2 has-text-weight-bold icon-pos">  @context.Text </span>
+                                <img class="icon-25" src="@PortfolioViewModel.GetIcon(context.Type)"/>
+                                <span @onclick="() => OnHideCard(context)" class="ml-2 mr-2 has-text-weight-bold icon-pos"> @context.Text </span>
                                 @if (context.Type != PortfolioType.Dataset)
                                 {
-                                    <img class="icon-25" src="_content/ClientUI.Components/icons/Add.png" @onclick="(() => ShowModal(context))" />
+                                    <img class="icon-25" src="_content/ClientUI.Components/icons/Add.png" @onclick="(() => ShowModal(context))"/>
                                 }
                             </NodeContent>
                         </TreeView>
@@ -37,46 +28,45 @@
             </div>
         </div>
         <div class="column is-two-thirds">
-            <div class="card">
+            <div class="card" hidden="@HideCard">
                 <div class="card-content">
                     <div class="content">
-                        <h4 class="mb-4"> Dataset 4 </h4>
+                        <h4 class="mb-4"> @selectedPortfolio.Text </h4>
                         <div class="columns">
                             <div class="column">
                                 <label>Description</label>
-                                <img class="icon-25 is-pulled-right" src="_content/ClientUI.Components/icons/Save.png" />
+                                <img class="icon-25 is-pulled-right" src="_content/ClientUI.Components/icons/Save.png"/>
                                 <article class="mt-2 message is-warning">
                                     <div class="message-body">
-                                        This is long description of <strong>Dataset</strong>
+                                        @selectedPortfolio.Description
                                     </div>
                                 </article>
                             </div>
                         </div>
-                        <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+                        <Tabs SelectedTab="@_selectedTab" SelectedTabChanged="@OnSelectedTab">
                             <Items>
-                                <Tab Name="home">Input data structure</Tab>
-                                <Tab Name="profile">Transformations</Tab>
-                                <Tab Name="messages">Version history</Tab>
+                                <Tab Name="tab1">Input data structure</Tab>
+                                <Tab Name="tab2">Transformations</Tab>
+                                <Tab Name="tab3">Version history</Tab>
                             </Items>
                             <Content>
-                                <TabPanel Name="home">
+                                <TabPanel Name="tab1">
                                     <h6>Data source</h6>
                                     <div class="columns">
                                         <div class="column is-one-fifth">
                                             <label>Source Type</label>
-
-                                            <select class="select">
-                                                @foreach (var datasource in _portfolioViewModel.GetDatasources())
+                                            <select class="select" @onchange="OnChangeDatasource">
+                                                @foreach (var datasource in PortfolioViewModel.GetDatasources())
                                                 {
-                                                    <option value=@datasource>@datasource</option>
+                                                    <option value=@datasource>@datasource.Key</option>
                                                 }
                                             </select>
                                         </div>
                                         <div class="column">
                                             <label>Filename</label>
                                             <div style="display:flex">
-                                                <input class="input is-primary" type="text" placeholder="Primary input" value="C:\somefile.json" />
-                                                <img style="top: 6px;left: 6px;" class="icon-25" src="_content/ClientUI.Components/icons/Open.png" />
+                                                <FileEdit Filter="filterFile" Placeholder="No File chosen" ClassNames="input is-primary" Changed="@OnChanged"/>
+                                                <img style="top: 6px;left: 6px;" class="icon-25" src="_content/ClientUI.Components/icons/Open.png"/>
                                             </div>
                                         </div>
                                         <div class="column is-two-quarters"> </div>
@@ -126,44 +116,33 @@
                                                         <TableHeaderCell>Name</TableHeaderCell>
                                                         <TableHeaderCell>Type</TableHeaderCell>
                                                         <TableHeaderCell>Description</TableHeaderCell>
-                                                        <TableHeaderCell><img class="icon-25" src="_content/ClientUI.Components/icons/Add.png" /></TableHeaderCell>
+                                                        <TableHeaderCell>
+                                                            <img class="icon-25" src="_content/ClientUI.Components/icons/Add.png"/>
+                                                        </TableHeaderCell>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
-                                                    <TableRow>
-                                                        <TableRowCell>[].Id</TableRowCell>
-                                                        <TableRowCell>integer</TableRowCell>
-                                                        <TableRowCell>Identifier of the entry</TableRowCell>
-                                                        <TableRowCell><img class="icon-25" src="_content/ClientUI.Components/icons/Delete.png" /></TableRowCell>
-                                                    </TableRow>
-                                                    <TableRow>
-                                                        <TableRowCell>[].name</TableRowCell>
-                                                        <TableRowCell>string</TableRowCell>
-                                                        <TableRowCell>Name of the entry</TableRowCell>
-                                                        <TableRowCell><img class="icon-25" src="_content/ClientUI.Components/icons/Delete.png" /></TableRowCell>
-                                                    </TableRow>
-                                                    <TableRow>
-                                                        <TableRowCell>[].addr.address</TableRowCell>
-                                                        <TableRowCell>string</TableRowCell>
-                                                        <TableRowCell>Street address</TableRowCell>
-                                                        <TableRowCell><img class="icon-25" src="_content/ClientUI.Components/icons/Delete.png" /></TableRowCell>
-                                                    </TableRow>
-                                                    <TableRow>
-                                                        <TableRowCell>[].addr.city</TableRowCell>
-                                                        <TableRowCell>string</TableRowCell>
-                                                        <TableRowCell>city</TableRowCell>
-                                                        <TableRowCell><img class="icon-25" src="_content/ClientUI.Components/icons/Delete.png" /></TableRowCell>
-                                                    </TableRow>
+                                                    @foreach (var item in  DataTable.Rows)
+                                                    {
+                                                        <TableRow>
+                                                            <TableRowCell>@item.Name</TableRowCell>
+                                                            <TableRowCell>@item.Type</TableRowCell>
+                                                            <TableRowCell>@item.Description</TableRowCell>
+                                                            <TableRowCell>
+                                                                <img class="icon-25" src="_content/ClientUI.Components/icons/Delete.png"/>
+                                                            </TableRowCell>
+                                                        </TableRow>
+                                                    }
                                                 </TableBody>
                                             </Table>
                                         </div>
                                     </div>
 
                                 </TabPanel>
-                                <TabPanel Name="profile">
+                                <TabPanel Name="tab2">
                                     Content for profile.
                                 </TabPanel>
-                                <TabPanel Name="messages">
+                                <TabPanel Name="tab3">
                                     Content for messages.
                                 </TabPanel>
                             </Content>
@@ -174,116 +153,30 @@
         </div>
     </div>
 
-    <Modal @ref="modalRefefence">
+    <Modal @ref="_modalRefefence">
         <ModalContent Centered>
             <ModalHeader>
-                <ModalTitle>@_localizer["AddPortfolio"]</ModalTitle>
+                <ModalTitle>@Localizer["AddPortfolio"]</ModalTitle>
             </ModalHeader>
             <ModalBody>
                 <Field>
-                    <FieldLabel>@_localizer["PortfolioName"]</FieldLabel>
-                    <input class="input is-primary" type="text" placeholder="Name..." value="@modalViewModel.Name" @onchange="@(e => { modalViewModel.Name = e.Value.ToString(); })">
+                    <FieldLabel>@Localizer["PortfolioName"]</FieldLabel>
+                    <TextEdit @bind-Text="@_modalViewModel.Name" PlaceHolder="Name..."/>
                 </Field>
-
-                <select class="select" style="width:100%;" @onchange="onChangeType">
-                    @foreach (var type in types)
-                    {
-                        <option value=@type>@type</option>
-                    }
-                </select>
-
+                <Field>
+                    <Select TValue="string" SelectedValueChanged="@OnChangeType">
+                        @foreach (var type in _types)
+                        {
+                            <SelectItem Value=@type>@type</SelectItem>
+                        }
+                    </Select>
+                </Field>
             </ModalBody>
             <ModalFooter>
-                <button class="button is-light" @onclick="onModalCancel">@_localizer["Cancel"]</button>
-                <button class="button is-success" @onclick="onModalSave">@_localizer["Save"]</button>
+                <Button Color="Color.Light" Clicked="@onModalCancel">@Localizer["Cancel"]</Button>
+                <Button Color="Color.Success" Clicked="@onModalSave">@Localizer["Save"]</Button>
             </ModalFooter>
         </ModalContent>
     </Modal>
 
 </div>
-
-@code {
-
-    private string selectedTab = "home";
-    private PortfolioTreeViewItem selectedPortfolio;
-    private IEnumerable<PortfolioTreeViewItem> PortfolioList;
-    private IList<PortfolioTreeViewItem> ExpandedPortfolio = new List<PortfolioTreeViewItem>();
-    private PortfolioModel modalViewModel = new PortfolioModel();
-    private List<string> types;
-
-    private void onChangeType(ChangeEventArgs args)
-    {
-        modalViewModel.Type = args.Value.ToString();
-    }
-
-    private Task OnSelectedTabChanged(string name)
-    {
-        selectedTab = name;
-        return Task.CompletedTask;
-    }
-
-
-    // reference to the modal component
-    private Modal? modalRefefence;
-    private bool cancelClose;
-
-    private PortfolioTreeViewItem SelectedPortfolio { get; set; }
-
-    private Task ShowModal(PortfolioTreeViewItem currentPortfolio)
-    {
-        this.SelectedPortfolio = currentPortfolio;
-        return modalRefefence.Show();
-    }
-
-    private async Task onModalSave()
-    {
-
-        // TODO: check the name of portfolio
-        //if (string.IsNullOrEmpty(modalViewModel.Name))
-        //{
-        //    toastService.ShowError(_localizer["NameIsRequired"], "ERROR");
-        //    return;
-        //}
-
-        await _portfolioViewModel.CreatePortfolio(new PortfolioModel
-        {
-            ID = Guid.NewGuid(),
-            Name = modalViewModel.Name,
-            ParentId = this.SelectedPortfolio.Id,
-            Type = this.modalViewModel.Type
-        });
-        ClearModel();
-        this.PortfolioList = await _portfolioViewModel.GetPortfolios();
-        cancelClose = false;
-        await modalRefefence.Hide();
-    }
-
-    private async Task onModalCancel()
-    {
-        ClearModel();
-        cancelClose = true;
-        await modalRefefence.Hide();
-    }
-
-
-    private void ClearModel()
-    {
-        modalViewModel.ID = Guid.Empty;
-        modalViewModel.ParentId = Guid.Empty;
-        modalViewModel.Name = string.Empty;
-        this.modalViewModel.Type = this.types[0];
-    }
-
-    protected async override Task OnInitializedAsync()
-    {
-        this.types = _portfolioViewModel.GetPortfolioTypes();
-        this.modalViewModel.Type = this.types[0];
-        PortfolioList = await _portfolioViewModel.GetPortfolios();
-    }
-
-    private void GoToCreatePortfolio()
-    {
-        _navigationManager.NavigateTo("/create_portfolio");
-    }
-
-}

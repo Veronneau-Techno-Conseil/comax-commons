@@ -1,98 +1,99 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-	  <SpaRoot>$(MSBuildProjectDirectory)/</SpaRoot>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <SpaRoot>$(MSBuildProjectDirectory)/</SpaRoot>
+    </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <WarningLevel>4</WarningLevel>
-    <NoWarn>1701;1702;8618;8602;8603;8601;8625</NoWarn>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Helper\**" />
-    <Content Remove="Helper\**" />
-    <EmbeddedResource Remove="Helper\**" />
-    <None Remove="Helper\**" />
-  </ItemGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <WarningLevel>4</WarningLevel>
+        <NoWarn>1701;1702;8618;8602;8603;8601;8625</NoWarn>
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Remove="Helper\**" />
+        <Content Remove="Helper\**" />
+        <EmbeddedResource Remove="Helper\**" />
+        <None Remove="Helper\**" />
+    </ItemGroup>
 
 
-  <ItemGroup>
-    <SupportedPlatform Include="browser" />
-  </ItemGroup>
+    <ItemGroup>
+        <SupportedPlatform Include="browser" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Blazorise" Version="1.0.6" />
-    <PackageReference Include="Blazorise.Bulma" Version="1.0.6" />
-    <PackageReference Include="Blazorise.Components" Version="1.0.6" />
-    <PackageReference Include="Blazorise.TreeView" Version="1.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.8" />
-	  <PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
-	  <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Blazorise" Version="1.0.6" />
+        <PackageReference Include="Blazorise.Bulma" Version="1.0.6" />
+        <PackageReference Include="Blazorise.Components" Version="1.0.6" />
+        <PackageReference Include="Blazorise.TreeView" Version="1.0.6" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
 
-  <ItemGroup>
-    <ProjectReference Include="..\ClientUI.Shared\ClientUI.Shared.csproj" />
-  </ItemGroup>
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\App\en.json" />
-    <EmbeddedResource Include="Resources\App\fr.json" />
-    <EmbeddedResource Include="Resources\Portfolio\en.json" />
-    <EmbeddedResource Include="Resources\Portfolio\fr.json" />
-    <EmbeddedResource Include="Resources\Login\en.json" />
-    <EmbeddedResource Include="Resources\Login\fr.json" />
-    <EmbeddedResource Include="Resources\MainMenu\en.json" />
-    <EmbeddedResource Include="Resources\MainMenu\fr.json" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\ClientUI.Shared\ClientUI.Shared.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Resources\MainMenu\" />
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Resources\App\en.json" />
+        <EmbeddedResource Include="Resources\App\fr.json" />
+        <EmbeddedResource Include="Resources\Portfolio\en.json" />
+        <EmbeddedResource Include="Resources\Portfolio\fr.json" />
+        <EmbeddedResource Include="Resources\Login\en.json" />
+        <EmbeddedResource Include="Resources\Login\fr.json" />
+        <EmbeddedResource Include="Resources\MainMenu\en.json" />
+        <EmbeddedResource Include="Resources\MainMenu\fr.json" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Content Remove="Resources\App\en.json" />
-    <Content Remove="Resources\App\fr.json" />
-    <Content Remove="Resources\ListPortfolios\en.json" />
-    <Content Remove="Resources\ListPortfolios\fr.json" />
-    <Content Remove="Resources\Login\en.json" />
-    <Content Remove="Resources\Login\fr.json" />
-    <Content Remove="Resources\MainMenu\MainMenu-en.json" />
-    <Content Remove="Resources\MainMenu\MainMenu-fr.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Resources\" />
-    <None Remove="Resources\MainMenu\" />
-  </ItemGroup>
-	<Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug'">
-		<!-- Ensure Node.js is installed -->
-		<Exec Command="node --version" ContinueOnError="true">
-			<Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
-		</Exec>
-		<Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
-		<Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
-		<Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
-		<Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
-	</Target>
-	<Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
-		<!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
-		<Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
-		<Exec WorkingDirectory="$(SpaRoot)" Command="npm run build -- --prod" />
-		<Exec WorkingDirectory="$(SpaRoot)" Command="npm run build:ssr -- --prod" Condition=" '$(BuildServerSideRenderer)' == 'true' " />
-		<!-- Include the newly-built files in the publish output -->
-		<ItemGroup>
-			<DistFiles Include="$(SpaRoot)dist\**; $(SpaRoot)dist-server\**" />
-			<DistFiles Include="$(SpaRoot)node_modules\**" Condition="'$(BuildServerSideRenderer)' == 'true'" />
-			<ResolvedFileToPublish Include="@(DistFiles-&gt;'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
-				<RelativePath>%(DistFiles.Identity)</RelativePath>
-				<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-				<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-			</ResolvedFileToPublish>
-		</ItemGroup>
-	</Target>
-	
+    <ItemGroup>
+        <Folder Include="Resources\MainMenu\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Remove="Resources\App\en.json" />
+        <Content Remove="Resources\App\fr.json" />
+        <Content Remove="Resources\ListPortfolios\en.json" />
+        <Content Remove="Resources\ListPortfolios\fr.json" />
+        <Content Remove="Resources\Login\en.json" />
+        <Content Remove="Resources\Login\fr.json" />
+        <Content Remove="Resources\MainMenu\MainMenu-en.json" />
+        <Content Remove="Resources\MainMenu\MainMenu-fr.json" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="Resources\" />
+        <None Remove="Resources\MainMenu\" />
+    </ItemGroup>
+    <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug'">
+        <!-- Ensure Node.js is installed -->
+        <Exec Command="node --version" ContinueOnError="true">
+            <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+        </Exec>
+        <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
+        <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
+        <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+        <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
+    </Target>
+    <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
+        <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
+        <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+        <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build -- --prod" />
+        <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build:ssr -- --prod" Condition=" '$(BuildServerSideRenderer)' == 'true' " />
+        <!-- Include the newly-built files in the publish output -->
+        <ItemGroup>
+            <DistFiles Include="$(SpaRoot)dist\**; $(SpaRoot)dist-server\**" />
+            <DistFiles Include="$(SpaRoot)node_modules\**" Condition="'$(BuildServerSideRenderer)' == 'true'" />
+            <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+                <RelativePath>%(DistFiles.Identity)</RelativePath>
+                <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+                <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            </ResolvedFileToPublish>
+        </ItemGroup>
+    </Target>
+
 </Project>

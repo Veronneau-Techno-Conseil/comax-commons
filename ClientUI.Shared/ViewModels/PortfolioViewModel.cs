@@ -14,6 +14,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Blazorise.TreeView;
 
 namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
 {
@@ -22,22 +23,18 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
         private const string RootKey = "79186558-5e84-4fd9-904b-58d74ba582af";
 
         private readonly HttpClient _httpClient;
+
         public PortfolioViewModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
-
-        public Guid ID { get; set; }
-        public string Type { get; set; }
-        public string Name { get; set; }
-        public Guid ParentId { get; set; }
 
         public async Task CreatePortfolio(PortfolioModel portfolio)
         {
             await _httpClient.PostAsJsonAsync("/api/Portfolio/Create", portfolio);
         }
 
-        public async Task<IEnumerable<PortfolioTreeViewItem>> GetPortfolios()
+        public async Task<IList<PortfolioModel>> GetPortfolios()
         {
             HttpResponseMessage httpResponseMessage = await _httpClient.GetAsync("/api/Portfolio/GetAll");
 
@@ -53,20 +50,23 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
                 {
                     Console.WriteLine("Portfolio List is defined but has no content");
 
-                    var list = new List<Portfolio>();
+                    var list = new List<PortfolioModel>();
 
-                    list.Add(new Portfolio { ID = new Guid(RootKey), Name = "Root", Type = "Folder", ParentId = Guid.Empty });
+                    list.Add(new PortfolioModel
+                        { ID = new Guid(RootKey), Name = "Root", Type = "Folder", ParentId = Guid.Empty });
 
-                    return list?.ToTree(o => o.ID, o => o.ParentId);
+                    return list;
                 }
-                var response = await httpResponseMessage.Content.ReadFromJsonAsync<List<Portfolio>>();
+
+                var response = await httpResponseMessage.Content.ReadFromJsonAsync<List<PortfolioModel>>();
 
 
-                response.Insert(0, new Portfolio { ID = new Guid(RootKey), Name = "Root", Type="Folder", ParentId = Guid.Empty });
-                
-                
-                return response?.ToTree(o => o.ID, o => o.ParentId);
+                response.Insert(0,
+                    new PortfolioModel
+                        { ID = new Guid(RootKey), Name = "Root", Type = "Folder", ParentId = Guid.Empty });
 
+
+                return response;
             }
         }
 
@@ -92,14 +92,19 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
             return $"_content/ClientUI.Components/icons/{iconName}.png";
         }
 
-        public List<string> GetDatasources()
+        public Dictionary<string, string> GetDatasources()
         {
-            return new List<string> { "JSON File", "CSV file" };
+            return new Dictionary<string, string>
+            {
+                { "JSON File", ".json" },
+                { "CSV file", ".csv" }
+            };
         }
 
         public List<string> GetPortfolioTypes()
         {
-            return new List<string>() {
+            return new List<string>()
+            {
                 PortfolioType.Folder.GetDisplayDescription(),
                 PortfolioType.Project.GetDisplayDescription(),
                 PortfolioType.Dataset.GetDisplayDescription()

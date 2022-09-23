@@ -6,19 +6,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Blazorise.TreeView;
 
 namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 {
     public interface IPortfolioViewModel
     {
         Task CreatePortfolio(PortfolioModel portfolio);
-        Task<IEnumerable<PortfolioTreeViewItem>> GetPortfolios();
+        Task<IList<PortfolioModel>> GetPortfolios();
 
         Task<bool> CheckIfUnique(string name);
 
         string GetIcon(PortfolioType portfolioType);
 
-        List<string> GetDatasources();
+        Dictionary<string, string> GetDatasources();
 
         List<string> GetPortfolioTypes();
     }
