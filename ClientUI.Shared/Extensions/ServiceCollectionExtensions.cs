@@ -52,6 +52,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.Extensions
             //// authentication http clients
             services.AddHttpClient<ISessionViewModel, SessionViewModel>("LoginViewModelClient", clientConfigurator);
             services.AddHttpClient<IPortfolioViewModel, PortfolioViewModel>("CreatePortfolioViewMode", clientConfigurator);
+            services.AddHttpClient<ITestViewModel, TestViewModel>("Test", clientConfigurator);
             //services.AddHttpClient<IRegisterViewModel, RegisterViewModel>("RegisterViewModelClient", clientConfigurator);
 
             // logging
