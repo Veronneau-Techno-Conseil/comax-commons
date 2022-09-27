@@ -4,7 +4,6 @@ using CommunAxiom.Commons.ClientUI.Shared.Models;
 using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
-using Newtonsoft.Json;
 
 namespace ClientUI.Components.Portfolio
 {
@@ -29,21 +28,13 @@ namespace ClientUI.Components.Portfolio
         private bool _cancelClose;
         private PortfolioTreeViewItem _selectedPortfolio;
         private PortfolioTreeViewItem SelectedPortfolio { get; set; }
-
         private bool HideCard { get; set; } = true;
-
-        public DataTable DataTable = new DataTable();
-
+        
         private void OnChangeType(string value)
         {
             _modalViewModel.Type = value;
         }
-
-        private void OnChangeDatasource(ChangeEventArgs args)
-        {
-            _filterFile = args.Value.ToString();
-        }
-
+        
         private Task OnSelectedTab(string name)
         {
             _selectedTab = name;
@@ -145,19 +136,6 @@ namespace ClientUI.Components.Portfolio
             NavigationManager.NavigateTo("/create_portfolio");
         }
 
-        async Task OnChanged(FileChangedEventArgs e)
-        {
-            var fileStream = e.Files[0];
-            using (var stream = new MemoryStream())
-            {
-                await fileStream.WriteToStreamAsync(stream);
-                stream.Seek(0, SeekOrigin.Begin);
-                using (var reader = new StreamReader(stream))
-                {
-                    var fileContent = await reader.ReadToEndAsync();
-                    DataTable.Rows.AddRange(JsonConvert.DeserializeObject<List<RowTable>>(fileContent));
-                }
-            }
-        }
+        
     }
 }
