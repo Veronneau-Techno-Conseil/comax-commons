@@ -1,5 +1,6 @@
 ﻿@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 @using Microsoft.AspNetCore.SignalR.Client
+
 @inherits LayoutComponentBase
 @inject IAccessTokenService _accessTokenService
 @inject ISessionViewModel _loginViewModel
@@ -21,7 +22,6 @@
     </div>
 </section>
 
-
 @code {
     private HubConnection? hubConnection;
 
@@ -31,10 +31,26 @@
             .WithUrl(_navigationManager.ToAbsoluteUri("/systemhub"))
             .Build();
 
-        hubConnection.On<string, string>("ReceiveNotification", (title, body) =>
+        hubConnection.On<string, string, int>("ReceiveNotification", (title, body, criticality) =>
         {
             var encodedMsg = $"{title}: {body}";
-            toastService.ShowInfo(encodedMsg);
+            if (criticality == 0)
+            {
+                toastService.ShowInfo(encodedMsg);
+            }
+            else if (criticality == 1)
+            {
+                toastService.ShowWarning(encodedMsg);
+            }
+            else if (criticality == 2)
+            {
+                toastService.ShowSuccess(encodedMsg);
+            }
+            else
+            {
+                 toastService.ShowError(encodedMsg);
+            }
+
             StateHasChanged();
         });
 

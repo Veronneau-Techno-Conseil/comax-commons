@@ -1,6 +1,7 @@
 ﻿@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 @using Microsoft.Extensions.Hosting
 @using Microsoft.Extensions.Localization
+@using Microsoft.AspNetCore.SignalR.Client
 @inject HttpClient _httpClient
 @inject NavigationManager _navigationManager
 @inject IAccessTokenService _accessTokenService
@@ -69,6 +70,23 @@
                         <span class="navbar-item">
                             @User?.Name
                         </span>
+
+                        <div id="criticalNotifications">
+                        <div class='ikrNoti_Counter'>@criticalNotifications.Count()</div>
+                        <div class='ikrNoti_Button' style="background: #2E467C" @onclick="HideShowNotifications"></div>
+                        <div class='ikrNotifications' style="display:@notificationsBox !important" @onclick=HideShowNotifications>
+                            <h3>Notifications (<span class='notiCounterOnHead'> @criticalNotifications.Count() </span>)</h3>
+                            <div>
+                                @foreach (var notification in criticalNotifications)
+                                {
+                                    <div>
+                                        <h4>noticiation</h4>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        </div>
+
                         <a class="navbar-item" @onclick="Logout">
                             <img alt="Log off" class="image is-32x32" src="https://djp65hxq6jm81.cloudfront.net/uploads/735de877-33df-42ce-a423-af091d396e7c/Logout.png" />
                         </a>
@@ -85,6 +103,11 @@
 </nav>
 
 @code {
+    private List<string> criticalNotifications = new List<string>();
+    private string notificationsBox = "none";
+    private HubConnection? hubConnection;
+    private bool portfolioSubMenu;
+
     [CascadingParameter]
     public Task<AuthenticationState> AuthenticationState { get; set; } = null!;
 
@@ -96,6 +119,30 @@
     {
         var authState = await AuthenticationState;
         this.User = await ((CustomAuthenticationStateProvider)_stateProvider).GetUserByJWTAsync();
+
+        hubConnection = new HubConnectionBuilder()
+           .WithUrl(_navigationManager.ToAbsoluteUri("/systemhub"))
+           .Build();
+
+        hubConnection.On<string, string, int>("ReceiveNotification", (title, body, criticality) =>
+        {
+            var encodedMsg = $"{title}: {body}";
+            if (criticality == 3)
+            {
+                criticalNotifications.Add(encodedMsg);
+            }
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private void HideShowNotifications()
+    {
+        if (notificationsBox == "none")
+            notificationsBox = "block";
+        else
+            notificationsBox = "none";
     }
 
     private async Task Logout()
@@ -108,6 +155,4 @@
     {
 
     }
-
-    private bool portfolioSubMenu;
 }

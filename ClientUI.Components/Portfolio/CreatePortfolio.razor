@@ -104,7 +104,7 @@
     {
         if (hubConnection is not null)
         {
-            await hubConnection.SendAsync("SendNotification", "From Portfolio", ("Portfolio " + portfolioName + " has  been created").ToString());
+            await hubConnection.SendAsync("SendNotification", "From Portfolio", ("Portfolio " + portfolioName + " has  been created").ToString(), 0);
         }
     }
 }

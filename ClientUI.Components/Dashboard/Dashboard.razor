@@ -27,7 +27,7 @@
             .WithUrl(_navigationManager.ToAbsoluteUri("/systemhub"))
             .Build();
 
-        hubConnection.On<string, string>("ReceiveNotification", (title, body) =>
+        hubConnection.On<string, string, int>("ReceiveNotification", (title, body, criticality) =>
         {
             var encodedMsg = $"{title}: {body}";
             notifications.Add(encodedMsg);

@@ -90,7 +90,7 @@
     {
         if (hubConnection is not null)
         {
-            await hubConnection.SendAsync("SendNotification", "From Test", notificationBody);
+            await hubConnection.SendAsync("SendNotification", "From Test", notificationBody, 3);
         }
     }
 
