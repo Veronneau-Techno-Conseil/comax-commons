@@ -77,7 +77,7 @@ namespace OrchestratorIntegration.Tests
                 sc.AddLogging(l=>l.AddConsole());
                 sc.AddSingleton<SecureTokenOutgoingFilter>(sp =>
                 {
-                    var logger = sp.GetService<ILogger>();
+                    var logger = sp.GetService<ILogger<SecureTokenOutgoingFilter>>();
                     var oidc = new OIDCSettings();
                     Configuration.Bind("ClientOIDC", oidc);
                     return new SecureTokenOutgoingFilter(logger, new TestTokenProvider(oidc, Configuration));
