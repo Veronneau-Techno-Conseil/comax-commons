@@ -1,4 +1,5 @@
-﻿@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+﻿@using CommunAxiom.Commons.ClientUI.Shared.Resources
+@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 @using Microsoft.AspNetCore.SignalR.Client
 
 @inherits LayoutComponentBase
@@ -30,31 +31,30 @@
         hubConnection = new HubConnectionBuilder()
             .WithUrl(_navigationManager.ToAbsoluteUri("/systemhub"))
             .Build();
+        await hubConnection.StartAsync();
 
-        hubConnection.On<string, string, int>("ReceiveNotification", (title, body, criticality) =>
+        hubConnection.On<Notifications>("ReceiveNotification", (notification) =>
         {
-            var encodedMsg = $"{title}: {body}";
-            if (criticality == 0)
+            var encodedMsg = $"{notification.Title}: {notification.Body}";
+            if (notification.Criticality == Criticality.Info)
             {
                 toastService.ShowInfo(encodedMsg);
             }
-            else if (criticality == 1)
+            else if (notification.Criticality == Criticality.Warning)
             {
                 toastService.ShowWarning(encodedMsg);
             }
-            else if (criticality == 2)
+            else if (notification.Criticality == Criticality.Success)
             {
                 toastService.ShowSuccess(encodedMsg);
             }
             else
             {
-                 toastService.ShowError(encodedMsg);
+                toastService.ShowError(encodedMsg);
             }
 
             StateHasChanged();
         });
-
-        await hubConnection.StartAsync();
     }
 
     protected override async Task OnParametersSetAsync()

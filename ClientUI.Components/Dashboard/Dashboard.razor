@@ -2,6 +2,7 @@
 @page "/dashboard"
 @page "/"
 
+@using CommunAxiom.Commons.ClientUI.Shared.Resources
 @using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager _navigationManager
 @implements IAsyncDisposable
@@ -27,9 +28,9 @@
             .WithUrl(_navigationManager.ToAbsoluteUri("/systemhub"))
             .Build();
 
-        hubConnection.On<string, string, int>("ReceiveNotification", (title, body, criticality) =>
+        hubConnection.On<Notifications>("ReceiveNotification", (notification) =>
         {
-            var encodedMsg = $"{title}: {body}";
+            var encodedMsg = $"{notification.Title}: {notification.Body}";
             notifications.Add(encodedMsg);
             StateHasChanged();
         });

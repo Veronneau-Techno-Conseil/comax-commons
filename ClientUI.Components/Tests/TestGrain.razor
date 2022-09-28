@@ -1,5 +1,6 @@
 ﻿@page "/test_grain"
 
+@using CommunAxiom.Commons.ClientUI.Shared.Resources
 @using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager _navigationManager
 @implements IAsyncDisposable
@@ -61,21 +62,15 @@
 <div class="form-group">
     <label>
         Message:
-        <input @bind="notificationBody" size="50" />
+        <input @bind="notification.Body" size="50" />
     </label>
 </div>
 <button @onclick="Send" disabled="@(!IsConnected)">Send</button>
 <hr>
-<ul id="notificationsList">
-    @foreach (var notification in notifications)
-    {
-        <li>@notification</li>
-    }
-</ul>
 
 @code {
     private HubConnection? hubConnection;
-    private List<string> notifications = new List<string>();
+    private Notifications notification = new Notifications();
     private string? notificationBody;
 
     protected override async Task OnInitializedAsync()
@@ -90,7 +85,9 @@
     {
         if (hubConnection is not null)
         {
-            await hubConnection.SendAsync("SendNotification", "From Test", notificationBody, 3);
+            notification.Title = "From Test";
+            notification.Criticality = Criticality.Critical;
+            await hubConnection.SendAsync("SendNotification",notification);
         }
     }
 
