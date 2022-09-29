@@ -64,7 +64,7 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<IReplication, Replications>();
 
                     services.AddSingleton<ISettingsProvider, SiloSettingsProvider>();
-                    services.AddSingleton<IClaimsPrincipalProvider, ClaimsProvider>();
+                    services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
                     services.AddSingleton<IIncomingGrainCallFilter, AccessControlFilter>();
 
                 })

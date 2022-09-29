@@ -20,7 +20,9 @@ namespace CommunAxiom.Commons.Shared.OIDC
                 return null;
 
             var settings = await _settingsProvider.GetOIDCSettings();
+
             var client = new TokenClient(settings);
+
             var (completed, result) = await client.RequestIntrospection(settings.ClientId, settings.Secret, token);
             if (completed)
             {
