@@ -26,9 +26,11 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BroadcastGrain\BroadcastGrain.csproj" />
     <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
     <ProjectReference Include="..\Node\Orchestrator.csproj" />
     <ProjectReference Include="..\Orchestrator.Client\Orchestrator.Client.csproj" />
+    <ProjectReference Include="..\Shared.Tests\Shared.Tests.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="config.json">

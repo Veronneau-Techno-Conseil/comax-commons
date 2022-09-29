@@ -1,5 +1,6 @@
 ﻿using Comax.Commons.Orchestrator.Contracts.Mailbox;
 using Comax.Commons.Orchestrator.Contracts.UriRegistry;
+using Comax.Commons.Orchestrator.Contracts.EventMailbox;
 using Orleans.Streams;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace Comax.Commons.Orchestrator.Contracts.ComaxSystem
     {
         IMailbox GetMailbox(string id);
         IUriRegistry GetUriRegistry(string id);
+        IEventMailbox GetEventMailbox(Guid id);
         Task Close();
     }
 }

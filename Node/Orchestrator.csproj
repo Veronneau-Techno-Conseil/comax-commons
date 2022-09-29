@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\IEventMailbox\EventMailboxGrain.csproj" />
     <ProjectReference Include="..\LiteDbStorageProvider\LiteDbStorageProvider.csproj" />
     <ProjectReference Include="..\MailboxGrain\MailboxGrain.csproj" />
     <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Comax.Commons.Orchestrator.Contracts.EventMailbox;
 using Comax.Commons.Orchestrator.Contracts.UriRegistry;
 
 namespace Comax.Commons.Orchestrator.Client
@@ -33,6 +34,11 @@ namespace Comax.Commons.Orchestrator.Client
         public IUriRegistry GetUriRegistry(string id)
         {
             return _clusterClient.GetGrain<IUriRegistry>(id);
+        }
+
+        public IEventMailbox GetEventMailbox(Guid id)
+        {
+            return _clusterClient.GetGrain<IEventMailbox>(id);
         }
         public void Dispose()
         {
