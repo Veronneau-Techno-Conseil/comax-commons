@@ -1,0 +1,27 @@
+﻿[
+  {
+    "id": 1,
+    "name": "hello",
+    "cdate": "2022-10-04T19:33:02.108Z",
+    "arrayValues": [
+      1,
+      2,
+      3
+    ],
+    "subObject": {
+      "id": 2,
+      "title": "subtitle",
+      "subarray": [ "asdf", 4, "sdfsdf" ]
+    },
+    "childrenObjects": [
+      {
+        "id": 1,
+        "name": "Child 1"
+      },
+      {
+        "id": 2,
+        "name": "Child 2"
+      }
+    ]
+  }
+]

@@ -25,7 +25,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
         [Test]
         public void WhenFieldIsNumberThenShouldReturnNull()
         {
-            var field = new FieldMetaData { FieldName = "p1", FieldType = FieldType.Number };
+            var field = new FieldMetaData { FieldName = "p1", FieldType = FieldType.Integer };
             JObject row = new JObject();
             row.Add("p1", 1);
 
@@ -37,7 +37,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
         [Test]
         public void WhenFieldIsNotNumberThenShouldReturnValidationErrorCode()
         {
-            var field = new FieldMetaData { FieldName = "p1", FieldType = FieldType.Number };
+            var field = new FieldMetaData { FieldName = "p1", FieldType = FieldType.Integer };
             JObject row = new JObject();
             row.Add("p1", "1");
 
