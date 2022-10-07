@@ -15,12 +15,14 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
     {
         public Guid? StreamId { get; set; }
         public IAsyncStream<MailMessage> Stream { get; set; }
-
-        private IPersistentState<List<MailMessage>> _storageState;
-        public EventMailbox([PersistentState("mailGrain")] IPersistentState<List<MailMessage>> storageState)
+        public readonly EventMailboxBusiness _eventMailboxBusiness;
+        public EventMailbox(EventMailboxBusiness eventMailboxBusiness,[PersistentState("mailGrain")] IPersistentState<List<MailMessage>> storageState)
         {
-            _storageState = storageState;
+            _eventMailboxBusiness = eventMailboxBusiness;
+            _eventMailboxBusiness.Init(storageState);
         }
+
+
         public Task ResumeMessageStream()
         {
             if (Stream == null)
@@ -31,8 +33,8 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
 
             _= Task.Run(async () =>
             {
-                await _storageState.ReadStateAsync();
-                foreach (var mail in _storageState.State)
+                var mailMessages = await _eventMailboxBusiness.GetMailMessages();
+                foreach (var mail in mailMessages)
                 {
                     await Stream.OnNextAsync(mail);
                 }
@@ -41,16 +43,11 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
         }
         public async Task MarkRead(Guid msgId)
         {
-            await _storageState.ReadStateAsync();
-            foreach (var mail in _storageState.State.Where(mail => mail.MsgId == msgId))
-            {
-                mail.ReadState = true;
-            }
-            await _storageState.WriteStateAsync();
+            await _eventMailboxBusiness.MarkRead(msgId);
         }
         public async Task<Guid> HasMail()
         {
-            return await Task.FromResult(this.GetPrimaryKey());
+            return await Task.FromResult(StreamId.Value);
         }
 
         public async Task<Guid> GetStreamId()
@@ -61,7 +58,8 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
 
         public async Task StartStream()
         {
-            //how?
+            //read storage and push to stream
+            await ResumeMessageStream();
         }
 
         public async Task SendMail(MailMessage mail)
@@ -71,20 +69,15 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
                 Stream = this.GetStreamProvider(Constants.DefaultStream)
                     .GetStream<MailMessage>(StreamId.Value, Constants.DefaultNamespace);
             }
-            await _storageState.ReadStateAsync();
-            _storageState.State.Add(mail);
-            await _storageState.WriteStateAsync();
+            var mailMessages = await _eventMailboxBusiness.GetMailMessages();
+            mailMessages.Add(mail);
+            await _eventMailboxBusiness.UpdateMailMessages(mailMessages);
             await Stream.OnNextAsync(mail);
         }
 
         public async Task DeleteMail(Guid msgId)
         {
-            await _storageState.ReadStateAsync();
-            foreach (var mail in _storageState.State)
-            {
-                _storageState.State.RemoveAll(e => e.MsgId == msgId);
-            }
-            await _storageState.WriteStateAsync();
+            await _eventMailboxBusiness.DeleteMail(msgId);
         }
     }
 }
