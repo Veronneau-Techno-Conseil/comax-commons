@@ -105,13 +105,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BroadcastGrain", "Broadcast
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClusterEvent", "ClusterEventStream\ClusterEvent.csproj", "{C1F32B7A-033F-4EDC-8C26-4F35426D5347}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Broadcast.Grian.Tests", "Broadcast.Grian.Tests\Broadcast.Grian.Tests.csproj", "{207623FF-DC79-4949-8259-1F5875CCC6EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Broadcast.Grain.Tests", "Broadcast.Grian.Tests\Broadcast.Grain.Tests.csproj", "{207623FF-DC79-4949-8259-1F5875CCC6EC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UriRegistryGrain", "UriRegistryGrain\UriRegistryGrain.csproj", "{18A8FCF2-62B8-41CA-BA27-0D3998761FC9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventMailboxGrain", "IEventMailbox\EventMailboxGrain.csproj", "{57189CBF-4BC5-4A3D-80BE-75753FB7670A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailGrain", "MailGrain\MailGrain.csproj", "{26279A10-DA4A-40A8-A2C8-51B88E6347EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MailGrain", "MailGrain\MailGrain.csproj", "{26279A10-DA4A-40A8-A2C8-51B88E6347EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
