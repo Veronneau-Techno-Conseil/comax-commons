@@ -8,9 +8,7 @@ using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Orleans;
-using Orleans.GrainDirectory;
-using Orleans.Runtime;
+using System.IO;
 
 namespace Comax.Commons.Orchestrator.EventMailboxGrain
 {
@@ -48,7 +46,21 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
             }
             await UpdateMailMessages(mailMessages);
         }
-
+        public async Task ResumeMessageStream(IAsyncStream<MailMessage> stream)
+        {
+            var mailMessages = await GetMailMessages();
+            foreach (var mail in mailMessages)
+            {
+                await stream.OnNextAsync(mail);
+            }
+        }
+        public async Task SendMail(IAsyncStream<MailMessage> stream, MailMessage mail)
+        {
+            var mailMessages = await GetMailMessages();
+            mailMessages.Add(mail);
+            await UpdateMailMessages(mailMessages);
+            await stream.OnNextAsync(mail);
+        }
 
     }
 }

@@ -23,23 +23,14 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
         }
 
 
-        public Task ResumeMessageStream()
+        public async Task ResumeMessageStream()
         {
             if (Stream == null)
             {
                 Stream = this.GetStreamProvider(Constants.DefaultStream)
                     .GetStream<MailMessage>(StreamId.Value, Constants.DefaultNamespace);
             }
-
-            _= Task.Run(async () =>
-            {
-                var mailMessages = await _eventMailboxBusiness.GetMailMessages();
-                foreach (var mail in mailMessages)
-                {
-                    await Stream.OnNextAsync(mail);
-                }
-            });
-            return Task.CompletedTask;
+            await _eventMailboxBusiness.ResumeMessageStream(Stream);
         }
         public async Task MarkRead(Guid msgId)
         {
@@ -69,10 +60,7 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
                 Stream = this.GetStreamProvider(Constants.DefaultStream)
                     .GetStream<MailMessage>(StreamId.Value, Constants.DefaultNamespace);
             }
-            var mailMessages = await _eventMailboxBusiness.GetMailMessages();
-            mailMessages.Add(mail);
-            await _eventMailboxBusiness.UpdateMailMessages(mailMessages);
-            await Stream.OnNextAsync(mail);
+            await _eventMailboxBusiness.SendMail(Stream, mail);
         }
 
         public async Task DeleteMail(Guid msgId)
