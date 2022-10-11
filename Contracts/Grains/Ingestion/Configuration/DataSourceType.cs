@@ -3,7 +3,8 @@
     public enum DataSourceType
     {
         File = 0,
-        API
+        API = 1,
+        CSV
     }
 }
 

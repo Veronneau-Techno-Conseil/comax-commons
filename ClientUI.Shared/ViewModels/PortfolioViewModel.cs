@@ -1,27 +1,15 @@
-﻿using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
-using CommunAxiom.Commons.ClientUI.Shared.Extensions;
-using CommunAxiom.Commons.ClientUI.Shared.Models;
+﻿using CommunAxiom.Commons.ClientUI.Shared.Models;
 using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Localization;
 using Radzen.Blazor;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Blazorise.TreeView;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 
 namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
 {
     public class PortfolioViewModel : IPortfolioViewModel
     {
         private const string RootKey = "79186558-5e84-4fd9-904b-58d74ba582af";
-
         private readonly HttpClient _httpClient;
 
         public PortfolioViewModel(HttpClient httpClient)
@@ -40,50 +28,47 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
 
             if (!httpResponseMessage.IsSuccessStatusCode)
             {
-                var errorMessage = httpResponseMessage.ReasonPhrase;
-                Console.WriteLine($"There was an error! {errorMessage}");
                 return null;
             }
-            else
+
+            if (httpResponseMessage.StatusCode == HttpStatusCode.NoContent)
             {
-                if (httpResponseMessage.StatusCode == HttpStatusCode.NoContent)
+                var list = new List<PortfolioModel>();
+
+                list.Add(new PortfolioModel
                 {
-                    Console.WriteLine("Portfolio List is defined but has no content");
+                    ID = new Guid(RootKey),
+                    Name = "Root",
+                    Type = "Folder",
+                    ParentId = Guid.Empty
+                });
 
-                    var list = new List<PortfolioModel>();
-
-                    list.Add(new PortfolioModel
-                        { ID = new Guid(RootKey), Name = "Root", Type = "Folder", ParentId = Guid.Empty });
-
-                    return list;
-                }
-
-                var response = await httpResponseMessage.Content.ReadFromJsonAsync<List<PortfolioModel>>();
-
-
-                response.Insert(0,
-                    new PortfolioModel
-                        { ID = new Guid(RootKey), Name = "Root", Type = "Folder", ParentId = Guid.Empty });
-
-
-                return response;
+                return list;
             }
+
+            var response = await httpResponseMessage.Content.ReadFromJsonAsync<List<PortfolioModel>>();
+            
+            response.Insert(0, new PortfolioModel
+            {
+                ID = new Guid(RootKey),
+                Name = "Root",
+                Type = "Folder",
+                ParentId = Guid.Empty
+            });
+            
+            return response;
         }
 
         public async Task<bool> CheckIfUnique(string name)
         {
-            HttpResponseMessage? httpResponseMessage;
-            httpResponseMessage = await _httpClient.GetAsync("/api/Portfolio/CheckName/" + name);
+            var httpResponseMessage = await _httpClient.GetAsync("/api/Portfolio/CheckName/" + name);
+            
             if (!httpResponseMessage.IsSuccessStatusCode)
             {
-                var errorMessage = httpResponseMessage.ReasonPhrase;
-                Console.WriteLine($"There was an error! {errorMessage}");
                 return false;
             }
-            else
-            {
-                return await httpResponseMessage.Content.ReadFromJsonAsync<bool>();
-            }
+
+            return await httpResponseMessage.Content.ReadFromJsonAsync<bool>();
         }
 
         public string GetIcon(PortfolioType portfolioType)
@@ -92,14 +77,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
             return $"_content/ClientUI.Components/icons/{iconName}.png";
         }
 
-        public Dictionary<string, string> GetDatasources()
-        {
-            return new Dictionary<string, string>
-            {
-                { "JSON File", ".json" },
-                { "CSV file", ".csv" }
-            };
-        }
+        public List<string> GetDatasources() => new() { "JSON", "CSV" };
 
         public List<string> GetPortfolioTypes()
         {
@@ -109,6 +87,38 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
                 PortfolioType.Project.GetDisplayDescription(),
                 PortfolioType.Dataset.GetDisplayDescription()
             };
+        }
+
+        public async Task SaveFieldMetaData(string id, List<FieldMetaData> fields)
+        {
+            await _httpClient.PostAsJsonAsync("/api/Datasource/SetFieldMetaData", 
+                new CreateFieldMetaDataRequest 
+                {
+                    Id = id,
+                    Fields = fields 
+                });
+        }
+
+        public async Task<List<FieldMetaData>> GetFieldMetaData(string id)
+        {
+            var httpResponseMessage = await _httpClient.GetAsync($"/api/Datasource/GetFieldMetaData?id={id}");
+
+            if (!httpResponseMessage.IsSuccessStatusCode || httpResponseMessage.StatusCode == HttpStatusCode.NoContent)
+            {
+                return null;
+            }
+
+            return await httpResponseMessage.Content.ReadFromJsonAsync<List<FieldMetaData>>();
+        }
+
+        public async Task SaveConfig(string id, SourceConfig sourceConfig)
+        {
+            await _httpClient.PostAsJsonAsync("/api/Datasource/SetConfigurations", 
+                new CreateConfigRequest
+                {
+                    Id = id,
+                    Config = sourceConfig
+                });
         }
     }
 }

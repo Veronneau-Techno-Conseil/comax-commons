@@ -38,6 +38,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\ClientUI.Shared\ClientUI.Shared.csproj" />
+        <ProjectReference Include="..\IO\CommunAxiom.Commons.Ingestion.csproj" />
     </ItemGroup>
 
     <ItemGroup>

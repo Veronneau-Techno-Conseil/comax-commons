@@ -1,9 +1,8 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.IO;
 using Orleans.Runtime;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 
 namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
 {
@@ -22,10 +21,23 @@ namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
             return _dataSourceState.State;
         }
 
-        public async Task WriteConfig(SourceState state)
+        public async Task SetConfig(DataSourceType dataSourceType, Dictionary<string, DataSourceConfiguration> configurations)
         {
-            _dataSourceState.State = state;
+            _dataSourceState.State.DataSourceType = dataSourceType;
+            _dataSourceState.State.Configurations = configurations;
             await _dataSourceState.WriteStateAsync();
+        }
+
+        public async Task SetFieldMetaData(List<FieldMetaData> fieldMetaDatas)
+        {
+            _dataSourceState.State.Fields = fieldMetaDatas;
+            await _dataSourceState.WriteStateAsync();
+        }
+
+        public Task<List<FieldMetaData>> GetFieldMetaData()
+        {
+            
+            return Task.FromResult(_dataSourceState.State.Fields);
         }
 
         public async Task DeleteConfig()

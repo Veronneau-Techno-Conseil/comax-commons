@@ -22,7 +22,8 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
             // factories
             services.AddTransient<IDataSourceFactory, DataSourceFactory>();
             services.AddTransient<IIngestorFactory, IngestorFactory>();
-
+            services.AddTransient<IMetadataParser, JSONMetadataParser>();
+            
             // validations
             var fieldValidatorManager = new ValidatorManager();
             fieldValidatorManager.ConfigureFields(options =>

@@ -1,12 +1,5 @@
-﻿
-using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
-using CommunAxiom.Commons.ClientUI.Shared.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Blazorise.TreeView;
+﻿using CommunAxiom.Commons.ClientUI.Shared.Models;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 
 namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 {
@@ -19,8 +12,12 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 
         string GetIcon(PortfolioType portfolioType);
 
-        Dictionary<string, string> GetDatasources();
+        List<string> GetDatasources();
 
         List<string> GetPortfolioTypes();
+
+        Task SaveFieldMetaData(string id, List<FieldMetaData> fields);
+        Task<List<FieldMetaData>> GetFieldMetaData(string id);
+        Task SaveConfig(string id, SourceConfig sourceConfig);
     }
 }

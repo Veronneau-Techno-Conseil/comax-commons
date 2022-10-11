@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using CommunAxiom.Commons.Ingestion.Extentions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,7 @@ builder.Services.AddBlazorise(options =>
 
 builder.Services.AddBulmaProviders();
 builder.Services.AddFontAwesomeIcons();
-
+builder.Services.AddIngestion();
 builder.Services.AddCors(option =>
 {
     option.AddDefaultPolicy(cp =>

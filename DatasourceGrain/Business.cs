@@ -1,8 +1,7 @@
-﻿using CommunAxiom.Commons.Client.Contracts.IO;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using CommunAxiom.Commons.Client.Contracts.IO;
 using System.Threading.Tasks;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 
 namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
 {
@@ -15,10 +14,21 @@ namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
             _repo = repo;
         }
 
-        public async Task WriteConfig(SourceState state)
+        public async Task SetConfig(DataSourceType dataSourceType,
+            Dictionary<string, DataSourceConfiguration> configurations)
         {
             //todo should be validate all configurations here? 
-            await _repo.WriteConfig(state);
+            await _repo.SetConfig(dataSourceType, configurations);
+        }
+
+        public async Task SetFieldMetaData(List<FieldMetaData> fieldMetaDatas)
+        {
+            await _repo.SetFieldMetaData(fieldMetaDatas);
+        }
+
+        public async Task<List<FieldMetaData>> GetFieldMetaData()
+        {
+            return await _repo.GetFieldMetaData();
         }
 
         public async Task<SourceState> ReadConfig()

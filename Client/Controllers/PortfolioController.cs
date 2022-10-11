@@ -1,22 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
-using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces;
-using CommunAxiom.Commons.ClientUI.Shared.ViewModels;
 using CommunAxiom.Commons.ClientUI.Shared.Models;
 
 namespace CommunAxiom.Commons.ClientUI.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-
-    public partial class PortfolioController : ControllerBase
+    public class PortfolioController : ControllerBase
     {
-        private readonly ICommonsClientFactory clusterClient;
+        private readonly ICommonsClientFactory _clusterClient;
 
         public PortfolioController(ICommonsClientFactory clusterClient)
         {
-            this.clusterClient = clusterClient;
+            this._clusterClient = clusterClient;
         }
 
 
@@ -34,7 +31,7 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
                         Type = model.Type,
                         ParentId = model.ParentId
                     };
-                    await clusterClient.WithClusterClient(async cc =>
+                    await _clusterClient.WithClusterClient(async cc =>
                     {
                         await cc.GetPortfolio("Portfolios").AddAPortfolio(portfolio);
                     });
@@ -53,7 +50,7 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
         [HttpGet("GetAll")]
         public async Task<IEnumerable<PortfolioModel>> GetAll()
         {
-            var PortfoliosFinalList = await clusterClient.WithClusterClient(async cc =>
+            var PortfoliosFinalList = await _clusterClient.WithClusterClient(async cc =>
             {
                 return await cc.GetPortfolio("Portfolios").GetPortfoliosList();
             });
@@ -65,7 +62,7 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
         {
             if (name != null)
             {
-                var result = await clusterClient.WithClusterClient(async cc =>
+                var result = await _clusterClient.WithClusterClient(async cc =>
                 {
                     return await cc.GetPortfolio("Portfolios").CheckIfUnique(name);
                 });
