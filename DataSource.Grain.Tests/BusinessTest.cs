@@ -18,7 +18,7 @@ namespace Ingestion.Grain.Tests
 
             var business = new Business(new Repo(store));
 
-            await business.SetConfig(DataSourceType.File,
+            await business.SetConfig(DataSourceType.FILE,
                 new Dictionary<string, DataSourceConfiguration>
                 {
                     ["Name"] = new DataSourceConfiguration { Name = "Name" }
@@ -27,7 +27,7 @@ namespace Ingestion.Grain.Tests
             var state = await business.ReadConfig();
 
             Assert.IsNotNull(state);
-            Assert.AreEqual(DataSourceType.File, state.DataSourceType);
+            Assert.AreEqual(DataSourceType.FILE, state.DataSourceType);
             Assert.AreEqual("Name", state.Configurations["Name"].Name);
 
             await business.DeleteConfig();

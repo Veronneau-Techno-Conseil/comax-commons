@@ -43,7 +43,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
 
             _serviceProvider.Setup(x => x.GetService(typeof(TextDataSourceReader))).Returns(textDataSourceReader);
 
-            var reader = _sourceFactory.Create(DataSourceType.File);
+            var reader = _sourceFactory.Create(DataSourceType.FILE);
             reader.Should().BeOfType<TextDataSourceReader>();
         }
 
@@ -66,7 +66,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         [Test]
         public void WhenServiceProviderIsResolvedNullThenSourceFactoryShouldThrowNullReferenceException()
         {
-            var sourceType = DataSourceType.File;
+            var sourceType = DataSourceType.FILE;
 
             _serviceProvider.Setup(x => x.GetService(typeof(TextDataSourceReader))).Returns(null);
 

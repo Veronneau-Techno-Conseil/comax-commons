@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace CommunAxiom.Commons.Ingestion.DataSource
 {
-    [DataSourceType(DataSourceType.File)]
+    [DataSourceType(DataSourceType.FILE)]
     public class TextDataSourceReader : IDataSourceReader
     {
         private readonly IConfigValidatorLookup _configValidatorLookup;
@@ -58,12 +58,27 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 
             configurations.Add("content-type", new DataSourceConfiguration
             {
-                FieldType = FieldType.Lookup,
+                DisplayName = "Content Type",
+                Name = "content-type",
+                FieldType = ConfigurationFieldType.Lookup,
                 Value = "json",
                 Parameter = "['json', 'csv']"
             });
 
-            configurations.Add("file-type", new DataSourceConfiguration { FieldType = FieldType.File });
+            configurations.Add("SampleFile",
+                new DataSourceConfiguration { 
+                    DisplayName = "Sample File",
+                    Name = "SampleFile",
+                    FieldType = ConfigurationFieldType.File 
+                });
+
+            configurations.Add("FilePath", new DataSourceConfiguration
+            {
+                Name = "FilePath",
+                DisplayName = "File Path",
+                FieldType = ConfigurationFieldType.Text
+            });
+
 
             if (sourceConfig != null)
             {

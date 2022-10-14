@@ -8,7 +8,7 @@ namespace CommunAxiom.Commons.Ingestion.Validators
     {
         public ValidationError Validate(DataSourceConfiguration configuration)
         {
-            if (configuration.FieldType == FieldType.File)
+            if (configuration.FieldType == ConfigurationFieldType.File)
             {
                 try
                 {

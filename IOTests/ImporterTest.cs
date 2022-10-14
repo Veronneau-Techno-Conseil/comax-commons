@@ -47,7 +47,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests
         {
             var sourceConfig = new SourceConfig
             {
-                DataSourceType = DataSourceType.File,
+                DataSourceType = DataSourceType.FILE,
                 Configurations = new Dictionary<string, DataSourceConfiguration>
                 {
                     {
@@ -55,7 +55,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests
                         new DataSourceConfiguration
                         {
                             Name = "file1",
-                            FieldType = FieldType.File,
+                            FieldType = ConfigurationFieldType.File,
                             Value = JsonConvert.SerializeObject(new FileModel { Name = "sample1.txt", Path = "Samples/Files" })
                         }
                     }
@@ -86,7 +86,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests
         {
             var sourceConfig = new SourceConfig
             {
-                DataSourceType = DataSourceType.File,
+                DataSourceType = DataSourceType.FILE,
                 Configurations = new Dictionary<string, DataSourceConfiguration>
                 {
                     {
@@ -94,7 +94,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests
                         new DataSourceConfiguration
                         {
                             Name = "file1",
-                            FieldType = FieldType.File,
+                            FieldType = ConfigurationFieldType.File,
                             Value = JsonConvert.SerializeObject(new FileModel { Name = "sample2.txt", Path = "Samples/Files" })
                         }
                     }
