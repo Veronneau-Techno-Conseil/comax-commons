@@ -1,6 +1,5 @@
-﻿@page "/test_grain"
+@page "/test_grain"
 @using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
-
 
 @inject ITestViewModel _testViewModel
 @inject IJSRuntime JsRuntime
@@ -10,6 +9,7 @@
 
 <p> Press on each button to launch its corresponding grain</p>
 <div>
+
     <div>
         <a class="button" target="_blank" href="/api/account/get">
             Account Grain
@@ -94,6 +94,7 @@
         </div>
     </div>
 
+
 </div>
 
 @code
@@ -121,3 +122,14 @@
 }
 
 
+@code{
+
+
+    async Task click(string url)
+    {
+        await httpClientConfig.Configure(httpClient);
+
+        await httpClient.GetAsync(url);
+    }
+
+}

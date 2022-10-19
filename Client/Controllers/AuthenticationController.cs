@@ -324,7 +324,7 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
             _tempData.SetTokenData(data);
             MemoryStream ms = new MemoryStream(sessionInfo.UserData);
             ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(new BinaryReader(ms));
-            string token = GenerateJSONWebToken(claimsPrincipal, sessionInfo.AuthenticationExpiration.DateTime);
+            string token = GenerateJSONWebToken(claimsPrincipal, sessionInfo.AuthenticationExpiration.DateTime, data.AccessToken);
 
             return this.Ok(new OperationResult<AuthResult>
             {
@@ -333,17 +333,19 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
             });
         }
 
-        private string GenerateJSONWebToken(ClaimsPrincipal userInfo, DateTime expiration)
+        private string GenerateJSONWebToken(ClaimsPrincipal userInfo, DateTime expiration, string srcToken)
         {
             
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-                       
+
+            var lst = userInfo.Claims.ToList();
+            lst.Add(new System.Security.Claims.Claim("comax:token", srcToken));
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Issuer"],
-                claims: userInfo.Claims,
+                claims: lst.ToArray(),
                 expires: expiration,
                 signingCredentials: credentials);
 

@@ -143,6 +143,5 @@ namespace Comax.Commons.Orchestrator
                 app.AddJsonFile("./config.json");
             });
         }
-
     }
 }

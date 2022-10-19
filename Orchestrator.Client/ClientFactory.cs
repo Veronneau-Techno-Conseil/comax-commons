@@ -1,6 +1,7 @@
 ﻿using Comax.Commons.Orchestrator.Contracts;
 using Comax.Commons.Orchestrator.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Orleans;
+using CommunAxiom.Commons.Orleans.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -28,6 +29,13 @@ namespace Comax.Commons.Orchestrator.Client
         private IClientBuilder GetBuilder()
         {
             var b = new ClientBuilder()
+                .ConfigureServices(services =>
+                {
+                    var conf = serviceProvider.GetService<IOrchestratorClientConfig>();
+                    if (conf != null)
+                        conf.Configure(services);
+                })
+                    .ConfigureLogging(logging =>logging.AddConsole())
                     .Configure<ClusterOptions>(options =>
                     {
                         options.ClusterId = "0.0.1-a1";
@@ -37,6 +45,7 @@ namespace Comax.Commons.Orchestrator.Client
                     {
                         parts.AddFromApplicationBaseDirectory();
                     }).UseLocalhostClustering(30001)
+                    .AddOutgoingGrainCallFilter(serviceProvider.GetService<SecureTokenOutgoingFilter>())
                     .AddSimpleMessageStreamProvider(Constants.DefaultStream);
             return b;
         }
@@ -97,7 +106,7 @@ namespace Comax.Commons.Orchestrator.Client
         }
 
         public async Task<(IOrchestratorClient, TResult)> WithUnmanagedClient<TResult>(Func<IOrchestratorClient, Task<TResult>> action)
-        {
+                {
             Counter c = new Counter();
             var builder = GetBuilder();
             var client = builder.Build();
@@ -107,13 +116,13 @@ namespace Comax.Commons.Orchestrator.Client
         }
 
         private Func<Exception, Task<bool>> GetRetryFilter(Counter c)
-        {
+            {
             return async (Exception exception) =>
             {
                 serviceProvider.GetService<ILogger>()?.LogWarning(
-                    exception,
-                    "Exception while attempting to connect to Orleans cluster"
-                );
+                        exception,
+                        "Exception while attempting to connect to Orleans cluster"
+                    );
                 if (c.Value == 5)
                 {
                     return false;
@@ -122,12 +131,12 @@ namespace Comax.Commons.Orchestrator.Client
                 c.Value++;
                 return true;
             };
-        }
+            }
 
-        private class Counter
-        {
-            public int Value { get; set; } = 0;
-        }
+                private class Counter
+            {
+                public int Value { get; set; } = 0;
+            }
 
     }
 }

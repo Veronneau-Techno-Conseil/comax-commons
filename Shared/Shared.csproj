@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <RootNamespace>Comax.Commons.Shared</RootNamespace>
+	  <RootNamespace>CommunAxiom.Commons.Shared</RootNamespace>
 	  <LangVersion>10.0</LangVersion>
   </PropertyGroup>
 

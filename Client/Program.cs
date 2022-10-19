@@ -5,12 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ClusterClient;
+using Comax.Commons.Shared.OIDC;
+using CommunAxiom.Commons.ClientUI.Server.Helper;
 using CommunAxiom.Commons.ClientUI.Server.Models;
 using CommunAxiom.Commons.ClientUI.Server.SEO;
 using CommunAxiom.Commons.ClientUI.Shared.Extensions;
 using CommunAxiom.Commons.ClientUI.Shared.JsonLocalizer;
 using CommunAxiom.Commons.ClientUI.Shared.Models;
 using CommunAxiom.Commons.ClientUI.Shared.Services;
+using CommunAxiom.Commons.Orleans.Security;
 using ElectronNET.API;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -57,6 +60,7 @@ builder.Services.AddCors(option =>
 
 #region ConfigureServices
 
+builder.Services.AddHttpContextAccessor();
 
 // setting client host environment 
 builder.Services.AddSingleton<IHostEnvironment>(
@@ -69,10 +73,17 @@ builder.Services.Configure<ApplicationSettings>(options =>
     applicationSettingsSection.Bind(options);
 });
 
+
 // SEO Services
 builder.Services.AddScoped<MetadataTransferService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<CommunAxiom.Commons.ClientUI.Server.Helper.ITempData, CommunAxiom.Commons.ClientUI.Server.Helper.TempStorage>();
+
+
+// Orleans client
+builder.Services.AddLogging(x => x.AddConsole());
+builder.Services.AddTransient<ITokenProvider, ClientTokenProvider>();
+builder.Services.AddSingleton<SecureTokenOutgoingFilter>();
 builder.Services.SetupOrleansClient();
 
 builder.Services.AddControllers();
@@ -100,7 +111,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // adding application services
 builder.Services.SetBlazorApp(applicationSettingsSection.Get<ApplicationSettings>());
-
 
 #endregion
 

@@ -1,9 +1,14 @@
 ﻿using Comax.Commons.Orchestrator;
+using Comax.Commons.Orchestrator.Client;
 using Comax.Commons.Orchestrator.Contracts.ComaxSystem;
+using CommunAxiom.Commons.Orleans.Security;
+using CommunAxiom.Commons.Shared.OIDC;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Orleans.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +22,8 @@ namespace OrchestratorIntegration.Tests
     {
         public static IConfiguration Configuration { get; set; }
         public static IServiceProvider ServiceProvider { get; set; }
+
+        
 
         [OneTimeSetUp]
         public async Task RunBeforeAnyTests()
@@ -40,7 +47,42 @@ namespace OrchestratorIntegration.Tests
             ServiceCollection sc = new ServiceCollection();
             sc.AddSingleton<IConfiguration>(Configuration);
             sc.AddLogging(lb => lb.AddConsole());
+
+            /*
+             * Client specific
+             * */
+
+            sc.AddSingleton<IOrchestratorClientConfig, ClientConfig>();
+            sc.AddSingleton<SecureTokenOutgoingFilter>(sp =>
+            {
+                var logger = sp.GetService<ILogger<SecureTokenOutgoingFilter>>();
+                var oidc = new OIDCSettings();
+                Configuration.Bind("ClientOIDC", oidc);
+                return new SecureTokenOutgoingFilter(logger, new TestTokenProvider(oidc, Configuration));
+            });
+
+            /*
+             * End client specific
+             * */
+
             ServiceProvider = sc.BuildServiceProvider();
+        }
+
+        
+
+        public class ClientConfig : IOrchestratorClientConfig
+        {
+            public void Configure(IServiceCollection sc)
+            {
+                sc.AddLogging(l=>l.AddConsole());
+                sc.AddSingleton<SecureTokenOutgoingFilter>(sp =>
+                {
+                    var logger = sp.GetService<ILogger<SecureTokenOutgoingFilter>>();
+                    var oidc = new OIDCSettings();
+                    Configuration.Bind("ClientOIDC", oidc);
+                    return new SecureTokenOutgoingFilter(logger, new TestTokenProvider(oidc, Configuration));
+                });
+            }
         }
     }
 }

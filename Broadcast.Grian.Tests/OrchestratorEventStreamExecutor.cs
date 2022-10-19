@@ -2,6 +2,7 @@
 using CommunAxiom.Commons.Client.Grains.BroadcastGrain;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using FluentAssertions;
+using GrainTests.Shared;
 using NUnit.Framework;
 
 namespace Broadcast.Grian.Tests
@@ -10,11 +11,11 @@ namespace Broadcast.Grian.Tests
     public class OrchestratorEventStreamExecutorTest
     {
         private readonly OrchestratorEventStreamExecutor _orchestratorEventStreamExecutor;
-        private readonly MessageStreamProvider _messageStreamProvider;
+        private readonly AsyncStreamProvider<Message> _messageStreamProvider;
         
         public OrchestratorEventStreamExecutorTest()
         {
-            _messageStreamProvider = new MessageStreamProvider();
+            _messageStreamProvider = new AsyncStreamProvider<Message>();
             _orchestratorEventStreamExecutor = new OrchestratorEventStreamExecutor(_messageStreamProvider);
         }
 
