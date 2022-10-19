@@ -59,9 +59,10 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
                 Configurations = new Dictionary<string, DataSourceConfiguration>
                 {
                     {
-                        "file-type",
+                        "SampleFile",
                         new DataSourceConfiguration
                         {
+                            Name = "SampleFile",
                             FieldType = ConfigurationFieldType.File,
                             Value = JsonConvert.SerializeObject(new FileModel { Name = "sample1.txt", Path = "Samples/Files" })
                         }
@@ -94,7 +95,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
                 DataSourceType = DataSourceType.FILE,
                 Configurations = new Dictionary<string, DataSourceConfiguration>
                 {
-                    { "file-type", new DataSourceConfiguration { Name = "file1", FieldType = ConfigurationFieldType.File }}
+                    { "SampleFile", new DataSourceConfiguration { Name = "SampleFile", FieldType = ConfigurationFieldType.File }}
                 }
             };
 
@@ -108,7 +109,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
                 if (actual == null) continue;
 
                 actual.ErrorCode.Should().Be("The file type is required to set file name and file path");
-                actual.FieldName.Should().Be("file1");
+                actual.FieldName.Should().Be("SampleFile");
             }
         }
 

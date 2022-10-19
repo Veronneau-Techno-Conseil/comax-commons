@@ -20,35 +20,25 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddBlazorise(options =>
-{
-    options.Immediate = true;
-});
+builder.Services.AddBlazorise(options => { options.Immediate = true; });
 
 builder.Services.AddBulmaProviders();
 builder.Services.AddFontAwesomeIcons();
 builder.Services.AddIngestion();
 builder.Services.AddCors(option =>
 {
-    option.AddDefaultPolicy(cp =>
-    {
-        cp.SetIsOriginAllowed(origin => new Uri(origin).IsLoopback);
-    });
+    option.AddDefaultPolicy(cp => { cp.SetIsOriginAllowed(origin => new Uri(origin).IsLoopback); });
 });
 
 #region ConfigureServices
 
-
 // setting client host environment 
 builder.Services.AddSingleton<IHostEnvironment>(
-    new HostingEnvironment() { EnvironmentName = builder.Environment.EnvironmentName });
+    new HostingEnvironment { EnvironmentName = builder.Environment.EnvironmentName });
 
 // adding client app settings 
 var applicationSettingsSection = builder.Configuration;
-builder.Services.Configure<ApplicationSettings>(options =>
-{
-    applicationSettingsSection.Bind(options);
-});
+builder.Services.Configure<ApplicationSettings>(options => { applicationSettingsSection.Bind(options); });
 
 // SEO Services
 builder.Services.AddScoped<MetadataTransferService>();
@@ -66,23 +56,22 @@ builder.Services.AddSignalR();
 builder.Services.AddDbContextFactory<LoggingContext>(options => options.UseSqlite("Name=LoggingDb"));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = applicationSettingsSection["Jwt:Issuer"],
-        ValidAudience = applicationSettingsSection["Jwt:Issuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(applicationSettingsSection["Jwt:Key"]))
-    };
-});
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = applicationSettingsSection["Jwt:Issuer"],
+            ValidAudience = applicationSettingsSection["Jwt:Issuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(applicationSettingsSection["Jwt:Key"]))
+        };
+    });
 
 // adding application services
 builder.Services.SetBlazorApp(applicationSettingsSection.Get<ApplicationSettings>());
-
 
 #endregion
 

@@ -51,8 +51,6 @@
                         </Items>
                         <Content>
                             <TabPanel Name="tab1" Class="p-2">
-
-
                                 <SpinLoader IsLoading="IsLoading">
                                     <LoadingTemplate>
                                         <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
@@ -61,7 +59,6 @@
                                         </div>
                                     </LoadingTemplate>
                                     <ContentTemplate>
-                                        
                                         <h6>Data Source</h6>
                                         <div class="columns m-2">
                                             <div class="column is-one-fifth">
@@ -86,50 +83,53 @@
                                             </div>
                                         </div>
                                         <div class="columns">
-                                            @* @foreach (var datasource in DataSources) *@
-                                            @* { *@
-                                            @*     <div class="box" @onclick="() => OnFileSelected(datasource.Fields)"> *@
-                                            @*         <Label>@datasource.File.Name</Label> *@
-                                            @*         <TextEdit class="text-input" Text="@datasource.File.UploadUrl"/> *@
-                                            @*     </div> *@
-                                            @* } *@
-                                        </div>
-                                        <h6>Versioning Strategy</h6>
-                                        <div class="columns">
-                                            <div class="column is-one-fifth">
-                                                <label>Strategy</label>
-                                                <div class="dropdown">
-                                                    <div class="dropdown-trigger">
-                                                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-                                                            <span> Upsert / DS per import / Incremental</span>
-                                                            <span class="icon is-small">
-                                                                <i class="fas fa-angle-down" aria-hidden="true"></i>
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="dropdown-menu" id="dropdown-menu" role="menu">
-                                                        <div class="dropdown-content">
-                                                            <a href="#" class="dropdown-item">
-                                                                Dropdown item
-                                                            </a>
-                                                            <a class="dropdown-item">
-                                                                Other dropdown item
-                                                            </a>
-                                                            <a href="#" class="dropdown-item is-active">
-                                                                Active dropdown item
-                                                            </a>
-                                                            <a href="#" class="dropdown-item">
-                                                                Other dropdown item
-                                                            </a>
-                                                            <hr class="dropdown-divider">
-                                                            <a href="#" class="dropdown-item">
-                                                                With a divider
-                                                            </a>
-                                                        </div>
-                                                    </div>
+                                            @foreach (var datasource in Sources)
+                                            {
+                                                <div class="column" style="cursor: pointer;" @onclick="() => OnFieldMetadataSelected(datasource.Value)">
+                                                    <Label>
+                                                        @(datasource.Value.FieldType != ConfigurationFieldType.File ? $"{datasource.Value.Name}" : "File Name:")
+                                                        @(datasource.Value.FieldType == ConfigurationFieldType.File ? $"{SelectedFileName}" : "")
+                                                    </Label>
+                                                    <TextEdit class="text-input" Text="@datasource.Value.Name"/>
                                                 </div>
-                                            </div>
+                                            }
                                         </div>
+                                        @* <h6>Versioning Strategy</h6> *@
+                                        @* <div class="columns"> *@
+                                        @*     <div class="column is-one-fifth"> *@
+                                        @*         <label>Strategy</label> *@
+                                        @*         <div class="dropdown"> *@
+                                        @*             <div class="dropdown-trigger"> *@
+                                        @*                 <button class="button" aria-haspopup="true" aria-controls="dropdown-menu"> *@
+                                        @*                     <span> Upsert / DS per import / Incremental</span> *@
+                                        @*                     <span class="icon is-small"> *@
+                                        @*                         <i class="fas fa-angle-down" aria-hidden="true"></i> *@
+                                        @*                     </span> *@
+                                        @*                 </button> *@
+                                        @*             </div> *@
+                                        @*             <div class="dropdown-menu" id="dropdown-menu" role="menu"> *@
+                                        @*                 <div class="dropdown-content"> *@
+                                        @*                     <a href="#" class="dropdown-item"> *@
+                                        @*                         Dropdown item *@
+                                        @*                     </a> *@
+                                        @*                     <a class="dropdown-item"> *@
+                                        @*                         Other dropdown item *@
+                                        @*                     </a> *@
+                                        @*                     <a href="#" class="dropdown-item is-active"> *@
+                                        @*                         Active dropdown item *@
+                                        @*                     </a> *@
+                                        @*                     <a href="#" class="dropdown-item"> *@
+                                        @*                         Other dropdown item *@
+                                        @*                     </a> *@
+                                        @*                     <hr class="dropdown-divider"> *@
+                                        @*                     <a href="#" class="dropdown-item"> *@
+                                        @*                         With a divider *@
+                                        @*                     </a> *@
+                                        @*                 </div> *@
+                                        @*             </div> *@
+                                        @*         </div> *@
+                                        @*     </div> *@
+                                        @* </div> *@
                                         <h6>
                                             Data Description
                                             <img @onclick="AddNewRow" style="cursor: pointer;" class="icon-25 m-2 is-pulled-right" src="_content/ClientUI.Components/icons/Add.png"/>
@@ -172,9 +172,19 @@
                                                             <div class="columns">
                                                                 <div class="column">
                                                                     <Label>Description</Label>
-                                                                    <TextEdit class="text-input" @bind-Text="@field.FieldName"/>
+                                                                    <TextEdit class="text-input" @bind-Text="@field.Description"/>
                                                                 </div>
                                                             </div>
+
+                                                            @if (field.FieldType == FieldType.Lookup)
+                                                            {
+                                                                <div class="columns">
+                                                                    <div class="column">
+                                                                        <Label>Valid list CSV</Label>
+                                                                        <TextEdit class="text-input" @bind-Text="@field.Configuration"/>
+                                                                    </div>
+                                                                </div>
+                                                            }
                                                         </ListGroupItem>
                                                     }
                                                 </ListGroup>

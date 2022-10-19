@@ -51,10 +51,10 @@ namespace CommunAxiom.Commons.Ingestion.Tests
                 Configurations = new Dictionary<string, DataSourceConfiguration>
                 {
                     {
-                        "file-type",
+                        "SampleFile",
                         new DataSourceConfiguration
                         {
-                            Name = "file1",
+                            Name = "SampleFile",
                             FieldType = ConfigurationFieldType.File,
                             Value = JsonConvert.SerializeObject(new FileModel { Name = "sample1.txt", Path = "Samples/Files" })
                         }
@@ -90,10 +90,10 @@ namespace CommunAxiom.Commons.Ingestion.Tests
                 Configurations = new Dictionary<string, DataSourceConfiguration>
                 {
                     {
-                        "file-type",
+                        "SampleFile",
                         new DataSourceConfiguration
                         {
-                            Name = "file1",
+                            Name = "SampleFile",
                             FieldType = ConfigurationFieldType.File,
                             Value = JsonConvert.SerializeObject(new FileModel { Name = "sample2.txt", Path = "Samples/Files" })
                         }
@@ -105,7 +105,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests
             {
                 DisplayName = "sample1",
                 FieldName = "property",
-                Validators = new List<IFieldValidator>() { new RequiredFieldValidator() }
+                Validators = new List<IFieldValidator> { new RequiredFieldValidator() }
             };
 
             var fields = new List<FieldMetaData> { field };

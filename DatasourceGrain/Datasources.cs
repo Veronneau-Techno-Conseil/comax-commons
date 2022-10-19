@@ -33,9 +33,9 @@ namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
             await _business.SetFieldMetaData(fieldMetaDatas);
         }
 
-        public async Task<List<FieldMetaData>> GetFieldMetaData()
+        public async Task<SourceState> GetSourceState()
         {
-            return await _business.GetFieldMetaData();
+            return await _business.GetSourceState();
         }
 
         public async Task DeleteConfig()

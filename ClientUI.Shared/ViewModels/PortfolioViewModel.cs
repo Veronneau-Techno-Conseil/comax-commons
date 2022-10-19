@@ -4,6 +4,7 @@ using Radzen.Blazor;
 using System.Net;
 using System.Net.Http.Json;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Contracts.IO;
 
 namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
 {
@@ -77,7 +78,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
             return $"_content/ClientUI.Components/icons/{iconName}.png";
         }
 
-        public List<string> GetDatasources() => new() { "JSON", "CSV" };
+        public List<string> GetDatasources() => new() { "FILE", "JSON_URL", "API" };
 
         public List<string> GetPortfolioTypes()
         {
@@ -99,16 +100,16 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
                 });
         }
 
-        public async Task<List<FieldMetaData>> GetFieldMetaData(string id)
+        public async Task<SourceState> GetSourceState(string id)
         {
-            var httpResponseMessage = await _httpClient.GetAsync($"/api/Datasource/GetFieldMetaData?id={id}");
+            var httpResponseMessage = await _httpClient.GetAsync($"/api/Datasource/GetSourceState?id={id}");
 
             if (!httpResponseMessage.IsSuccessStatusCode || httpResponseMessage.StatusCode == HttpStatusCode.NoContent)
             {
                 return null;
             }
 
-            return await httpResponseMessage.Content.ReadFromJsonAsync<List<FieldMetaData>>();
+            return await httpResponseMessage.Content.ReadFromJsonAsync<SourceState>();
         }
 
         public async Task SaveConfig(string id, SourceConfig sourceConfig)

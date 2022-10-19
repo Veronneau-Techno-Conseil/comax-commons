@@ -31,8 +31,11 @@ namespace CommunAxiom.Commons.Ingestion
             dataSourceReader.Setup(sourceConfig);
 
             sourceConfig.Configurations.Clear();
-            foreach(var kvp in dataSourceReader.Configurations)
-            sourceConfig.Configurations.Add(kvp.Key, kvp.Value);
+            
+            foreach (var kvp in dataSourceReader.Configurations)
+            {
+                sourceConfig.Configurations.Add(kvp.Key, kvp.Value);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CommunAxiom.Commons.ClientUI.Shared.Models;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Contracts.IO;
 
 namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 {
@@ -17,7 +18,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
         List<string> GetPortfolioTypes();
 
         Task SaveFieldMetaData(string id, List<FieldMetaData> fields);
-        Task<List<FieldMetaData>> GetFieldMetaData(string id);
+        Task<SourceState> GetSourceState(string id);
         Task SaveConfig(string id, SourceConfig sourceConfig);
     }
 }

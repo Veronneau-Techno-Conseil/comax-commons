@@ -14,15 +14,10 @@ namespace Ingestion.Grain.Tests
         public async Task RunWhenNoErrors()
         {
             IPersistentState<SourceState> store = new PersistentStorageMock<SourceState>();
-            ;
 
             var business = new Business(new Repo(store));
 
-            await business.SetConfig(DataSourceType.FILE,
-                new Dictionary<string, DataSourceConfiguration>
-                {
-                    ["Name"] = new DataSourceConfiguration { Name = "Name" }
-                });
+            await business.SetConfig(DataSourceType.FILE, new Dictionary<string, DataSourceConfiguration> { ["Name"] = new DataSourceConfiguration { Name = "Name" } });
 
             var state = await business.ReadConfig();
 

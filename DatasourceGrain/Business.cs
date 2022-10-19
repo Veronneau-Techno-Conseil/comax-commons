@@ -26,9 +26,9 @@ namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
             await _repo.SetFieldMetaData(fieldMetaDatas);
         }
 
-        public async Task<List<FieldMetaData>> GetFieldMetaData()
+        public async Task<SourceState> GetSourceState()
         {
-            return await _repo.GetFieldMetaData();
+            return await _repo.GetSourceState();
         }
 
         public async Task<SourceState> ReadConfig()

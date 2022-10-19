@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 
 namespace GrainTests.Shared
 {
-    public class PersistentStorageMock<T> : Orleans.Runtime.IPersistentState<T> where T : class
+    public class PersistentStorageMock<T> : Orleans.Runtime.IPersistentState<T> where T : class, new()
     {
         public T? StoredValue { get; set;  }
 
         public string Key { get; set; } = default!;
 
-        public T State { get; set; } = default!;
+        public T State { get; set; } = new T();
 
         public string Etag => $"MemoryStorage-{Key}";
 

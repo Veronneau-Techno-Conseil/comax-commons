@@ -39,7 +39,7 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
                 throw new NullReferenceException("There is no data source configuration!");
             }
 
-            var dataSourceConfiguration = _configurations.FirstOrDefault(x => x.Key == "file-type").Value;
+            var dataSourceConfiguration = _configurations.FirstOrDefault(x => x.Key == "SampleFile").Value;
 
             var file = JsonConvert.DeserializeObject<FileModel>(dataSourceConfiguration.Value);
 

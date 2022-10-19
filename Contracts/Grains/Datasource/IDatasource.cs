@@ -11,7 +11,7 @@ namespace CommunAxiom.Commons.Client.Contracts.Datasource
         Task<SourceState> GetConfig();
         Task SetConfig(DataSourceType dataSourceType, Dictionary<string, DataSourceConfiguration> configurations);
         Task SetFieldMetaData(List<FieldMetaData> fieldMetaDatas);
-        Task<List<FieldMetaData>> GetFieldMetaData();
+        Task<SourceState> GetSourceState();
         Task DeleteConfig();
     }
 }

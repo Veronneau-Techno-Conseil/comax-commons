@@ -52,14 +52,14 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
             return Ok();
         }
         
-        [HttpGet("GetFieldMetaData")]
-        public async Task<IActionResult> GetFieldMetaData([FromQuery] string id)
+        [HttpGet("GetSourceState")]
+        public async Task<IActionResult> GetSourceState([FromQuery] string id)
         {
-            List<FieldMetaData> result = null;
+            SourceState result = null;
             
             await _clusterClient.WithClusterClient(async cc =>
             {
-                result = await cc.GetDatasource(id).GetFieldMetaData();
+                result = await cc.GetDatasource(id).GetSourceState();
             });
             
             return Ok(result);
