@@ -1,18 +1,18 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.IO;
-using Newtonsoft.Json.Linq;
 using Orleans;
 using Orleans.Runtime;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 
 namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
 {
     public class Datasources : Grain, IDatasource
     {
         private readonly Business _business;
-        public Datasources([PersistentState("DataSource")]IPersistentState<SourceState> state)
+
+        public Datasources([PersistentState("DataSource")] IPersistentState<SourceState> state)
         {
             _business = new Business(new Repo(state));
         }
@@ -22,15 +22,25 @@ namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
             return _business.ReadConfig();
         }
 
-        public async Task SetConfig(SourceState sourceState)
+        public async Task SetConfig(DataSourceType dataSourceType,
+            Dictionary<string, DataSourceConfiguration> configurations)
         {
-            await _business.WriteConfig(sourceState);
+            await _business.SetConfig(dataSourceType, configurations);
+        }
+
+        public async Task SetFieldMetaData(List<FieldMetaData> fieldMetaDatas)
+        {
+            await _business.SetFieldMetaData(fieldMetaDatas);
+        }
+
+        public async Task<SourceState> GetSourceState()
+        {
+            return await _business.GetSourceState();
         }
 
         public async Task DeleteConfig()
         {
             await _business.DeleteConfig();
         }
-
     }
 }

@@ -1,79 +1,125 @@
-﻿//using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
-using CommunAxiom.Commons.ClientUI.Shared.Models;
+﻿using CommunAxiom.Commons.ClientUI.Shared.Models;
 using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces;
-using Microsoft.Extensions.Localization;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using Radzen.Blazor;
+using System.Net;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Contracts.IO;
 
 namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
 {
     public class PortfolioViewModel : IPortfolioViewModel
     {
+        private const string RootKey = "79186558-5e84-4fd9-904b-58d74ba582af";
         private readonly HttpClient _httpClient;
+
         public PortfolioViewModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            PROJECT = "Project";
-            DATABASE = "Database";
         }
 
-        public string PROJECT { get; }
-        public string DATABASE { get; }
-        public string ID { get; set; }
-        [Required]
-        public string TheType { get; set; }
-        [Required]
-        public string Name { get; set; }
-        public string ParentId { get; set; }
-        public Models.Portfolio portfolio { get; set; }
-        public List<Models.Portfolio> Portfolios { get; set; }
-
-        public async Task CreatePortfolio(Portfolio portfolio)
+        public async Task CreatePortfolio(PortfolioModel portfolio)
         {
             await _httpClient.PostAsJsonAsync("/api/Portfolio/Create", portfolio);
         }
 
-        public async Task<List<Portfolio>?> GetPortfolios()
+        public async Task<IList<PortfolioModel>> GetPortfolios()
         {
-            HttpResponseMessage? httpResponseMessage;
-            httpResponseMessage = await _httpClient.GetAsync("/api/Portfolio/GetAll");
+            HttpResponseMessage httpResponseMessage = await _httpClient.GetAsync("/api/Portfolio/GetAll");
 
             if (!httpResponseMessage.IsSuccessStatusCode)
             {
-                var errorMessage = httpResponseMessage.ReasonPhrase;
-                Console.WriteLine($"There was an error! {errorMessage}");
                 return null;
             }
-            else
+
+            if (httpResponseMessage.StatusCode == HttpStatusCode.NoContent)
             {
-                if ((int)httpResponseMessage.StatusCode == 204)
+                var list = new List<PortfolioModel>();
+
+                list.Add(new PortfolioModel
                 {
-                    Console.WriteLine("Portfolio List is defined but has no content");
-                    return null;
-                }
-                return httpResponseMessage.Content.ReadFromJsonAsync<List<Portfolio>>().Result;
+                    ID = new Guid(RootKey),
+                    Name = "Root",
+                    Type = "Folder",
+                    ParentId = Guid.Empty
+                });
+
+                return list;
             }
+
+            var response = await httpResponseMessage.Content.ReadFromJsonAsync<List<PortfolioModel>>();
+            
+            response.Insert(0, new PortfolioModel
+            {
+                ID = new Guid(RootKey),
+                Name = "Root",
+                Type = "Folder",
+                ParentId = Guid.Empty
+            });
+            
+            return response;
         }
 
         public async Task<bool> CheckIfUnique(string name)
         {
-            HttpResponseMessage? httpResponseMessage;
-            httpResponseMessage = await _httpClient.GetAsync("/api/Portfolio/CheckName/" + name);
+            var httpResponseMessage = await _httpClient.GetAsync("/api/Portfolio/CheckName/" + name);
+            
             if (!httpResponseMessage.IsSuccessStatusCode)
             {
-                var errorMessage = httpResponseMessage.ReasonPhrase;
-                Console.WriteLine($"There was an error! {errorMessage}");
                 return false;
             }
-            else
+
+            return await httpResponseMessage.Content.ReadFromJsonAsync<bool>();
+        }
+
+        public string GetIcon(PortfolioType portfolioType)
+        {
+            var iconName = portfolioType.GetDisplayDescription();
+            return $"_content/ClientUI.Components/icons/{iconName}.png";
+        }
+
+        public List<string> GetDatasources() => new() { "FILE", "JSON_URL", "API" };
+
+        public List<string> GetPortfolioTypes()
+        {
+            return new List<string>()
             {
-                return httpResponseMessage.Content.ReadFromJsonAsync<bool>().Result;
+                PortfolioType.Folder.GetDisplayDescription(),
+                PortfolioType.Project.GetDisplayDescription(),
+                PortfolioType.Dataset.GetDisplayDescription()
+            };
+        }
+
+        public async Task SaveFieldMetaData(string id, List<FieldMetaData> fields)
+        {
+            await _httpClient.PostAsJsonAsync("/api/Datasource/SetFieldMetaData", 
+                new CreateFieldMetaDataRequest 
+                {
+                    Id = id,
+                    Fields = fields 
+                });
+        }
+
+        public async Task<SourceState> GetSourceState(string id)
+        {
+            var httpResponseMessage = await _httpClient.GetAsync($"/api/Datasource/GetSourceState?id={id}");
+
+            if (!httpResponseMessage.IsSuccessStatusCode || httpResponseMessage.StatusCode == HttpStatusCode.NoContent)
+            {
+                return null;
             }
+
+            return await httpResponseMessage.Content.ReadFromJsonAsync<SourceState>();
+        }
+
+        public async Task SaveConfig(string id, SourceConfig sourceConfig)
+        {
+            await _httpClient.PostAsJsonAsync("/api/Datasource/SetConfigurations", 
+                new CreateConfigRequest
+                {
+                    Id = id,
+                    Config = sourceConfig
+                });
         }
     }
 }

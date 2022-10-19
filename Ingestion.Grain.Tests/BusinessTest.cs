@@ -59,7 +59,7 @@ namespace Ingestion.Grain.Tests
         [Test]
         public async Task RunWhenNoErrors()
         {
-            _dataSourceFactory.Setup(o => o.Create(DataSourceType.File)).Returns(new TextDataSourceReader(_configValidatorLookup.Object));
+            _dataSourceFactory.Setup(o => o.Create(DataSourceType.FILE)).Returns(new TextDataSourceReader(_configValidatorLookup.Object));
             _ingestorFactory.Setup(x => x.Create(IngestorType.JSON)).Returns(new JsonIngestor(_fieldValidatorLookup.Object));
 
             var field = new FieldMetaData
@@ -74,16 +74,16 @@ namespace Ingestion.Grain.Tests
                 Configurations = new Dictionary<string, DataSourceConfiguration>
                 {
                     {
-                        "file-type",
+                        "SampleFile",
                         new DataSourceConfiguration
                         {
-                            Name = "file1",
-                            FieldType = FieldType.File,
+                            Name = "SampleFile",
+                            FieldType = ConfigurationFieldType.File,
                             Value = JsonConvert.SerializeObject(new FileModel { Name = "sample1.txt", Path = "Samples/Files" })
                         }
                     }
                 },
-                DataSourceType = DataSourceType.File,
+                DataSourceType = DataSourceType.FILE,
                 Fields = new List<FieldMetaData> { field }
             };
 

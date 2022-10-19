@@ -8,7 +8,6 @@ using Comax.Commons.Orchestrator.MailGrain;
 using Moq;
 using NUnit.Framework;
 using Orleans.Streams;
-using Shared.Tests.RulesEngine.Mock;
 
 namespace OrchestratorIntegration.Tests.EventMailbox
 {

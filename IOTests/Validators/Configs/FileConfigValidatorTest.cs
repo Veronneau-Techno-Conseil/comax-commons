@@ -22,7 +22,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
             var dataSourceConfiguration = new DataSourceConfiguration
             {
                 Name = "file1",
-                FieldType = FieldType.Boolean
+                FieldType = ConfigurationFieldType.Boolean
             };
 
             var actual = _fileConfigValidator.Validate(dataSourceConfiguration);
@@ -36,7 +36,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
             var dataSourceConfiguration = new DataSourceConfiguration
             {
                 Name = "file1",
-                FieldType = FieldType.File
+                FieldType = ConfigurationFieldType.File
             };
 
             var actual = _fileConfigValidator.Validate(dataSourceConfiguration);
@@ -52,7 +52,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
             var dataSourceConfiguration = new DataSourceConfiguration
             {
                 Name = "file1",
-                FieldType = FieldType.File,
+                FieldType = ConfigurationFieldType.File,
                 Value = JsonConvert.SerializeObject(file)
             };
 

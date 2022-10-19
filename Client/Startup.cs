@@ -17,6 +17,8 @@ using ClusterClient;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Blazorise;
+using Blazorise.Bulma;
 
 namespace CommunAxiom.Commons.ClientUI.Server
 {
@@ -51,6 +53,14 @@ namespace CommunAxiom.Commons.ClientUI.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+            services.AddBlazorise(options =>
+             {
+                 options.Immediate = true;
+             });
+
+            services.AddBulmaProviders();
+
             services.AddSingleton<Helper.ITempData, Helper.TempStorage>();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

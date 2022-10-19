@@ -1,10 +1,6 @@
-﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using Newtonsoft.Json;
 
 namespace CommunAxiom.Commons.Ingestion.Ingestor
 {
@@ -12,37 +8,19 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
     {
         Regex replaceIndex = new Regex(@"(\[\d+\])");
         Dictionary<string, FieldMetaData> metaDictionary = new Dictionary<string, FieldMetaData>();
-
+        
         private string FormatName(string name)
         {
             var n = replaceIndex.Replace(name, "[]");
             return n;
         }
 
-        public IEnumerable<FieldMetaData> ReadMetadata(string content)
+        private string FormatDisplayName(string name)
         {
-            Newtonsoft.Json.JsonReader jsonReader = new Newtonsoft.Json.JsonTextReader(new StringReader(content));
-            while (jsonReader.Read())
-            {
-                switch (jsonReader.TokenType)
-                {
-                    case Newtonsoft.Json.JsonToken.StartObject:
-                    case Newtonsoft.Json.JsonToken.PropertyName:
-                    case Newtonsoft.Json.JsonToken.StartArray:
-                    case Newtonsoft.Json.JsonToken.EndArray:
-                    case Newtonsoft.Json.JsonToken.Comment:
-                    case Newtonsoft.Json.JsonToken.EndObject:
-                    case Newtonsoft.Json.JsonToken.Undefined:
-                        continue;
-                    default:
-                        SetProperty(jsonReader);
-                        break;
-                }
-            }
-            
-            return metaDictionary.Values;
+            var n = Regex.Replace(name, @"(\[\d+\].)", string.Empty);
+            return n;
         }
-
+        
         private void SetProperty(JsonReader jsonReader)
         {
             var name = FormatName(jsonReader.Path);
@@ -51,7 +29,7 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
                 metaDictionary.Add(name, new FieldMetaData()
                 {
                     FieldName = name,
-                    DisplayName = name,
+                    DisplayName = FormatDisplayName(jsonReader.Path),
                     Index = metaDictionary.Keys.Count
                 });
             }
@@ -133,6 +111,29 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
                 default:
                     return FieldType.Undefined;
             }
+        }
+        public IEnumerable<FieldMetaData> ReadMetadata(string content)
+        { 
+            JsonReader jsonReader = new JsonTextReader(new StringReader(content));
+            while (jsonReader.Read())
+            {
+                switch (jsonReader.TokenType)
+                {
+                    case JsonToken.StartObject:
+                    case JsonToken.PropertyName:
+                    case JsonToken.StartArray:
+                    case JsonToken.EndArray:
+                    case JsonToken.Comment:
+                    case JsonToken.EndObject:
+                    case JsonToken.Undefined:
+                        continue;
+                    default:
+                        SetProperty(jsonReader);
+                        break;
+                }
+            }
+
+            return metaDictionary.Values;
         }
     }
 }

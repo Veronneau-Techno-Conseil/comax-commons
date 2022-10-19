@@ -1,5 +1,4 @@
-﻿@using CommunAxiom.Commons.ClientUI.Shared.Resources
-@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+﻿@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 @using Microsoft.Extensions.Hosting
 @using Microsoft.Extensions.Localization
 @using Microsoft.AspNetCore.SignalR.Client
@@ -18,7 +17,7 @@
                 <img src="_content/ClientUI.Components/images/Commons.png" />
                 <strong>@_localizer["Commons"]</strong>
             </NavLink>
-            <a role="button" @onclick="BurgerClick" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navMenuIndex">
+            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navMenuIndex">
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
@@ -30,6 +29,7 @@
                 <AuthorizeView>
                     <Authorized>
                         <NavLink class="navbar-item" href="dashboard" Match="NavLinkMatch.All">
+                            <img class="icon-25" src="_content/ClientUI.Components/icons/Home.png" />
                             @_localizer["Dashboard"]
                         </NavLink>
                     </Authorized>
@@ -38,29 +38,20 @@
                 @if (_environment.IsDevelopment())
                 {
                     <NavLink class="navbar-item" href="test_grain" Match="NavLinkMatch.All">
+                        <img class="icon-25" src="_content/ClientUI.Components/icons/Commons.png" />
                         @_localizer["Test grains"]
                     </NavLink>
                 }
 
                 <div class="navbar-item has-dropdown is-hoverable">
-                    <NavLink class="navbar-item" Match="NavLinkMatch.All" @onclick="()=> portfolioSubMenu = !portfolioSubMenu">
+                    <NavLink class="navbar-item" href="portfolio" Match="NavLinkMatch.All">
+                        <img class="icon-25" src="_content/ClientUI.Components/icons/Portfolio.png" />
                         @_localizer["Portfolio"]
                     </NavLink>
-                    @if (portfolioSubMenu)
-                    {
-                        <div div class="navbar-dropdown">
-                            <NavLink class="navbar-item" href="create_portfolio" Match="NavLinkMatch.All">
-                                @_localizer["CreatePortfolio"]
-                            </NavLink>
-
-                            <NavLink class="navbar-item" href="list_portfolios" Match="NavLinkMatch.All">
-                                @_localizer["Portfolios"]
-                            </NavLink>
-                        </div>
-                    }
                 </div>
 
                 <NavLink class="navbar-item" href="about" Match="NavLinkMatch.All">
+                    <img class="icon-25" src="_content/ClientUI.Components/icons/Commons.png" />
                     @_localizer["About"]
                 </NavLink>
             </div>
@@ -103,56 +94,3 @@
     </div>
 </nav>
 
-@code {
-    private List<string> criticalNotifications = new List<string>();
-    private string notificationsBox = "none";
-    private HubConnection? hubConnection;
-    private bool portfolioSubMenu;
-
-    [CascadingParameter]
-    public Task<AuthenticationState> AuthenticationState { get; set; } = null!;
-
-    ElementReference navMenuIndex;
-
-    public User? User { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationState;
-        this.User = await ((CustomAuthenticationStateProvider)_stateProvider).GetUserByJWTAsync();
-
-        hubConnection = new HubConnectionBuilder()
-           .WithUrl(_navigationManager.ToAbsoluteUri("/systemhub"))
-           .Build();
-        await hubConnection.StartAsync();
-
-        hubConnection.On<Notifications>("ReceiveNotification", (notification) =>
-        {
-            var encodedMsg = $"{notification.Title}: {notification.Body}";
-            if (notification.Criticality == Criticality.Critical)
-            {
-                criticalNotifications.Add(encodedMsg);
-            }
-            StateHasChanged();
-        });
-    }
-
-    private void HideShowNotifications()
-    {
-        if (notificationsBox == "none")
-            notificationsBox = "block";
-        else
-            notificationsBox = "none";
-    }
-
-    private async Task Logout()
-    {
-        await _accessTokenService.RemoveAccessTokenAsync("jwt_token");
-        _navigationManager.NavigateTo("/", true);
-    }
-
-    private void BurgerClick()
-    {
-
-    }
-}

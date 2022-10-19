@@ -24,6 +24,7 @@ namespace PortfolioGrain
 
         public async Task AddAPortfolio(Portfolio portfolio)
         {
+            // Add check reference parent/child 
             if (portfolio != null)
             {
                 var listCreated = await CheckPortfoliolist();
@@ -60,7 +61,7 @@ namespace PortfolioGrain
             return await Task.FromResult<List<Portfolio>>(null);
         }
 
-        public async Task<Portfolio> GetAPortfolioDetails(string portfolioID)
+        public async Task<Portfolio> GetAPortfolioDetails(Guid portfolioID)
         {
             var portfolio = await _portfolioRepo.GetAPortfolioDetails(portfolioID);
             if (portfolio != null)

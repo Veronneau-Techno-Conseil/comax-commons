@@ -6,8 +6,10 @@ namespace CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration
     public class DataSourceConfiguration
     {
         public string Name { get; set; }
+        public string DisplayName { get; set; }
+        public string Hint { get; set; }
 
-        public FieldType FieldType { get; set; }
+        public ConfigurationFieldType FieldType { get; set; }
 
         public IList<IFieldValidator> Validators { get; set; }
 

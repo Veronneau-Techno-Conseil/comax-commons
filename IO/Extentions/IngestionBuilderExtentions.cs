@@ -1,4 +1,5 @@
-﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
 using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Ingestor;
 using CommunAxiom.Commons.Ingestion.Validators;
@@ -14,7 +15,21 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
             services.AddTransient<IConfigValidatorLookup, ValidatorLookup>();
 
             // data sources
-            services.AddTransient<IDataSourceReader, TextDataSourceReader>();
+
+            services.AddScoped<TextDataSourceReader>();
+            
+            services.AddTransient<Func<DataSourceType, IDataSourceReader>>(provider => key =>
+            {
+                switch (key)
+                {
+                    case DataSourceType.FILE:
+                        return provider.GetService<TextDataSourceReader>();
+                    case DataSourceType.API:
+                        return null;
+                }
+
+                return null;
+            });
 
             // ingestors
             services.AddTransient<IIngestor, JsonIngestor>();
@@ -22,7 +37,8 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
             // factories
             services.AddTransient<IDataSourceFactory, DataSourceFactory>();
             services.AddTransient<IIngestorFactory, IngestorFactory>();
-
+            services.AddTransient<IMetadataParser, JSONMetadataParser>();
+            
             // validations
             var fieldValidatorManager = new ValidatorManager();
             fieldValidatorManager.ConfigureFields(options =>

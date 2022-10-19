@@ -11,7 +11,7 @@ namespace CommunAxiom.Commons.Client.Contracts.Grains.Portfolio
     {
         Task AddAPortfolio(Portfolio portfolio);
         Task<IEnumerable<Portfolio>> GetPortfoliosList();
-        Task<Portfolio> GetAPortfolioDetails(string portfolioID);
+        Task<Portfolio> GetAPortfolioDetails(Guid portfolioID);
         Task<IEnumerable<Portfolio>> FilterPortfolios(string filter);
         Task<bool> CheckIfUnique(string name);
     }
