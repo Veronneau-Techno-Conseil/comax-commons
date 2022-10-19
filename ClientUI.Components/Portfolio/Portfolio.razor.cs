@@ -189,8 +189,15 @@ namespace ClientUI.Components.Portfolio
 
         private void OnChangeDatasource(ChangeEventArgs args)
         {
-            DataSourceConfigurationChange(args.Value.ToString());
-            SelectedDataSource = args.Value.ToString();
+            var sourceType = args.Value.ToString();
+            
+            var dataSourceType = Enum.Parse<DataSourceType>(sourceType);
+            
+            if (dataSourceType == DataSourceType.FILE)
+            {
+                DataSourceConfigurationChange(sourceType);
+                SelectedDataSource = sourceType;
+            }
         }
 
         public string SelectedFileName = string.Empty;
