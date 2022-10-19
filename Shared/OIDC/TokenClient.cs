@@ -1,27 +1,21 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Http.Json;
-using CommunAxiom.Commons.Shared.OIDC;
-using CommunAxiom.Commons.Shared.Configuration;
+﻿using CommunAxiom.Commons.Shared.Configuration;
 using IdentityModel.Client;
-using IdentityModel;
+using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
 
-namespace CommunAxiom.Commons.Shared
+namespace CommunAxiom.Commons.Shared.OIDC
 {
     public class TokenClient
     {
         public const string SCOPES_OFFLINE = "openid offline_access";
         const string WELL_KNOWN = ".well-known/openid-configuration";
-        private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
         private readonly OIDCSettings _settings;
         private DiscoveryDocumentResponse? _tokenMetadata = null;
-        public DiscoveryDocumentResponse TokenMetadata { get
+
+        public DiscoveryDocumentResponse TokenMetadata 
+        {
+            get
             {
                 if(_tokenMetadata == null)
                 {
@@ -31,12 +25,18 @@ namespace CommunAxiom.Commons.Shared
                 return _tokenMetadata;
             }
         }
+
         private bool _configured;
         public TokenClient(IConfiguration configuration)
         {
-            this._configuration = configuration;
             this._settings = new OIDCSettings();
-            _configuration.Bind(Sections.OIDCSection, this._settings);
+            configuration.Bind(Sections.OIDCSection, this._settings);
+            this._httpClient = new HttpClient();
+        }
+
+        public TokenClient(OIDCSettings settings)
+        {
+            this._settings = settings;
             this._httpClient = new HttpClient();
         }
 
@@ -44,12 +44,11 @@ namespace CommunAxiom.Commons.Shared
         {
             if (!_configured)
             {
-
                 _configured = true;
             }
         }
 
-        public async Task<(bool, TokenData?)> GetToken(string clientId, string secret, string scope)
+        public async Task<(bool, TokenData?)> AuthenticateClient(string clientId, string secret, string scope)
         {
             await this.Configure();
             
@@ -74,7 +73,39 @@ namespace CommunAxiom.Commons.Shared
             }
         }
 
-        public async Task<(bool, IEnumerable<Claim>?)> RequestIntrospection(string clientId, string secret, string token)
+        public Task<(bool, TokenData?)> AuthenticatePassword(string username, string password)
+        {
+            return this.AuthenticatePassword(this._settings.ClientId, this._settings.Secret, this._settings.Scopes, username, password);
+        }
+
+        public async Task<(bool, TokenData?)> AuthenticatePassword(string clientId, string secret, string scope, string username, string password)
+        {
+            await this.Configure();
+
+            var res = await _httpClient.RequestPasswordTokenAsync(new PasswordTokenRequest
+            {
+                Address = TokenMetadata.TokenEndpoint,
+                ClientId = clientId,
+                ClientSecret = secret,
+                Scope = scope,
+                UserName = username,
+                Password = password
+            });
+            if (res.HttpResponse.IsSuccessStatusCode)
+            {
+                return (true, new TokenData { access_token = res.AccessToken, expires_in = res.ExpiresIn, refresh_token = res.RefreshToken, token_type = res.TokenType });
+            }
+            else if (res.HttpResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return (false, null);
+            }
+            else
+            {
+                throw new Exception($"Unexpected result calling token endpoint: {res.HttpStatusCode}=> {res.HttpErrorReason}, {await res.HttpResponse.Content.ReadAsStringAsync()}");
+            }
+        }
+
+        public async Task<(bool, ClaimsPrincipal?)> RequestIntrospection(string clientId, string secret, string token)
         {
             await this.Configure();
 
@@ -86,9 +117,10 @@ namespace CommunAxiom.Commons.Shared
                 Token = token,
                 AuthorizationHeaderStyle = BasicAuthenticationHeaderStyle.Rfc2617
             });
+
             if (res.HttpResponse.IsSuccessStatusCode)
             {
-                return (true, res.Claims);
+                return (true, new ClaimsPrincipal(new ClaimsIdentity(res.Claims)));
             }
             else if (res.HttpResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {

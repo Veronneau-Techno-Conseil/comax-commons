@@ -17,11 +17,11 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
         private Repo _repo;
 
         private readonly Importer _importer;
-        private readonly IGrainFactory _grainFactory;
+        private readonly IComaxGrainFactory _grainFactory;
         private readonly string _grainKey;
         private IngestionState _ingestionState;
 
-        public Business(Importer importer, IGrainFactory grainFactory, string grainKey)
+        public Business(Importer importer, IComaxGrainFactory grainFactory, string grainKey)
         {
             _importer = importer;
             _grainFactory = grainFactory;

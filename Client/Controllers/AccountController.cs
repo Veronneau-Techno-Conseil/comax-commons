@@ -1,4 +1,6 @@
-﻿using CommunAxiom.Commons.Client.Contracts.Account;
+﻿using ClusterClient;
+using CommunAxiom.Commons.Client.Contracts.Account;
+using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Orleans;
@@ -12,36 +14,39 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
     public class AccountController : ControllerBase
     {
 
-        private readonly IClusterClient _clusterClient;
-        public AccountController(IClusterClient clusterClient)
+        private readonly ICommonsClientFactory _clientFactory;
+        public AccountController(ICommonsClientFactory clientFactory)
         {
-            _clusterClient = clusterClient;
+            _clientFactory = clientFactory;
         }
 
-        [HttpGet("Get/{GrainId}")]
-        public async Task<IActionResult> Get(string GrainId)
+        [HttpGet("Get")]
+        public async Task<IActionResult> Get()
         {
-
-            var result = _clusterClient.GetGrain<IAccount>(Guid.Empty).GetGrainIdentity().IdentityString;
-
-            return Ok(result);
+            return Ok(await _clientFactory.WithClusterClient(c=> Task.FromResult(c.GetAccount().GetGrainIdentity().IdentityString)));
         }
 
-        [HttpPost("SetDetails/{GrainId}")]
-        public async Task<IActionResult> SetDetails(string GrainId, AccountDetails account)
+        [HttpPost()]
+        public async Task<IActionResult> SetDetails(AccountDetails account)
         {
-            await _clusterClient.GetGrain<IAccount>(Guid.Empty).Initialize(account);
-
+            await _clientFactory.WithClusterClient(c => c.GetAccount().Initialize(account));
+            
             return Ok();
         }
 
         [HttpGet("GetDetails/{GrainId}")]
         public async Task<IActionResult> GetDetails(string GrainId)
         {
+            var details =  await _clientFactory.WithClusterClient(c => c.GetAccount().GetDetails());
+            details.ClientSecret = String.Empty;
+            return Ok(details);
+        }
 
-            var result = await _clusterClient.GetGrain<IAccount>(Guid.Empty).GetDetails();
-
-            return Ok(result);
+        [HttpGet("security_check")]
+        public async Task<IActionResult> security_check()
+        {
+            await _clientFactory.WithClusterClient(c => c.GetAccount().SecurityCheck());
+            return Ok();
         }
     }
 }

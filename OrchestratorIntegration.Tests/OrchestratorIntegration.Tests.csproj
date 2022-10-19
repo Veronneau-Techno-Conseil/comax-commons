@@ -19,15 +19,18 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.7.0" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0-rc.1.22426.10" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.0" />
     <PackageReference Include="Moq" Version="4.18.2" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BroadcastGrain\BroadcastGrain.csproj" />
     <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
     <ProjectReference Include="..\Node\Orchestrator.csproj" />
     <ProjectReference Include="..\Orchestrator.Client\Orchestrator.Client.csproj" />
+    <ProjectReference Include="..\Shared.Tests\Shared.Tests.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="config.json">

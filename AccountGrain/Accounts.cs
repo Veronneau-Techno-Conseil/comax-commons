@@ -6,6 +6,8 @@ using Orleans;
 using Orleans.Runtime;
 using CommunAxiom.Commons.Client.Contracts;
 using Microsoft.Extensions.Configuration;
+using CommunAxiom.Commons.Orleans.Security;
+using System.Linq;
 
 namespace CommunAxiom.Commons.Client.Grains.AccountGrain
 {
@@ -38,6 +40,14 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
         public async Task Initialize(AccountDetails accountDetails)
         {
             await this._accountBusiness.Initialize(accountDetails);
+        }
+
+        public Task<string> SecurityCheck()
+        {
+            var user = this.GetUser();
+            var ci = user.Identities.First();
+            
+            return Task.FromResult(ci.Name);
         }
     }
 }

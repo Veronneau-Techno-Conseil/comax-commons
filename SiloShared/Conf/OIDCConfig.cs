@@ -3,7 +3,6 @@ using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Shared.Configuration;
 using CommunAxiom.Commons.Shared.OIDC;
 using Microsoft.Extensions.Configuration;
-using Orleans.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,27 +13,33 @@ namespace CommunAxiom.Commons.Client.SiloShared.Conf
 {
     public class OIDCConfig
     {
-        public IdentityServer4Info Server { get; set; }
-
-        public static OIDCConfig Config
+        public static OIDCSettings Config
         {
             get
             {
                 return Instance.Config;
+            }
+            set
+            {
+                Instance.Config = value;
             }
         }
 
         private static class Instance
         {
             private static object _lockObj = new object();
-            private static OIDCConfig identityServer4Config;
-            public static OIDCConfig Config 
-            { 
+            private static OIDCSettings oidcConfig;
+            public static OIDCSettings Config
+            {
                 get
+                {
+                    return oidcConfig;
+                }
+                set
                 {
                     lock (_lockObj)
                     {
-                        return identityServer4Config = identityServer4Config ?? new OIDCConfig();
+                        oidcConfig = value;
                     }
                 }
             }
@@ -49,7 +54,7 @@ namespace CommunAxiom.Commons.Client.SiloShared.Conf
             var act = await actGrain.GetDetails();
             OIDCSettings authSettings = new OIDCSettings();
             configuration.Bind(Sections.OIDCSection, authSettings);
-            Conf.OIDCConfig.Config.Server = new IdentityServer4Info(authSettings.Authority, act.ClientID, act.ClientSecret, authSettings.Scopes);
+            Conf.OIDCConfig.Config = authSettings;
         }
     }
 }

@@ -1,7 +1,9 @@
 using ClusterClient;
+using Comax.Commons.Shared.OIDC;
 using CommunAxiom.Commons.Client.Silo.System;
 using CommunAxiom.Commons.Client.SiloShared;
 using CommunAxiom.Commons.Client.SiloShared.System;
+using CommunAxiom.Commons.Orleans.Security;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -18,14 +20,16 @@ namespace CommunAxiom.Commons.Client.Silo
                 .SetConfiguration(out var cfg)
                 .ConfigureServices((host, sc) =>
                 {
+                    sc.AddLogging(x => x.AddConsole());
+                    sc.AddSingleton<ITokenProvider, SiloTokenProvider>();
+                    sc.AddSingleton<SecureTokenOutgoingFilter>();
+
                     sc.SetServerServices();
                     sc.SetupOrleansClient();
                     sc.AddTransient<IClusterManagement, ClusterManagement>();
-                    sc.AddLogging(lb => lb.AddConsole());
                 }).Build();
 
             host.Run();
         }
-
     }
 }

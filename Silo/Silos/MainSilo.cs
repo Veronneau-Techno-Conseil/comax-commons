@@ -12,13 +12,13 @@ using CommunAxiom.Commons.Client.Grains.AccountGrain;
 using CommunAxiom.Commons.Client.Grains.DatasourceGrain;
 using CommunAxiom.Commons.Client.Grains.IngestionGrain;
 using CommunAxiom.Commons.Client.SiloShared;
+using CommunAxiom.Commons.Orleans.Security;
+using CommunAxiom.Commons.Shared.OIDC;
 using DatasetGrain;
 using DataTransferGrain;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Hosting;
-using Orleans.Security;
-using Orleans.Security.Clustering;
 using PortfolioGrain;
 using ProjectGrain;
 using ReplicationGrain;
@@ -68,6 +68,10 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<SchedulerBusiness, SchedulerBusiness>();
                     services.AddSingleton<SchedulerRepo, SchedulerRepo>();
 
+                    services.AddSingleton<ISettingsProvider, SiloSettingsProvider>();
+                    services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
+                    services.AddSingleton<IIncomingGrainCallFilter, AccessControlFilter>();
+
                 })
                 //configure application parts for each grain
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Accounts).Assembly).WithReferences())
@@ -88,19 +92,10 @@ namespace CommunAxiom.Commons.Client.Silo
 
         static void ConfigureIdentitty(IServiceCollection services)
         {
-            var configs = new IdentityServer4Info("https://localhost:5001/", "org1_node1", "846B62D0-DEF9-4215-A99D-86E6B8DAB342", "org1");
             
-            services.AddOrleansClusteringAuthorization(configs,
-                config =>
-                {
-                    config.ConfigureAuthorizationOptions = CommunAxiom.Commons.Client.Contracts.Auth.Configuration.ConfigurePolicyOptions;
-                    config.TracingEnabled = true;
-                });
-            
-            
-            services.AddTransient<IdentityServer4Info>(services =>
+            services.AddTransient<Shared.OIDC.OIDCSettings>(services =>
             {
-                return SiloShared.Conf.OIDCConfig.Config.Server;
+                return SiloShared.Conf.OIDCConfig.Config;
             });
         }
 
