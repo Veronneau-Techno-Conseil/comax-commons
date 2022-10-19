@@ -27,6 +27,8 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.ResponseCompression;
+using CommunAxiom.Commons.ClientUI.Server.Hubs;
 
 //namespace CommunAxiom.Commons.ClientUI;
 
@@ -47,6 +49,13 @@ using Microsoft.OpenApi.Models;
 //}
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSignalR();
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" });
+});
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -116,6 +125,7 @@ builder.Services.SetBlazorApp(applicationSettingsSection.Get<ApplicationSettings
 
 var app = builder.Build();
 
+app.UseResponseCompression();
 
 app.UseRequestLocalization();
 
@@ -146,6 +156,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller}/{action=Index}/{id?}");
+    endpoints.MapHub<SystemHub>("/systemhub");
 });
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

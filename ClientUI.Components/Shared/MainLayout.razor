@@ -1,9 +1,13 @@
-﻿@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+﻿@using CommunAxiom.Commons.ClientUI.Shared.Resources
+@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+@using Microsoft.AspNetCore.SignalR.Client
+
 @inherits LayoutComponentBase
 @inject IAccessTokenService _accessTokenService
 @inject ISessionViewModel _loginViewModel
 @inject NavigationManager _navigationManager
 @inject IJSRuntime JsRuntime
+@inject IToastService toastService
 <BlazoredToasts Position="ToastPosition.BottomRight"
                 Timeout="3"
                 IconType="IconType.FontAwesome"
@@ -19,18 +23,50 @@
     </div>
 </section>
 
-
 @code {
+    private HubConnection? hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/systemhub"))
+            .Build();
+        await hubConnection.StartAsync();
+
+        hubConnection.On<Notifications>("ReceiveNotification", (notification) =>
+        {
+            var encodedMsg = $"{notification.Title}: {notification.Body}";
+            if (notification.Criticality == Criticality.Info)
+            {
+                toastService.ShowInfo(encodedMsg);
+            }
+            else if (notification.Criticality == Criticality.Warning)
+            {
+                toastService.ShowWarning(encodedMsg);
+            }
+            else if (notification.Criticality == Criticality.Success)
+            {
+                toastService.ShowSuccess(encodedMsg);
+            }
+            else
+            {
+                toastService.ShowError(encodedMsg);
+            }
+
+            StateHasChanged();
+        });
+    }
+
     protected override async Task OnParametersSetAsync()
     {
 
-        
+
     }
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         await JsRuntime.InvokeVoidAsync("Startup");
-        
+
     }
 
     private async Task LogoutUser()

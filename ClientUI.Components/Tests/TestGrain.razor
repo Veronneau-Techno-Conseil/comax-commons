@@ -1,9 +1,17 @@
 @page "/test_grain"
+
+@using CommunAxiom.Commons.ClientUI.Shared.Resources
 @using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+@using Microsoft.AspNetCore.SignalR.Client
+
+@inject NavigationManager _navigationManager
 
 @inject ITestViewModel _testViewModel
 @inject IJSRuntime JsRuntime
-@inject NavigationManager _navigationManager
+
+@implements IAsyncDisposable
+
+
 
 <h3>TestGrain</h3>
 
@@ -53,7 +61,7 @@
         </a>
     </div>
 
-    <div>
+     <div>
         <a class="button" @onclick="@AddScheduler">
             Scheduler Grain
         </a>
@@ -97,10 +105,55 @@
 
 </div>
 
-@code
-{
+
+
+<div class="form-group">
+    <label>
+        Message:
+        <input @bind="notification.Body" size="50" />
+    </label>
+</div>
+<button @onclick="Send" disabled="@(!IsConnected)">Send</button>
+<hr>
+
+@code {
+    private HubConnection? hubConnection;
+    private Notifications notification = new Notifications();
+    private string? notificationBody;
     List<Schedulers> _schedulers = new List<Schedulers>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        _schedulers = await _testViewModel.GetSchedulers();
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/systemhub"))
+            .Build();
+        await hubConnection.StartAsync();
+    }
+
+    private async Task Send()
+    {
+        if (hubConnection is not null)
+        {
+            notification.Title = "From Test";
+            notification.Criticality = Criticality.Critical;
+            await hubConnection.SendAsync("SendNotification",notification);
+        }
+    }
+
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+    
     private async void AddScheduler()
     {
         var scheduler = new Schedulers
@@ -114,22 +167,4 @@
         StateHasChanged();
         _navigationManager.NavigateTo("test_grain");
     }
-
-    protected async override Task OnInitializedAsync()
-    {
-        _schedulers = await _testViewModel.GetSchedulers();
-    }
-}
-
-
-@code{
-
-
-    async Task click(string url)
-    {
-        await httpClientConfig.Configure(httpClient);
-
-        await httpClient.GetAsync(url);
-    }
-
 }
