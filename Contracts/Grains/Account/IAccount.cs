@@ -4,6 +4,7 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Orleans;
+using CommunAxiom.Commons.Orleans.Security;
 
 namespace CommunAxiom.Commons.Client.Contracts.Account
 {
@@ -13,5 +14,8 @@ namespace CommunAxiom.Commons.Client.Contracts.Account
         Task<Stream> EncryptStream(Stream data);
         Task<AccountDetails> GetDetails();
         Task<AccountState> CheckState(bool forceRefresh, string clientIdRef = null);
+
+        [AuthorizeClaim]
+        Task<string> SecurityCheck();
     }
 }

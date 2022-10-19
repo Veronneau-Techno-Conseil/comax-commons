@@ -15,13 +15,16 @@ namespace CommunAxiom.Commons.Client.SiloShared.System
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+
             await clusterManagement.SetSilo(Silos.Pilot);
             
             while (!stoppingToken.IsCancellationRequested)
             {
+
                 await clusterManagement.Heartbeat();
                 await Task.Delay(1000);
             }
         }
+        
     }
 }

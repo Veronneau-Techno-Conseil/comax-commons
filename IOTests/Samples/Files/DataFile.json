@@ -1,0 +1,56 @@
+﻿[
+  {
+    "id": 1,
+    "name": "hello",
+    "cdate": "2022-10-04T19:33:02.108Z",
+    "arrayValues": [
+      1,
+      2,
+      3
+    ],
+    "subObject": {
+      "id": 2,
+      "title": "subtitle",
+      "subarray": [ "asdf", 4, "sdfsdf" ]
+    },
+    "childrenObjects": [  
+      {
+        "id": 1,
+        "name": "Child 1"
+      },
+      {
+        "id": 2,
+        "name": "Child 2"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "goodbye",
+    "cdate": "2022-10-05T19:33:02.108Z",
+    "arrayValues": [
+      1,
+      6,
+      3
+    ],
+    "subObject": {
+      "id": 4,
+      "title": "subtitle2",
+      "subarray": [ "asdf34", "sdfsdf", 5 ]
+    },
+    "childrenObjects": [
+      {
+        "id": 3,
+        "name": "Child 3"
+      },
+      {
+        "id": 5,
+        "name": "Child 5",
+        "subChild": {
+          "name": "sdfgdfg",
+          "code": "sdfsdgf"
+        }
+      }
+    ]
+  }
+]

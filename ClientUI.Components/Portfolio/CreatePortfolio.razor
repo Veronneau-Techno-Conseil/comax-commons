@@ -1,8 +1,10 @@
 ﻿@*@page "/create_portfolio"
 
+@using CommunAxiom.Commons.ClientUI.Shared.Resources
 @using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 @using Microsoft.Extensions.Options
 @using Microsoft.Extensions.Localization
+@using Microsoft.AspNetCore.SignalR.Client
 
 @inject NavigationManager _navigationManager
 @inject IStringLocalizer<CreatePortfolio> _localizer
@@ -48,8 +50,20 @@
 </EditForm>
 
 @code {
+    private HubConnection? hubConnection;
     List<Portfolio> _portfolios = new List<Portfolio>();
+    private Notifications notification = new Notifications();
     bool IsUnique;
+
+    protected async override Task OnInitializedAsync()
+    {
+        _portfolios = await _portfolioViewModel.GetPortfolios();
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/systemhub"))
+            .Build();
+        await hubConnection.StartAsync();
+    }
 
     private async void HandleValidSubmit()
     {
@@ -73,6 +87,13 @@
                     ParentId = _portfolioViewModel.ParentId
                 };
             await _portfolioViewModel.CreatePortfolio(portfolio);
+
+            //send the notification by the following 4 lines of code
+            notification.Title = "Protfolio";
+            notification.Body = ("Portfolio " + portfolio.Name + " has  been created").ToString();
+            notification.Criticality = Criticality.Info;
+            await SendNotification(notification);
+
             StateHasChanged();
             _navigationManager.NavigateTo("/list_portfolios");
         }
@@ -87,8 +108,11 @@
         toastService.ShowError(_localizer["NameIsNotUnique"], "ERROR");
     }
 
-    protected async override Task OnInitializedAsync()
+    private async Task SendNotification(Notifications notification)
     {
-        _portfolios = await _portfolioViewModel.GetPortfolios();
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("SendNotification",notification);
+        }
     }
 }*@

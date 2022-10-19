@@ -3,7 +3,7 @@ using System;
 
 namespace CommunAxiom.Commons.Orleans
 {
-    public class GrainFactory : IGrainFactory
+    public class GrainFactory : IComaxGrainFactory
     {
         private readonly o.IGrainFactory _grainFactory;
 

@@ -1,6 +1,7 @@
 ﻿@attribute [Authorize]
 @page "/dashboard"
 @page "/"
+@inject NavigationManager _navigationManager;
 <div class="container.is-fullhd">
     <div class="columns is-mobile">
         <div class="column">
@@ -310,8 +311,11 @@
     </div>
 </div>
 
+<ul id="notificationsList">
+    @foreach (var notification in notifications)
+    {
+        <li>@notification</li>
+    }
+</ul>
 
 
-@code {
-
-}

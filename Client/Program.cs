@@ -7,15 +7,29 @@ using CommunAxiom.Commons.ClientUI.Server.Models;
 using CommunAxiom.Commons.ClientUI.Server.SEO;
 using CommunAxiom.Commons.ClientUI.Shared.Extensions;
 using CommunAxiom.Commons.ClientUI.Shared.Models;
+using CommunAxiom.Commons.ClientUI.Shared.Services;
+using CommunAxiom.Commons.Orleans.Security;
+using ElectronNET.API;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.ResponseCompression;
 using System.Text;
+using CommunAxiom.Commons.ClientUI.Server.Hubs;
 using CommunAxiom.Commons.Ingestion.Extentions;
+using Comax.Commons.Shared.OIDC;
+//                TODO: webBuilder.UseElectron(args);
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSignalR();
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" });
+});
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -32,6 +46,8 @@ builder.Services.AddCors(option =>
 
 #region ConfigureServices
 
+builder.Services.AddHttpContextAccessor();
+
 // setting client host environment 
 builder.Services.AddSingleton<IHostEnvironment>(
     new HostingEnvironment { EnvironmentName = builder.Environment.EnvironmentName });
@@ -40,10 +56,17 @@ builder.Services.AddSingleton<IHostEnvironment>(
 var applicationSettingsSection = builder.Configuration;
 builder.Services.Configure<ApplicationSettings>(options => { applicationSettingsSection.Bind(options); });
 
+
 // SEO Services
 builder.Services.AddScoped<MetadataTransferService>();
 builder.Services.AddMemoryCache();
-builder.Services.AddSingleton<ITempData, TempStorage>();
+builder.Services.AddSingleton<CommunAxiom.Commons.ClientUI.Server.Helper.ITempData, CommunAxiom.Commons.ClientUI.Server.Helper.TempStorage>();
+
+
+// Orleans client
+builder.Services.AddLogging(x => x.AddConsole());
+builder.Services.AddTransient<ITokenProvider, ClientTokenProvider>();
+builder.Services.AddSingleton<SecureTokenOutgoingFilter>();
 builder.Services.SetupOrleansClient();
 
 builder.Services.AddControllers();
@@ -77,6 +100,7 @@ builder.Services.SetBlazorApp(applicationSettingsSection.Get<ApplicationSettings
 
 var app = builder.Build();
 
+app.UseResponseCompression();
 
 app.UseRequestLocalization();
 
@@ -105,6 +129,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller}/{action=Index}/{id?}");
+    endpoints.MapHub<SystemHub>("/systemhub");
 });
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

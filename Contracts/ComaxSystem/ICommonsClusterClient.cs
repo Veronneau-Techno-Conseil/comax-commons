@@ -4,6 +4,7 @@ using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.DataTransfer;
 using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
+using CommunAxiom.Commons.Client.Contracts.Grains.Scheduler;
 using CommunAxiom.Commons.Client.Contracts.Ingestion;
 using CommunAxiom.Commons.Client.Contracts.Project;
 using CommunAxiom.Commons.Client.Contracts.Replication;
@@ -26,6 +27,7 @@ namespace CommunAxiom.Commons.Client.Contracts.ComaxSystem
         IPortfolio GetPortfolio(string portfolioId);
         IProject GetProject(string projectId);
         IReplication GetReplication();
+        IScheduler GetScheduler(int schedulersListId);
         Task Close();
         Task<StreamSubscriptionHandle<SystemEvent>> SubscribeSystem(Func<SystemEvent, StreamSequenceToken, Task> fn, Func<Exception, Task> funcError, Func<Task> onCompleted);
         Task<(StreamSubscriptionHandle<AuthorizationInstructions>, AsyncEnumerableStream<AuthorizationInstructions>)> SubscribeAuth(Guid streamId);

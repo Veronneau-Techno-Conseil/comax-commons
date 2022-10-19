@@ -39,6 +39,7 @@ namespace CommunAxiom.Commons.Client.SiloShared
         /// <returns></returns>
         public static ISiloHostBuilder SetDefaults(this ISiloHostBuilder siloHostBuilder, out IConfiguration configuration)
         {
+
             siloHostBuilder.SetConfiguration(out configuration);
             siloHostBuilder.SetClustering();
             siloHostBuilder.SetEndPoints();
@@ -93,6 +94,12 @@ namespace CommunAxiom.Commons.Client.SiloShared
             return siloHostBuilder;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
         public static IServiceCollection SetStorage(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOptions();

@@ -12,6 +12,7 @@
         Boolean = 7,
         Collection = 8,
         Decimal = 9,
-        Object = 10
+        Object = 10,
+        Array = 11
     }
 }

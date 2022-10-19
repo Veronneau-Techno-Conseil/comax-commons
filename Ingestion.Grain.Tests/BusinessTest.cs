@@ -27,7 +27,7 @@ namespace Ingestion.Grain.Tests
         private MockRepository _mockRepository;
         private Mock<IDataSourceFactory> _dataSourceFactory;
         private Mock<IIngestorFactory> _ingestorFactory;
-        private Mock<IGrainFactory> _grainFactory;
+        private Mock<IComaxGrainFactory> _grainFactory;
         private Mock<IConfigValidatorLookup> _configValidatorLookup;
         private Mock<IFieldValidatorLookup> _fieldValidatorLookup;
         private Mock<IDatasource> _dataSource;
@@ -40,7 +40,7 @@ namespace Ingestion.Grain.Tests
             _mockRepository = new MockRepository(MockBehavior.Strict);
             _dataSourceFactory = new Mock<IDataSourceFactory>();
             _ingestorFactory = new Mock<IIngestorFactory>();
-            _grainFactory = new Mock<IGrainFactory>();
+            _grainFactory = new Mock<IComaxGrainFactory>();
             _configValidatorLookup = new Mock<IConfigValidatorLookup>();
             _fieldValidatorLookup = new Mock<IFieldValidatorLookup>();
             _dataSource = new Mock<IDatasource>();

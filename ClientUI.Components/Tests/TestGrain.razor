@@ -1,52 +1,170 @@
-﻿@page "/test_grain"
+@page "/test_grain"
+
+@using CommunAxiom.Commons.ClientUI.Shared.Resources
+@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+@using Microsoft.AspNetCore.SignalR.Client
+
+@inject NavigationManager _navigationManager
+
+@inject ITestViewModel _testViewModel
+@inject IJSRuntime JsRuntime
+
+@implements IAsyncDisposable
+
+
+
 <h3>TestGrain</h3>
 
 <p> Press on each button to launch its corresponding grain</p>
-
 <div>
-  <div>
-    <a class="button" target="_blank" href="/api/account/get">
-        Account Grain
-    </a>
-  </div>
 
-  <div>
-    <a class="button" target="_blank" href="/api/Datasource">
-        Datasource Grain
-    </a>
-  </div>
+    <div>
+        <a class="button" target="_blank" href="/api/account/get">
+            Account Grain
+        </a>
+    </div>
 
-  <div>
-    <a class="button" target="_blank" href="/api/DataTransfer">
-        DataTransfer Grain
-    </a>
+    <div>
+        <a class="button" target="_blank" href="/api/Datasource">
+            Datasource Grain
+        </a>
+    </div>
 
-  </div>
+    <div>
+        <a class="button" target="_blank" href="/api/DataTransfer">
+            DataTransfer Grain
+        </a>
 
-  <div>
-    <a class="button" target="_blank" href="/api/Ingestion">
-        Ingestion Grain
-    </a>
-  </div>
+    </div>
 
-  <div>
-    <a class="button" target="_blank" href="/api/Portfolio">
-        Portfolio Grain
-    </a>
-  </div>
+    <div>
+        <a class="button" target="_blank" href="/api/Ingestion">
+            Ingestion Grain
+        </a>
+    </div>
 
-  <div>
-    <a class="button" target="_blank" href="/api/Project">
-        Project Grain
-    </a>
-  </div>
+    <div>
+        <a class="button" target="_blank" href="/api/Portfolio">
+            Portfolio Grain
+        </a>
+    </div>
 
-  <div>
-    <a class="button" target="_blank" href="/api/Replication">
-        Replication Grain
-    </a>
-  </div>
+    <div>
+        <a class="button" target="_blank" href="/api/Project">
+            Project Grain
+        </a>
+    </div>
+
+    <div>
+        <a class="button" target="_blank" href="/api/Replication">
+            Replication Grain
+        </a>
+    </div>
+
+     <div>
+        <a class="button" @onclick="@AddScheduler">
+            Scheduler Grain
+        </a>
+    </div>
+
+
+    @*The scheduled actions shown here*@
+    <div>
+        <div class="table-container">
+            @if (_schedulers != null)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID </th>
+                            <th>DataSourceID </th>
+                            <th>Expression </th>
+                            <th>Next Execution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var schedule in _schedulers)
+                        {
+                            <tr>
+                                <td> @schedule.ID </td>
+                                <td> @schedule.DataSourceID </td>
+                                <td> @schedule.CronExpression </td>
+                                <td> @schedule.NextExecutionTime </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <h3>NoSchedulersAdded</h3>
+            }
+        </div>
+    </div>
+
 
 </div>
 
 
+
+<div class="form-group">
+    <label>
+        Message:
+        <input @bind="notification.Body" size="50" />
+    </label>
+</div>
+<button @onclick="Send" disabled="@(!IsConnected)">Send</button>
+<hr>
+
+@code {
+    private HubConnection? hubConnection;
+    private Notifications notification = new Notifications();
+    private string? notificationBody;
+    List<Schedulers> _schedulers = new List<Schedulers>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _schedulers = await _testViewModel.GetSchedulers();
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/systemhub"))
+            .Build();
+        await hubConnection.StartAsync();
+    }
+
+    private async Task Send()
+    {
+        if (hubConnection is not null)
+        {
+            notification.Title = "From Test";
+            notification.Criticality = Criticality.Critical;
+            await hubConnection.SendAsync("SendNotification",notification);
+        }
+    }
+
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+    
+    private async void AddScheduler()
+    {
+        var scheduler = new Schedulers
+            {
+                ID = Guid.NewGuid().ToString(),
+                DataSourceID = Guid.NewGuid().ToString(),
+                CronExpression = "10 * * * * *",
+                StartDate = DateTime.UtcNow,
+            };
+        await _testViewModel.CreateScheduler(scheduler);
+        StateHasChanged();
+        _navigationManager.NavigateTo("test_grain");
+    }
+}

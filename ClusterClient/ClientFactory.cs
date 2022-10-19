@@ -1,6 +1,7 @@
 ﻿using CommunAxiom.Commons.Client.Contracts;
 using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Orleans;
+using CommunAxiom.Commons.Orleans.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -37,6 +38,7 @@ namespace ClusterClient
                     {
                         parts.AddFromApplicationBaseDirectory();
                     }).UseLocalhostClustering(30000)
+                    .AddOutgoingGrainCallFilter(serviceProvider.GetService<SecureTokenOutgoingFilter>())
                     .AddSimpleMessageStreamProvider(Constants.DefaultStream);
             return b;
         }

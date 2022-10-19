@@ -4,6 +4,7 @@ using CommunAxiom.Commons.Client.Contracts.Dataset;
 using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.DataTransfer;
 using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
+using CommunAxiom.Commons.Client.Contracts.Grains.Scheduler;
 using CommunAxiom.Commons.Client.Contracts.Ingestion;
 using CommunAxiom.Commons.Client.Contracts.Project;
 using CommunAxiom.Commons.Client.Contracts.Replication;
@@ -11,16 +12,17 @@ using CommunAxiom.Commons.Client.Grains.AccountGrain;
 using CommunAxiom.Commons.Client.Grains.DatasourceGrain;
 using CommunAxiom.Commons.Client.Grains.IngestionGrain;
 using CommunAxiom.Commons.Client.SiloShared;
+using CommunAxiom.Commons.Orleans.Security;
+using CommunAxiom.Commons.Shared.OIDC;
 using DatasetGrain;
 using DataTransferGrain;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Hosting;
-using Orleans.Security;
-using Orleans.Security.Clustering;
 using PortfolioGrain;
 using ProjectGrain;
 using ReplicationGrain;
+using SchedulerGrain;
 using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.Silo
@@ -62,6 +64,13 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<PortfolioBusiness, PortfolioBusiness>();
                     services.AddSingleton<IProject, Projects>();
                     services.AddSingleton<IReplication, Replications>();
+                    services.AddSingleton<IScheduler, Scheduler>();
+                    services.AddSingleton<SchedulerBusiness, SchedulerBusiness>();
+                    services.AddSingleton<SchedulerRepo, SchedulerRepo>();
+
+                    services.AddSingleton<ISettingsProvider, SiloSettingsProvider>();
+                    services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
+                    services.AddSingleton<IIncomingGrainCallFilter, AccessControlFilter>();
 
                 })
                 //configure application parts for each grain
@@ -72,7 +81,8 @@ namespace CommunAxiom.Commons.Client.Silo
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Ingestions).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Portfolios).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Projects).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Replications).Assembly).WithReferences());
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Replications).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Scheduler).Assembly).WithReferences());
 
             var silo = builder.Build();
             await silo.StartAsync();
@@ -82,19 +92,10 @@ namespace CommunAxiom.Commons.Client.Silo
 
         static void ConfigureIdentitty(IServiceCollection services)
         {
-            var configs = new IdentityServer4Info("https://localhost:5001/", "org1_node1", "846B62D0-DEF9-4215-A99D-86E6B8DAB342", "org1");
             
-            services.AddOrleansClusteringAuthorization(configs,
-                config =>
-                {
-                    config.ConfigureAuthorizationOptions = CommunAxiom.Commons.Client.Contracts.Auth.Configuration.ConfigurePolicyOptions;
-                    config.TracingEnabled = true;
-                });
-            
-            
-            services.AddTransient<IdentityServer4Info>(services =>
+            services.AddTransient<Shared.OIDC.OIDCSettings>(services =>
             {
-                return SiloShared.Conf.OIDCConfig.Config.Server;
+                return SiloShared.Conf.OIDCConfig.Config;
             });
         }
 
