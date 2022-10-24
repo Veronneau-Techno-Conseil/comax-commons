@@ -1,6 +1,5 @@
 @page "/test_grain"
 
-@using CommunAxiom.Commons.ClientUI.Shared.Resources
 @using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 @using Microsoft.AspNetCore.SignalR.Client
 
@@ -118,7 +117,7 @@
 
 @code {
     private HubConnection? hubConnection;
-    private Notifications notification = new Notifications();
+    private DashboardItem notification = new DashboardItem();
     private string? notificationBody;
     List<Schedulers> _schedulers = new List<Schedulers>();
 
@@ -137,7 +136,7 @@
         if (hubConnection is not null)
         {
             notification.Title = "From Test";
-            notification.Criticality = Criticality.Critical;
+            notification.Criticality = ItemCriticality.Critical;
             await hubConnection.SendAsync("SendNotification",notification);
         }
     }
