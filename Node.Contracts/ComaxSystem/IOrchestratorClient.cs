@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Comax.Commons.Orchestrator.MailGrain;
 
 namespace Comax.Commons.Orchestrator.Contracts.ComaxSystem
 {
@@ -14,6 +15,7 @@ namespace Comax.Commons.Orchestrator.Contracts.ComaxSystem
         IMailbox GetMailbox(string id);
         IUriRegistry GetUriRegistry(string id);
         IEventMailbox GetEventMailbox(Guid id);
+        Task<StreamSubscriptionHandle<MailMessage>> SubscribeEventMailboxStream(Guid id, Func<MailMessage, StreamSequenceToken, Task> fn, Func<Exception, Task> funcError, Func<Task> onCompleted);
         Task Close();
     }
 }

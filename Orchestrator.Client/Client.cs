@@ -9,6 +9,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Comax.Commons.Orchestrator.Contracts.EventMailbox;
 using Comax.Commons.Orchestrator.Contracts.UriRegistry;
+using Comax.Commons.Orchestrator.MailGrain;
+using System.IO;
+using CommunAxiom.Commons.Orleans;
+using System.Xml;
 
 namespace Comax.Commons.Orchestrator.Client
 {
@@ -39,6 +43,11 @@ namespace Comax.Commons.Orchestrator.Client
         public IEventMailbox GetEventMailbox(Guid id)
         {
             return _clusterClient.GetGrain<IEventMailbox>(id);
+        }
+        public Task<StreamSubscriptionHandle<MailMessage>> SubscribeEventMailboxStream(Guid id, Func<MailMessage, StreamSequenceToken, Task> fn, Func<Exception, Task> funcError, Func<Task> onCompleted)
+        {
+            return _clusterClient.GetStreamProvider(Constants.DefaultStream)
+                    .GetStream<MailMessage>(id, Constants.DefaultNamespace).SubscribeAsync(fn,funcError,onCompleted);
         }
         public void Dispose()
         {
