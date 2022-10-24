@@ -1,25 +1,24 @@
-﻿
-using CommunAxiom.Commons.ClientUI.Shared.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommunAxiom.Commons.ClientUI.Shared.Models;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Contracts.IO;
 
 namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 {
     public interface IPortfolioViewModel
     {
-        string PROJECT { get; }
-        string DATABASE { get; }
-        string ID { get; set; }
-        string TheType { get; set; }
-        string Name { get; set; }
-        string ParentId { get; set; }
-        Portfolio portfolio { get; set; }
-        List<Portfolio> Portfolios { get; set; }
-        Task CreatePortfolio(Portfolio portfolio);
-        Task<List<Portfolio>?> GetPortfolios();
+        Task CreatePortfolio(PortfolioModel portfolio);
+        Task<IList<PortfolioModel>> GetPortfolios();
+
         Task<bool> CheckIfUnique(string name);
+
+        string GetIcon(PortfolioType portfolioType);
+
+        List<string> GetDatasources();
+
+        List<string> GetPortfolioTypes();
+
+        Task SaveFieldMetaData(string id, List<FieldMetaData> fields);
+        Task<SourceState> GetSourceState(string id);
+        Task SaveConfig(string id, SourceConfig sourceConfig);
     }
 }

@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CentralGrain\CentralGrain.csproj" />
     <ProjectReference Include="..\IEventMailbox\EventMailboxGrain.csproj" />
     <ProjectReference Include="..\LiteDbStorageProvider\LiteDbStorageProvider.csproj" />
     <ProjectReference Include="..\MailboxGrain\MailboxGrain.csproj" />

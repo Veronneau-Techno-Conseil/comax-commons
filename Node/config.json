@@ -16,5 +16,6 @@
   "PubSubStore": {
     "Name": "PubSubStore",
     "FileName": "./PubSubStore.db"
-  }
+  },
+  "CentralApiUrl": "https://central.communaxiom.org"
 }

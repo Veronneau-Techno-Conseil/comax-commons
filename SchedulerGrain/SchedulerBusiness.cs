@@ -13,9 +13,9 @@ namespace SchedulerGrain
     public class SchedulerBusiness
     {
         private SchedulerRepo _schedulerRepo;
-        private readonly IGrainFactory _grainFactory;
+        private readonly IComaxGrainFactory _grainFactory;
 
-        public SchedulerBusiness(IGrainFactory grainFactory)
+        public SchedulerBusiness(IComaxGrainFactory grainFactory)
         {
             _grainFactory = grainFactory;
         }

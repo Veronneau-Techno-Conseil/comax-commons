@@ -3,6 +3,9 @@ using CommunAxiom.Commons.Client.Contracts.IO;
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using System.Threading.Tasks;
+using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.ClientUI.Shared.Models;
 
 namespace CommunAxiom.Commons.ClientUI.Server.Controllers
 {
@@ -10,31 +13,66 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
     [Route("api/[controller]")]
     public class DatasourceController : ControllerBase
     {
-        private readonly IClusterClient _clusterClient;
-        public DatasourceController(IClusterClient clusterClient)
+        private readonly ICommonsClientFactory _clusterClient;
+
+        public DatasourceController(ICommonsClientFactory clusterClient)
         {
-            _clusterClient = clusterClient;
+            this._clusterClient = clusterClient;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get(string id)
+        [HttpGet("{id}")] 
+        public async Task<IActionResult> Get([FromRoute]  string id)
         {
-            var result = await _clusterClient.GetGrain<IDatasource>(id).GetConfig();
+            SourceState result = null;
+            await _clusterClient.WithClusterClient(async cc =>
+            {
+                result = await cc.GetDatasource(id).GetConfig();
+            });
             return Ok(result);
         }
 
-        [HttpPost]
-        [HttpPut]
-        public async Task<IActionResult> Set(string id, SourceState sourceState)
+        [HttpPost("SetConfigurations")]
+        public async Task<IActionResult> SetConfigurations(CreateConfigRequest request)
         {
-            await _clusterClient.GetGrain<IDatasource>(id).SetConfig(sourceState);
+            await _clusterClient.WithClusterClient(async cc =>
+            {
+                await cc.GetDatasource(request.Id).SetConfig(request.Config.DataSourceType, request.Config.Configurations);
+            });
             return Ok();
         }
+        
+        [HttpPost("SetFieldMetaData")]
+        public async Task<IActionResult> SetFieldMetaData(CreateFieldMetaDataRequest request)
+        {
+            await _clusterClient.WithClusterClient(async cc =>
+            {
+                await cc.GetDatasource(request.Id).SetFieldMetaData(request.Fields);
+            });
+            
+            return Ok();
+        }
+        
+        [HttpGet("GetSourceState")]
+        public async Task<IActionResult> GetSourceState([FromQuery] string id)
+        {
+            SourceState result = null;
+            
+            await _clusterClient.WithClusterClient(async cc =>
+            {
+                result = await cc.GetDatasource(id).GetSourceState();
+            });
+            
+            return Ok(result);
+        }
+
 
         [HttpDelete]
         public async Task<IActionResult> Delete(string id)
         {
-            await _clusterClient.GetGrain<IDatasource>(id).DeleteConfig();
+            await _clusterClient.WithClusterClient(async cc =>
+            {
+                await cc.GetDatasource(id).DeleteConfig();
+            });
             return Ok();
         }
     }

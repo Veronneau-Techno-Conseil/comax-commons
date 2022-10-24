@@ -6,9 +6,9 @@ namespace CommunAxiom.Commons.Client.Contracts.Grains.Portfolio
 {
     public class Portfolio
     {
-        public string ID { get; set; }
-        public string TheType { get; set; }
+        public Guid ID { get; set; }
+        public string Type { get; set; }
         public string Name { get; set; }
-        public string ParentId { get; set; }
+        public Guid ParentId { get; set; }
     }
 }

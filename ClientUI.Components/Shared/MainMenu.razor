@@ -1,6 +1,7 @@
 ﻿@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 @using Microsoft.Extensions.Hosting
 @using Microsoft.Extensions.Localization
+@using Microsoft.AspNetCore.SignalR.Client
 @inject HttpClient _httpClient
 @inject NavigationManager _navigationManager
 @inject IAccessTokenService _accessTokenService
@@ -16,7 +17,7 @@
                 <img src="_content/ClientUI.Components/images/Commons.png" />
                 <strong>@_localizer["Commons"]</strong>
             </NavLink>
-            <a role="button" @onclick="BurgerClick" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navMenuIndex">
+            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navMenuIndex">
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
@@ -28,6 +29,7 @@
                 <AuthorizeView>
                     <Authorized>
                         <NavLink class="navbar-item" href="dashboard" Match="NavLinkMatch.All">
+                            <img class="icon-25" src="_content/ClientUI.Components/icons/Home.png" />
                             @_localizer["Dashboard"]
                         </NavLink>
                     </Authorized>
@@ -36,29 +38,20 @@
                 @if (_environment.IsDevelopment())
                 {
                     <NavLink class="navbar-item" href="test_grain" Match="NavLinkMatch.All">
+                        <img class="icon-25" src="_content/ClientUI.Components/icons/Commons.png" />
                         @_localizer["Test grains"]
                     </NavLink>
                 }
 
                 <div class="navbar-item has-dropdown is-hoverable">
-                    <NavLink class="navbar-item" Match="NavLinkMatch.All" @onclick="()=> portfolioSubMenu = !portfolioSubMenu">
+                    <NavLink class="navbar-item" href="portfolio" Match="NavLinkMatch.All">
+                        <img class="icon-25" src="_content/ClientUI.Components/icons/Portfolio.png" />
                         @_localizer["Portfolio"]
                     </NavLink>
-                    @if (portfolioSubMenu)
-                    {
-                        <div div class="navbar-dropdown">
-                            <NavLink class="navbar-item" href="create_portfolio" Match="NavLinkMatch.All">
-                                @_localizer["CreatePortfolio"]
-                            </NavLink>
-
-                            <NavLink class="navbar-item" href="list_portfolios" Match="NavLinkMatch.All">
-                                @_localizer["Portfolios"]
-                            </NavLink>
-                        </div>
-                    }
                 </div>
 
                 <NavLink class="navbar-item" href="about" Match="NavLinkMatch.All">
+                    <img class="icon-25" src="_content/ClientUI.Components/icons/Commons.png" />
                     @_localizer["About"]
                 </NavLink>
             </div>
@@ -69,6 +62,23 @@
                         <span class="navbar-item">
                             @User?.Name
                         </span>
+
+                        <span id="criticalNotifications" class="navbar-item">
+                            <div class='ikrNoti_Counter'>@criticalNotifications.Count()</div>
+                            <div class='ikrNoti_Button' style="background: #2E467C" @onclick="HideShowNotifications"></div>
+                            <div class='ikrNotifications' style="display:@notificationsBox !important" @onclick=HideShowNotifications>
+                                <h3>Critical Notifications (<span class='notiCounterOnHead'> @criticalNotifications.Count() </span>)</h3>
+                                <div>
+                                    @foreach (var notification in criticalNotifications)
+                                    {
+                                        <div>
+                                            <h4>@notification</h4>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </span>
+
                         <a class="navbar-item" @onclick="Logout">
                             <img alt="Log off" class="image is-32x32" src="https://djp65hxq6jm81.cloudfront.net/uploads/735de877-33df-42ce-a423-af091d396e7c/Logout.png" />
                         </a>
@@ -84,30 +94,3 @@
     </div>
 </nav>
 
-@code {
-    [CascadingParameter]
-    public Task<AuthenticationState> AuthenticationState { get; set; } = null!;
-
-    ElementReference navMenuIndex;
-
-    public User? User { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationState;
-        this.User = await ((CustomAuthenticationStateProvider)_stateProvider).GetUserByJWTAsync();
-    }
-
-    private async Task Logout()
-    {
-        await _accessTokenService.RemoveAccessTokenAsync("jwt_token");
-        _navigationManager.NavigateTo("/", true);
-    }
-
-    private void BurgerClick()
-    {
-
-    }
-
-    private bool portfolioSubMenu;
-}

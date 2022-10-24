@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Comax.Commons.Orchestrator.Contracts.EventMailbox;
 using Comax.Commons.Orchestrator.Contracts.UriRegistry;
+using Comax.Commons.Orchestrator.Contracts.Central;
 
 namespace Comax.Commons.Orchestrator.Client
 {
@@ -39,6 +40,11 @@ namespace Comax.Commons.Orchestrator.Client
         public IEventMailbox GetEventMailbox(Guid id)
         {
             return _clusterClient.GetGrain<IEventMailbox>(id);
+        }
+
+        public ICentral GetCentral()
+        {
+            return _clusterClient.GetGrain<ICentral>(Guid.Empty);
         }
         public void Dispose()
         {

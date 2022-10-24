@@ -2,7 +2,6 @@
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
 using CommunAxiom.Commons.Ingestion.DataSource;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -13,7 +12,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
     public class DataSourceFactoryTest
     {
         private MockRepository _mockRepository;
-        private Mock<IServiceProvider> _serviceProvider;
+        private Mock<Func<DataSourceType, IDataSourceReader>> _serviceResolver;
         private Mock<IConfigValidatorLookup> _configValidatorLookup;
 
         private DataSourceFactory _sourceFactory;
@@ -22,12 +21,12 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         public void SetUp()
         {
             _mockRepository = new MockRepository(MockBehavior.Strict);
-            _serviceProvider = _mockRepository.Create<IServiceProvider>();
+            _serviceResolver = _mockRepository.Create<Func<DataSourceType, IDataSourceReader>>();
             _configValidatorLookup = _mockRepository.Create<IConfigValidatorLookup>();
 
-            SetupMock();
+            // SetupMock();
 
-            _sourceFactory = new DataSourceFactory(_serviceProvider.Object);
+            _sourceFactory = new DataSourceFactory(_serviceResolver.Object);
         }
 
         [TearDown]
@@ -41,52 +40,22 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         {
             var textDataSourceReader = new TextDataSourceReader(_configValidatorLookup.Object);
 
-            _serviceProvider.Setup(x => x.GetService(typeof(TextDataSourceReader))).Returns(textDataSourceReader);
+            _serviceResolver.Setup(x => x.Invoke(DataSourceType.FILE)).Returns(textDataSourceReader);
 
-            var reader = _sourceFactory.Create(DataSourceType.File);
+            var reader = _sourceFactory.Create(DataSourceType.FILE);
             reader.Should().BeOfType<TextDataSourceReader>();
-        }
-
-
-        [Test]
-        public void WhenDataSourceTypeIsNotFoundThenSourceFactoryShouldThrowArgumentException()
-        {
-            var sourceType = DataSourceType.API;
-            var textDataSourceReader = new TextDataSourceReader(_configValidatorLookup.Object);
-
-            _serviceProvider.Setup(x => x.GetService(typeof(TextDataSourceReader))).Returns(textDataSourceReader);
-
-            Action act = () => _sourceFactory.Create(sourceType);
-
-            act.Should()
-                .Throw<ArgumentException>()
-                .WithMessage($"No DataSourceReader type with name {Enum.GetName(sourceType)} could be found");
         }
 
         [Test]
         public void WhenServiceProviderIsResolvedNullThenSourceFactoryShouldThrowNullReferenceException()
         {
-            var sourceType = DataSourceType.File;
+            var sourceType = DataSourceType.FILE;
 
-            _serviceProvider.Setup(x => x.GetService(typeof(TextDataSourceReader))).Returns(null);
+            _serviceResolver.Setup(x => x.Invoke(DataSourceType.FILE)).Returns(() => null);
 
             Action act = () => _sourceFactory.Create(sourceType);
 
-            act.Should()
-                .Throw<NullReferenceException>()
-                .WithMessage($"No DataSourceReader resolved with type {typeof(TextDataSourceReader).FullName}");
-        }
-
-        private void SetupMock()
-        {
-
-            var serviceScope = new Mock<IServiceScope>();
-            serviceScope.Setup(x => x.ServiceProvider).Returns(_serviceProvider.Object);
-
-            var serviceScopeFactory = new Mock<IServiceScopeFactory>();
-            serviceScopeFactory.Setup(x => x.CreateScope()).Returns(serviceScope.Object);
-
-            _serviceProvider.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(serviceScopeFactory.Object);
+            act.Should().Throw<NullReferenceException>().WithMessage("No DataSourceReader resolved!");
         }
     }
 }

@@ -24,6 +24,19 @@ namespace CommunAxiom.Commons.Ingestion
             ingestor.Configure(fieldMetaDatas);
             return ingestor.ParseAsync(stream);
         }
+
+        public void Configure(SourceConfig sourceConfig)
+        {
+            var dataSourceReader = _sourceFactory.Create(sourceConfig.DataSourceType);
+            dataSourceReader.Setup(sourceConfig);
+
+            sourceConfig.Configurations.Clear();
+            
+            foreach (var kvp in dataSourceReader.Configurations)
+            {
+                sourceConfig.Configurations.Add(kvp.Key, kvp.Value);
+            }
+        }
     }
 }
 

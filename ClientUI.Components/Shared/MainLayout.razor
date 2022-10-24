@@ -1,9 +1,13 @@
-﻿@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+﻿@using CommunAxiom.Commons.ClientUI.Shared.Resources
+@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+@using Microsoft.AspNetCore.SignalR.Client
+
 @inherits LayoutComponentBase
 @inject IAccessTokenService _accessTokenService
 @inject ISessionViewModel _loginViewModel
 @inject NavigationManager _navigationManager
 @inject IJSRuntime JsRuntime
+@inject IToastService toastService
 <BlazoredToasts Position="ToastPosition.BottomRight"
                 Timeout="3"
                 IconType="IconType.FontAwesome"
@@ -14,28 +18,8 @@
 <MainMenu />
 
 <section class="section">
-    <div class="container content">
+    <div class="container.is-fullhd content">
         @Body
     </div>
 </section>
 
-
-@code {
-    protected override async Task OnParametersSetAsync()
-    {
-
-        
-    }
-
-    protected async override Task OnAfterRenderAsync(bool firstRender)
-    {
-        await JsRuntime.InvokeVoidAsync("Startup");
-        
-    }
-
-    private async Task LogoutUser()
-    {
-        await _accessTokenService.RemoveAccessTokenAsync("jwt_token");
-        _navigationManager.NavigateTo("/", true);
-    }
-}

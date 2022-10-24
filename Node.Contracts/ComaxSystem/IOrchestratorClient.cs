@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Comax.Commons.Orchestrator.Contracts.Central;
 
 namespace Comax.Commons.Orchestrator.Contracts.ComaxSystem
 {
@@ -14,6 +15,7 @@ namespace Comax.Commons.Orchestrator.Contracts.ComaxSystem
         IMailbox GetMailbox(string id);
         IUriRegistry GetUriRegistry(string id);
         IEventMailbox GetEventMailbox(Guid id);
+        ICentral GetCentral();
         Task Close();
     }
 }

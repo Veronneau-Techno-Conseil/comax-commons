@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Comax.Commons.Orchestrator.MailboxGrain
 {
     
-    [AuthorizeClaim(ClaimType = "http://orchestrator.communaxion.org/mailbox")]
+    [AuthorizeClaim(ClaimType = "https://orchestrator.communaxiom.org/mailbox")]
     public class Mailbox : Grain, IMailbox
     {
         public Task<bool> HasMail()

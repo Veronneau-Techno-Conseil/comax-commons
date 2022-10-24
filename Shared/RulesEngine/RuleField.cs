@@ -5,21 +5,25 @@ namespace CommunAxiom.Commons.Shared.RuleEngine
     public class RuleField<T>: IConfigField
     {
 
+        public Func<T, Task<bool>> CheckAsync { get; set; }
         public Func<T, bool> Check { get; set; }
 
-        public bool DoCheck(object o)
+        public async Task<bool> DoCheck(object o)
         {
             if (o.GetType() != typeof(T))
             {
                 throw new InvalidCastException($"Parameter o should be of type ${typeof(T)}");
             }
 
-            if (this.Check == null)
+            if (this.Check == null && this.CheckAsync == null)
             {
                 throw new NullReferenceException("Check method has not been set.");
             }
 
-            return this.Check((T)o);
+            if(this.Check != null)
+                return this.Check((T)o);
+            else
+                return await this.CheckAsync((T)o);
         }
 
         public bool Mandatory { get; set; }
@@ -29,7 +33,7 @@ namespace CommunAxiom.Commons.Shared.RuleEngine
 
     public interface IConfigField
     {
-        bool DoCheck(object o);
+        Task<bool> DoCheck(object o);
         bool Mandatory { get; set; }
         bool Ignore { get; set; }
     }

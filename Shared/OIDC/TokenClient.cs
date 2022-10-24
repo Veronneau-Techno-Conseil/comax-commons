@@ -73,6 +73,32 @@ namespace CommunAxiom.Commons.Shared.OIDC
             }
         }
 
+        public async Task<(bool, TokenData?)> Impersonate(string token)
+        {
+            await this.Configure();
+
+            _httpClient.DefaultRequestHeaders.Add("x-act-as", token);
+            var res = await _httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+            {
+                Address = TokenMetadata.TokenEndpoint,
+                ClientId = this._settings.ClientId,
+                ClientSecret = this._settings.Secret,
+                Scope = this._settings.Scopes
+            });
+            if (res.HttpResponse.IsSuccessStatusCode)
+            {
+                return (true, new TokenData { access_token = res.AccessToken, expires_in = res.ExpiresIn, refresh_token = res.RefreshToken, token_type = res.TokenType });
+            }
+            else if (res.HttpResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return (false, null);
+            }
+            else
+            {
+                throw new Exception($"Unexpected result calling token endpoint: {res.HttpStatusCode}=> {res.HttpErrorReason}, {await res.HttpResponse.Content.ReadAsStringAsync()}");
+            }
+        }
+
         public Task<(bool, TokenData?)> AuthenticatePassword(string username, string password)
         {
             return this.AuthenticatePassword(this._settings.ClientId, this._settings.Secret, this._settings.Scopes, username, password);

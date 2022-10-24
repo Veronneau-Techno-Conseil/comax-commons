@@ -51,7 +51,7 @@ namespace PortfolioGrain
             return listDetails;
         }
 
-        public async Task<Portfolio> GetAPortfolioDetails(string portfolioID)
+        public async Task<Portfolio> GetAPortfolioDetails(Guid portfolioID)
         {
             var PortfolioList = await GetListDetails();
             var Portfolio = PortfolioList.Portfolios.AsQueryable().Where(x => x.ID == portfolioID).FirstOrDefault();

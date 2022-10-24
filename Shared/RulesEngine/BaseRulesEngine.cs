@@ -78,7 +78,7 @@
                         break;
                     }
 
-                    shouldExecute &= field.DoCheck(values[ix]);
+                    shouldExecute &= await field.DoCheck(values[ix]);
                 }
                 if (shouldExecute)
                 {
