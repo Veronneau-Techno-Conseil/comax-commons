@@ -7,6 +7,7 @@ using CommunAxiom.Commons.Ingestion;
 using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Ingestor;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Localization;
 using Radzen.Blazor;
 
@@ -130,7 +131,16 @@ namespace ClientUI.Components.Portfolio
             };
 
             await PortfolioViewModel.CreatePortfolio(newPortfolio);
-
+            
+            await Notify(new DashboardItem
+            {
+                Title = newPortfolio.Name,
+                Body = "New Portfolio Added!",
+                ItemGroup = ItemGroup.Notification,
+                Criticality = ItemCriticality.Success,
+                CreateDateTime = new DateTime()
+            });
+            
             AddToTree(SelectedPortfolio, new PortfolioTreeViewItem
             {
                 Id = newPortfolio.ID,
@@ -161,9 +171,14 @@ namespace ClientUI.Components.Portfolio
 
         [Inject] public IDataSourceFactory DataSourceFactory { get; set; }
         [Inject] public IIngestorFactory IngestorFactory { get; set; }
-
+        
+        private HubConnection? hubConnection;
+        
+        [Inject] public NavigationManager NavigationManager { get; set; }
+        
         protected override async Task OnInitializedAsync()
         {
+
             _types = PortfolioViewModel.GetPortfolioTypes();
             ModalViewModel.Type = _types[0];
 
@@ -172,6 +187,12 @@ namespace ClientUI.Components.Portfolio
             PortfolioList = await PortfolioViewModel.GetPortfolios();
             PortfolioListResult = PortfolioList?.ToTree(o => o.ID, o => o.ParentId);
             if (PortfolioListResult != null) ExpandAll(PortfolioListResult);
+            
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/systemhub"))
+                .Build();
+            
+            await hubConnection.StartAsync();
         }
 
         private void ExpandAll(IEnumerable<PortfolioTreeViewItem> nodes)
@@ -332,6 +353,14 @@ namespace ClientUI.Components.Portfolio
             if (sourceConfiguration.Name =="SampleFile" && !string.IsNullOrEmpty(sourceConfiguration.Value))
             {
                 FieldMetaDataList.AddRange(MetadataParser.ReadMetadata(sourceConfiguration.Value));
+            }
+        }
+        
+        private async Task Notify(DashboardItem notification)
+        {
+            if (hubConnection is not null)
+            {
+                await hubConnection.SendAsync("SendNotification",notification);
             }
         }
     }

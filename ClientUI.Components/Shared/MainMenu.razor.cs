@@ -1,6 +1,5 @@
 using CommunAxiom.Commons.ClientUI.Shared;
 using CommunAxiom.Commons.ClientUI.Shared.Models;
-using CommunAxiom.Commons.ClientUI.Shared.Resources;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -30,10 +29,10 @@ namespace ClientUI.Components.Shared
               .Build();
             await hubConnection.StartAsync();
 
-            hubConnection.On<Notifications>("ReceiveNotification", (notification) =>
+            hubConnection.On<DashboardItem>("ReceiveNotification", (notification) =>
             {
                 var encodedMsg = $"{notification.Title}: {notification.Body}";
-                if (notification.Criticality == Criticality.Critical)
+                if (notification.Criticality == ItemCriticality.Critical)
                 {
                     criticalNotifications.Add(encodedMsg);
                 }
