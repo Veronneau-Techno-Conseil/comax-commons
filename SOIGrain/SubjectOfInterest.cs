@@ -9,20 +9,22 @@ using System.Threading.Tasks;
 
 namespace Comax.Commons.Orchestrator.SOIGrain
 {
+    [AuthorizeClaim]
     public class SubjectOfInterest : Grain, ISubjectOfInterest
     {
-        private readonly IComaxGrainFactory _comaxGrainFactory;
         public SubjectOfInterest()
         {
-            _comaxGrainFactory = new CommunAxiom.Commons.Orleans.GrainFactory(GrainFactory);
+            
         }
         public async Task<OperationResult> Broadcast(Message message)
         {
-            SOIBroadcastRulesEngine broadcastRulesEngine = new SOIBroadcastRulesEngine(this.GetUser(), this.GetStreamProvider(Constants.DefaultStream), _comaxGrainFactory);
+            //TODO: Validate message from against authenticated user
+            var comaxGrainFactory = new CommunAxiom.Commons.Orleans.GrainFactory(GrainFactory);
+            SOIBroadcastRulesEngine broadcastRulesEngine = new SOIBroadcastRulesEngine(this.GetUser(), this.GetStreamProvider(Constants.DefaultStream), comaxGrainFactory);
             var r = broadcastRulesEngine.Validate(message);
             if (r.IsError)
                 return r;
-            _ = broadcastRulesEngine.Process(message);
+            await broadcastRulesEngine.Process(message);
             return new OperationResult();
         }
     }

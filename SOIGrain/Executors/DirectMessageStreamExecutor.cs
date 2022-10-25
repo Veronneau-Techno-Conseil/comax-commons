@@ -1,6 +1,8 @@
-﻿using Comax.Commons.Orchestrator.Contracts.UriRegistry;
+﻿using Comax.Commons.Orchestrator.Contracts.EventMailbox;
+using Comax.Commons.Orchestrator.Contracts.UriRegistry;
 using CommunAxiom.Commons.Orleans;
 using CommunAxiom.Commons.Shared.RuleEngine;
+using CommunAxiom.Commons.Shared.RulesEngine;
 using Orleans.Streams;
 using System;
 using System.Collections.Generic;
@@ -21,9 +23,10 @@ namespace Comax.Commons.Orchestrator.SOIGrain.Executors
 
         public async Task Execute(Message param)
         {
-            var grain = _comaxGrainFactory.GetGrain<IUriRegistry>(param.To);
+            
+            var grain = _comaxGrainFactory.GetGrain<IUriRegistry>(MessageHelper.GetUserId(param.To));
             var g = await grain.GetOrCreate();
-            var strm = _streamProvider.GetStream<Message>(g, Constants.DefaultNamespace);
+            var strm = _streamProvider.GetStream<Message>(g, EventMailboxConstants.MAILBOX_STREAM_NS);
             await strm.OnNextAsync(param);
         }
     }

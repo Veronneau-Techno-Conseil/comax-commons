@@ -8,6 +8,7 @@ namespace CommunAxiom.Commons.Orleans
     {
         public const string DefaultStream = "Default";
         public const string DefaultNamespace = "Default";
+        public const string BLANK_ID = "BLANK";
 
         public static class Storage
         {

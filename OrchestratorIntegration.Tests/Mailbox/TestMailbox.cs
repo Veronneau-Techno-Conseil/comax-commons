@@ -21,7 +21,7 @@ namespace OrchestratorIntegration.Tests.Mailbox
 
             await cf.WithClusterClient(async client =>
             {
-                var mb = client.GetMailbox("Test mailbox");
+                var mb = await client.GetEventMailbox(Guid.Empty);
                 var testCall = mb.HasMail();
                 await testCall;
                 testCall.Exception.Should().BeNull("Task should complete successfully");

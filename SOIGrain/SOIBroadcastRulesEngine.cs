@@ -37,8 +37,8 @@ namespace Comax.Commons.Orchestrator.SOIGrain
                             return await ValidationHelper.AuthorizeDirectUserMessage(_comaxGrainFactory, u);
                         }
                 },
-                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals("DIRECT_MSG") },
-                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals("PRIVATE") }
+                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals(MessageHelper.MSG_TYPE_DIRECT) },
+                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals(MessageHelper.MSG_SCOPE_PRIVATE) }
             );
 
         }

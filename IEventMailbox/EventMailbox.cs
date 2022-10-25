@@ -3,69 +3,84 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Comax.Commons.Orchestrator.Contracts.EventMailbox;
-using Comax.Commons.Orchestrator.MailGrain;
 using CommunAxiom.Commons.Orleans;
 using Orleans;
 using Orleans.Streams;
 using Orleans.Runtime;
+using CommunAxiom.Commons.Orleans.Security;
+using CommunAxiom.Commons.Shared.RuleEngine;
+using Comax.Commons.Orchestrator.Contracts.Mail;
 
 namespace Comax.Commons.Orchestrator.EventMailboxGrain
 {
-    public class EventMailbox: Grain,IEventMailbox
+    [ImplicitStreamSubscription(EventMailboxConstants.MAILBOX_STREAM_NS)]
+    [AuthorizeClaim(ClaimType = "https://orchestrator.communaxiom.org/mailbox")]
+    public class EventMailbox: Grain, IEventMailbox
     {
-        public Guid? StreamId { get; set; }
-        public IAsyncStream<MailMessage> Stream { get; set; }
-        public readonly EventMailboxBusiness _eventMailboxBusiness;
-        public EventMailbox(EventMailboxBusiness eventMailboxBusiness,[PersistentState("mailGrain")] IPersistentState<List<MailMessage>> storageState)
+        private readonly IPersistentState<MailboxState> _storageState;
+        public EventMailboxBusiness _eventMailboxBusiness;
+        public EventMailbox([PersistentState("mailGrain")] IPersistentState<MailboxState> storageState)
         {
-            _eventMailboxBusiness = eventMailboxBusiness;
-            _eventMailboxBusiness.Init(storageState);
+            _storageState = storageState;
+
         }
 
-
-        public async Task ResumeMessageStream()
-        {
-            if (Stream == null)
-            {
-                Stream = this.GetStreamProvider(Constants.DefaultStream)
-                    .GetStream<MailMessage>(StreamId.Value, Constants.DefaultNamespace);
-            }
-            await _eventMailboxBusiness.ResumeMessageStream(Stream);
-        }
         public async Task MarkRead(Guid msgId)
         {
             await _eventMailboxBusiness.MarkRead(msgId);
         }
-        public async Task<Guid> HasMail()
+        public async Task<bool> HasMail()
         {
-            return await Task.FromResult(StreamId.Value);
+            return await _eventMailboxBusiness.HasMail();
         }
 
         public async Task<Guid> GetStreamId()
         {
-            StreamId ??= Guid.NewGuid();
-            return await Task.FromResult(StreamId.Value);
+            return await _eventMailboxBusiness.GetStreamId();
         }
 
         public async Task StartStream()
         {
             //read storage and push to stream
-            await ResumeMessageStream();
+            await _eventMailboxBusiness.ResumeMessageStream();
+
         }
 
         public async Task SendMail(MailMessage mail)
         {
-            if (Stream == null)
-            {
-                Stream = this.GetStreamProvider(Constants.DefaultStream)
-                    .GetStream<MailMessage>(StreamId.Value, Constants.DefaultNamespace);
-            }
-            await _eventMailboxBusiness.SendMail(Stream, mail);
+            await _eventMailboxBusiness.DropMail(mail);
         }
 
         public async Task DeleteMail(Guid msgId)
         {
             await _eventMailboxBusiness.DeleteMail(msgId);
+        }
+
+        public override async Task OnActivateAsync()
+        {
+            _eventMailboxBusiness = new EventMailboxBusiness(this.GetStreamProvider(Constants.DefaultStream));
+            _eventMailboxBusiness.Init(_storageState);
+
+            var streamProvider = GetStreamProvider(Constants.DefaultStream);
+            var key = this.GetPrimaryKey();
+            var stream = streamProvider.GetStream<Message>(
+                    key, EventMailboxConstants.MAILBOX_STREAM_NS);
+
+            await stream.SubscribeAsync(async (msg, seqToken) =>
+            {
+                var mg = this.GrainFactory.GetGrain<IMail>(msg.Id);
+                await mg.Save(msg);
+                var mm = new MailMessage
+                {
+                    From = msg.From,
+                    MsgId = msg.Id,
+                    ReceivedDate = DateTime.UtcNow,
+                    Subject = msg.Subject,
+                    Type = msg.Type
+                };
+                await _eventMailboxBusiness.DropMail(mm);
+            });
+            
         }
     }
 }

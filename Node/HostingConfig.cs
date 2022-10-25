@@ -82,7 +82,10 @@ namespace Comax.Commons.Orchestrator
         /// <returns></returns>
         public static ISiloHostBuilder SetStreamProviders(this ISiloHostBuilder siloHostBuilder)
         {
-            siloHostBuilder.AddSimpleMessageStreamProvider(Constants.DefaultStream);
+            siloHostBuilder.AddSimpleMessageStreamProvider(Constants.DefaultStream, opts =>
+            {
+                opts.FireAndForgetDelivery = true;
+            });
             return siloHostBuilder;
         }
 

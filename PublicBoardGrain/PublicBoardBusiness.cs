@@ -19,6 +19,5 @@ namespace Comax.Commons.Orchestrator.MailboxGrain
             _logger = logger;
         }
 
-
     }
 }

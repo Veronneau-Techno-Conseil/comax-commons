@@ -1,65 +1,106 @@
-﻿using Comax.Commons.Orchestrator.MailGrain;
+﻿
 using CommunAxiom.Commons.Orleans;
 using Orleans.Runtime;
 using Orleans.Streams;
 using System;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.IO;
+using Comax.Commons.Orchestrator.Contracts.EventMailbox;
+using CommunAxiom.Commons.Shared;
 
 namespace Comax.Commons.Orchestrator.EventMailboxGrain
 {
     public class EventMailboxBusiness
     {
-        private EventMailboxRepo _EventMailboxRepo;
+        private Guid? _streamId;
+        private IAsyncStream<MailMessage>? _stream;
+        private EventMailboxRepo? _eventMailboxRepo;
+        private IStreamProvider _streamProvider;
 
-        public void Init(IPersistentState<List<MailMessage>> mailMessages)
+        public EventMailboxBusiness(IStreamProvider streamProvider)
         {
-            _EventMailboxRepo = new EventMailboxRepo(mailMessages);
+            _streamProvider = streamProvider;
         }
-        public async Task<List<MailMessage>> GetMailMessages()
+
+        public void Init(IPersistentState<MailboxState> mbState)
         {
-            return await _EventMailboxRepo.Fetch();
+            _eventMailboxRepo = new EventMailboxRepo(mbState);
         }
-        public async Task UpdateMailMessages(List<MailMessage> mailMessages)
+
+        private async Task Dispatch(MailMessage mailMessage)
         {
-            await _EventMailboxRepo.Update(mailMessages);
+            if (_stream == null)
+                throw new InvalidOperationException("Stream cannot be null");
+            await _stream.OnNextAsync(mailMessage);
         }
+
+        public async Task<Guid> GetStreamId()
+        {
+            if(_streamId == null)
+                _streamId = Guid.NewGuid();
+
+            if (_stream == null || _stream.Guid != _streamId.Value)
+            {
+                if(_stream != null)
+                {
+                    await _stream.OnCompletedAsync();
+                }
+                _stream = this._streamProvider.GetStream<MailMessage>(_streamId.Value, Constants.DefaultNamespace);
+            }
+
+            return _streamId.Value;
+        }
+      
         public async Task MarkRead(Guid msgId)
         {
-            var mailMessages = await _EventMailboxRepo.Fetch();
-            foreach (var mail in mailMessages.Where(mail => mail.MsgId == msgId))
-            {
-                mail.ReadState = true;
-            }
-            await UpdateMailMessages(mailMessages);
+            var msg = await _eventMailboxRepo.Find(msgId);
+            msg.ReadState = true;
+            await _eventMailboxRepo.Save();
         }
         public async Task DeleteMail(Guid msgId)
         {
-            var mailMessages = await _EventMailboxRepo.Fetch();
-            foreach (var mail in mailMessages)
-            {
-                mailMessages.RemoveAll(e => e.MsgId == msgId);
-            }
-            await UpdateMailMessages(mailMessages);
+            await _eventMailboxRepo.Remove(msgId);
         }
-        public async Task ResumeMessageStream(IAsyncStream<MailMessage> stream)
+        public async Task<OperationResult> ResumeMessageStream()
         {
-            var mailMessages = await GetMailMessages();
-            foreach (var mail in mailMessages)
+            if(_streamId == null)
             {
-                await stream.OnNextAsync(mail);
+                return new OperationResult
+                {
+                    IsError = true,
+                    Error = EventMailboxConstants.STREAM_NOT_CREATED,
+                    Detail = "Retrieve the streamid first"
+                };
             }
+
+            if (_stream == null && _streamId != null)
+            {
+                _stream = this._streamProvider.GetStream<MailMessage>(_streamId.Value, Constants.DefaultNamespace);
+            }
+
+            var mailMessages = await _eventMailboxRepo.Fetch();
+
+            _ = Task.Run(async () =>
+            {
+                var msg = mailMessages;
+                foreach (var mail in msg)
+                {
+                    await Dispatch(mail);
+                }
+            });
+
+            return new OperationResult();
         }
-        public async Task SendMail(IAsyncStream<MailMessage> stream, MailMessage mail)
+        public async Task DropMail(MailMessage mail)
         {
-            var mailMessages = await GetMailMessages();
-            mailMessages.Add(mail);
-            await UpdateMailMessages(mailMessages);
-            await stream.OnNextAsync(mail);
+            await _eventMailboxRepo.Add(mail);
+            
+            if(_streamId.HasValue && _stream != null)
+                await Dispatch(mail);
+        }
+
+        public async Task<bool> HasMail()
+        {
+            return await _eventMailboxRepo.HasMail();
         }
 
     }

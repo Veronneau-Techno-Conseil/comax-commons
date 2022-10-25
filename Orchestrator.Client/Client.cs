@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 using Comax.Commons.Orchestrator.Contracts.EventMailbox;
 using Comax.Commons.Orchestrator.Contracts.UriRegistry;
 using Comax.Commons.Orchestrator.Contracts.Central;
+using CommunAxiom.Commons.Shared.RuleEngine;
+using Comax.Commons.Orchestrator.Contracts.SOI;
+using CommunAxiom.Commons.Orleans;
 
 namespace Comax.Commons.Orchestrator.Client
 {
@@ -17,6 +20,8 @@ namespace Comax.Commons.Orchestrator.Client
     {
         private bool _disposed = false;
         private readonly IClusterClient _clusterClient;
+
+        private Guid? _userID = null;
         public Client(IClusterClient clusterClient)
         {
             _clusterClient = clusterClient;
@@ -27,19 +32,27 @@ namespace Comax.Commons.Orchestrator.Client
             if (!_disposed) { Dispose(); }
         }
 
-        public IMailbox GetMailbox(string id)
+        private async Task<Guid> LoadUserId()
         {
-            return _clusterClient.GetGrain<IMailbox>(id);
+            if (_userID == null)
+                _userID = await this.GetUriRegistry("").GetOrCreate();
+            return _userID.Value;
         }
 
         public IUriRegistry GetUriRegistry(string id)
         {
-            return _clusterClient.GetGrain<IUriRegistry>(id);
+            string actual = Constants.BLANK_ID;
+            if(!string.IsNullOrWhiteSpace(id))
+                actual = id;
+            return _clusterClient.GetGrain<IUriRegistry>(actual);
         }
 
-        public IEventMailbox GetEventMailbox(Guid id)
+        public async Task<IEventMailbox> GetEventMailbox(Guid? id = null)
         {
-            return _clusterClient.GetGrain<IEventMailbox>(id);
+            Guid? userID = id;
+            if(userID == null)
+                userID = await this.LoadUserId();
+            return _clusterClient.GetGrain<IEventMailbox>(userID.Value);
         }
 
         public ICentral GetCentral()
@@ -54,7 +67,7 @@ namespace Comax.Commons.Orchestrator.Client
             }
             catch (Exception ex)
             {
-
+                Console.Error.WriteLine(ex);
             }
             _clusterClient.Dispose();
             _disposed = true;
@@ -65,6 +78,20 @@ namespace Comax.Commons.Orchestrator.Client
             return _clusterClient.Close();
         }
 
-        
+        public Task<Message> GetMail(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IPublicBoard GetPublicBoard()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ISubjectOfInterest> GetSubjectOfInterest()
+        {
+            Guid? userID = await this.LoadUserId();
+            return _clusterClient.GetGrain<ISubjectOfInterest>(userID.Value);
+        }
     }
 }

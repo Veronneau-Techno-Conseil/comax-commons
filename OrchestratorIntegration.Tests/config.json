@@ -27,5 +27,9 @@
     "username": "usera@vertechcon.net",
     "password": "Tester123!"
   },
+  "TestUserB": {
+    "username": "userb@vertechcon.net",
+    "password": "Tester123!"
+  },
   "CentralApiUrl": "https://central.communaxiom.org"
 }

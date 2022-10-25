@@ -1,6 +1,5 @@
 ﻿
 using Comax.Commons.Orchestrator.Contracts.Mailbox;
-using Comax.Commons.Orchestrator.MailboxGrain;
 using Comax.Commons.Shared.OIDC;
 using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.OIDC;
@@ -17,6 +16,10 @@ using Comax.Commons.Orchestrator.EventMailboxGrain;
 using Comax.Commons.Orchestrator.Contracts.Central;
 using Comax.Commons.Orchestrator.CentralGrain;
 using System.Net.Http;
+using Comax.Commons.Orchestrator.MailboxGrain;
+using Comax.Commons.Orchestrator.Contracts.SOI;
+using Comax.Commons.Orchestrator.SOIGrain;
+using Comax.Commons.Orchestrator.MailGrain;
 
 namespace Comax.Commons.Orchestrator
 {
@@ -44,7 +47,7 @@ namespace Comax.Commons.Orchestrator
                     services.CentralGrainSetup();
 
                     //register singleton services for each grain/interface
-                    services.AddSingleton<IMailbox, Mailbox>();
+                    //services.AddSingleton<ISubjectOfInterest, SubjectOfInterest>();
                     services.AddSingleton<IPublicBoard, PublicBoard>();
                     services.AddSingleton<ICentral, Central>();
 
@@ -61,9 +64,11 @@ namespace Comax.Commons.Orchestrator
 
                 })
                 //configure application parts for each grain
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Mailbox).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(PublicBoard).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts=>parts.AddApplicationPart(typeof(UriRegistry).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(EventMailbox).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Mail).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(SubjectOfInterest).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Central).Assembly).WithReferences());
 
             var silo = builder.Build();
