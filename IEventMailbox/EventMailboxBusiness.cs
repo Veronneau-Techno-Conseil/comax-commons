@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 using Comax.Commons.Orchestrator.Contracts.EventMailbox;
 using CommunAxiom.Commons.Shared;
+using Comax.Commons.Orchestrator.Contracts.Mail;
 
 namespace Comax.Commons.Orchestrator.EventMailboxGrain
 {
@@ -15,10 +16,12 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
         private IAsyncStream<MailMessage>? _stream;
         private EventMailboxRepo? _eventMailboxRepo;
         private IStreamProvider _streamProvider;
+        private IComaxGrainFactory _comaxGrainFactory;
 
-        public EventMailboxBusiness(IStreamProvider streamProvider)
+        public EventMailboxBusiness(IStreamProvider streamProvider, IComaxGrainFactory comaxGrainFactory)
         {
             _streamProvider = streamProvider;
+            _comaxGrainFactory = comaxGrainFactory;
         }
 
         public void Init(IPersistentState<MailboxState> mbState)
@@ -38,14 +41,13 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
             if(_streamId == null)
                 _streamId = Guid.NewGuid();
 
-            if (_stream == null || _stream.Guid != _streamId.Value)
+            if (_stream != null && _stream.Guid != _streamId.Value)
             {
-                if(_stream != null)
-                {
-                    await _stream.OnCompletedAsync();
-                }
-                _stream = this._streamProvider.GetStream<MailMessage>(_streamId.Value, Constants.DefaultNamespace);
+                await _stream.OnCompletedAsync();
+                _stream = null;   
             }
+
+            _stream = this._streamProvider.GetStream<MailMessage>(_streamId.Value, Constants.DefaultNamespace);
 
             return _streamId.Value;
         }
@@ -58,6 +60,8 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
         }
         public async Task DeleteMail(Guid msgId)
         {
+            var mail = this._comaxGrainFactory.GetGrain<IMail>(msgId);
+            await mail.Delete();
             await _eventMailboxRepo.Remove(msgId);
         }
         public async Task<OperationResult> ResumeMessageStream()
@@ -85,7 +89,12 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
                 foreach (var mail in msg)
                 {
                     await Dispatch(mail);
+                    Console.WriteLine("Dispatched Mail");
                 }
+            }).ContinueWith(ac =>
+            {
+                if (ac.IsFaulted)
+                    Console.Error.WriteLine(ac.Exception);
             });
 
             return new OperationResult();

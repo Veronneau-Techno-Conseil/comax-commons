@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace CommunAxiom.Commons.Orleans.Security
 {
@@ -34,8 +35,10 @@ namespace CommunAxiom.Commons.Orleans.Security
             }
 
             var cp = await _claimsPrincipalProvider.GetClaimsPrincipal(this);
+            ClaimsContainer claimsContainer = new ClaimsContainer();
+            claimsContainer.SetPrincipal(cp);
 
-            RequestContext.Set("cp", cp);
+            RequestContext.Set("cp", claimsContainer);
             try
             {
                 validationResult = AccessControl.IsAuthorized(context, cp);

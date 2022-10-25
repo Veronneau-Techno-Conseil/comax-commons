@@ -17,6 +17,12 @@ namespace Comax.Commons.Orchestrator.MailGrain
             _storageState = storageState;
         }
 
+        public async Task Delete()
+        {
+            await _storageState.ReadStateAsync();
+            await _storageState.ClearStateAsync();
+        }
+
         public async Task<bool> Exists()
         {
             await _storageState.ReadStateAsync();

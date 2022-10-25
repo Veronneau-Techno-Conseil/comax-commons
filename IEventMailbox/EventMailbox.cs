@@ -10,9 +10,11 @@ using Orleans.Runtime;
 using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using Comax.Commons.Orchestrator.Contracts.Mail;
+using Orleans.Concurrency;
 
 namespace Comax.Commons.Orchestrator.EventMailboxGrain
 {
+    [Reentrant]
     [ImplicitStreamSubscription(EventMailboxConstants.MAILBOX_STREAM_NS)]
     [AuthorizeClaim(ClaimType = "https://orchestrator.communaxiom.org/mailbox")]
     public class EventMailbox: Grain, IEventMailbox
@@ -58,10 +60,10 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
 
         public override async Task OnActivateAsync()
         {
-            _eventMailboxBusiness = new EventMailboxBusiness(this.GetStreamProvider(Constants.DefaultStream));
+            _eventMailboxBusiness = new EventMailboxBusiness(this.GetStreamProvider(Constants.DefaultStream), new CommunAxiom.Commons.Orleans.GrainFactory(GrainFactory));
             _eventMailboxBusiness.Init(_storageState);
 
-            var streamProvider = GetStreamProvider(Constants.DefaultStream);
+            var streamProvider = GetStreamProvider(Constants.ImplicitStream);
             var key = this.GetPrimaryKey();
             var stream = streamProvider.GetStream<Message>(
                     key, EventMailboxConstants.MAILBOX_STREAM_NS);

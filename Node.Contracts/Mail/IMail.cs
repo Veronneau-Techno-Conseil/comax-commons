@@ -10,5 +10,6 @@ namespace Comax.Commons.Orchestrator.Contracts.Mail
         Task<bool> Exists();
         Task<Message> GetMessage();
         Task Save(Message message);
+        Task Delete();
     }
 }

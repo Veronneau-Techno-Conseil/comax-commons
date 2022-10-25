@@ -12,7 +12,10 @@ using Comax.Commons.Orchestrator.Contracts.UriRegistry;
 using Comax.Commons.Orchestrator.Contracts.Central;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using Comax.Commons.Orchestrator.Contracts.SOI;
+using System.IO;
 using CommunAxiom.Commons.Orleans;
+using System.Xml;
+using CommunAxiom.Commons.Shared;
 
 namespace Comax.Commons.Orchestrator.Client
 {
@@ -31,6 +34,15 @@ namespace Comax.Commons.Orchestrator.Client
         {
             if (!_disposed) { Dispose(); }
         }
+
+        public IClusterClient ClusterClient
+        {
+            get
+            {
+                return _clusterClient;
+            }
+        }
+
 
         private async Task<Guid> LoadUserId()
         {
@@ -59,6 +71,21 @@ namespace Comax.Commons.Orchestrator.Client
         {
             return _clusterClient.GetGrain<ICentral>(Guid.Empty);
         }
+        public Task<StreamSubscriptionHandle<MailMessage>> SubscribeEventMailboxStream(Guid id, Func<MailMessage, StreamSequenceToken, Task> fn, Func<Exception, Task> funcError, Func<Task> onCompleted)
+        {
+            return _clusterClient.GetStreamProvider(Constants.DefaultStream)
+                    .GetStream<MailMessage>(id, Constants.DefaultNamespace).SubscribeAsync(fn,funcError,onCompleted);
+        }
+
+        public async Task<(StreamSubscriptionHandle<MailMessage>, AsyncEnumerableStream<MailMessage>)> EnumEventMailbox(Guid streamId)
+        {
+            var result = new AsyncEnumerableStream<MailMessage>();
+            var handle = await _clusterClient.GetStreamProvider(Constants.DefaultStream)
+                    .GetStream<MailMessage>(streamId, Constants.DefaultNamespace)
+                    .SubscribeAsync(result);
+            return (handle, result);
+        }
+
         public void Dispose()
         {
             try
