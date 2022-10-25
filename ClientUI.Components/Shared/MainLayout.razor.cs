@@ -1,4 +1,4 @@
-using CommunAxiom.Commons.ClientUI.Shared.Resources;
+using CommunAxiom.Commons.ClientUI.Shared.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 
@@ -15,18 +15,18 @@ namespace ClientUI.Components.Shared
                 .Build();
             await _hubConnection.StartAsync();
 
-            _hubConnection.On<Notifications>("ReceiveNotification", (notification) =>
+            _hubConnection.On<DashboardItem>("ReceiveNotification", (notification) =>
             {
                 var encodedMsg = $"{notification.Title}: {notification.Body}";
-                if (notification.Criticality == Criticality.Info)
+                if (notification.Criticality == ItemCriticality.Info)
                 {
                     toastService.ShowInfo(encodedMsg);
                 }
-                else if (notification.Criticality == Criticality.Warning)
+                else if (notification.Criticality == ItemCriticality.Warning)
                 {
                     toastService.ShowWarning(encodedMsg);
                 }
-                else if (notification.Criticality == Criticality.Success)
+                else if (notification.Criticality == ItemCriticality.Success)
                 {
                     toastService.ShowSuccess(encodedMsg);
                 }

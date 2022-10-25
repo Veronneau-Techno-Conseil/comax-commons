@@ -7,110 +7,74 @@
         <div class="column">
             <div class="card has-background-warning-light mb-5">
                 <header class="card-header has-background-primary">
-                    <img class="icon" src="_content/ClientUI.Components/icons/Tasks.png" />
+                    <img class="icon" src="_content/ClientUI.Components/icons/Tasks.png"/>
                     <p class="card-header-title has-text-white has-text-weight-bold pl-0">
                         Tasks
                     </p>
                 </header>
                 <div class="card-content scrollbar has-background-warning-light p-3">
                     <div class="content ">
-                        <div class="box">
-                            <div class="columns">
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7">
-                                        Réginald Bouvier Leduc le
-                                        Second
+                        @foreach (var item in notifications.Where(o => o.ItemGroup == ItemGroup.Task))
+                        {
+                            <div class="box">
+                                <div class="columns">
+                                    <div class="column">
+                                        <p class="has-text-weight-bold is-size-7">
+                                            @item.Title
                                         </p>
+                                    </div>
+                                    <div class="column">
+                                        <p class="has-text-weight-bold is-size-7"> @item.CreateDateTime.ToString("yyyy-MM-dd hh:mm")</p>
+                                    </div>
                                 </div>
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7"> 2022-07-29 13:20:30</p>
+                                <div class="columns">
+                                    <div class="column is-size-6">
+                                        @item.Body
+                                    </div>
+                                </div>
+                                <div class="tags are-small is-right">
+                                    <span class="tag is-primary">Respond...</span>
                                 </div>
                             </div>
-                            <div class="columns">
-                                <div class="column is-size-6">
-                                    Réginald Bouvier Leduc le Second requests to add
-                                    you to their Intacts.
-                                </div>
-                            </div>
-                            <div class="tags are-small is-right">
-                                <span class="tag is-primary">Respond...</span>
-                            </div>
-                        </div>
+                        }
+
                     </div>
                 </div>
             </div>
             <div class="card has-background-warning-light">
                 <header class="card-header has-background-primary">
-                    <img style="width:25px;height:35px;margin:8px;" src="_content/ClientUI.Components/icons/Exclamation.png" />
+                    <img style="width:25px;height:35px;margin:8px;" src="_content/ClientUI.Components/icons/Exclamation.png"/>
                     <p class="card-header-title has-text-white has-text-weight-bold pl-0">
                         Notifications
                     </p>
                 </header>
                 <div class="card-content scrollbar p-3">
                     <div class="content ">
-                        <div class="box mb-3">
-                            <div class="columns">
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7">
-                                       Datasource 2
-                                    </p>
+                        @foreach (var item in notifications.Where(o => o.ItemGroup == ItemGroup.Notification))
+                        {
+                            <div class="box mb-3">
+                                <div class="columns">
+                                    <div class="column">
+                                        <p class="has-text-weight-bold is-size-7">
+                                            @item.Title
+                                        </p>
+                                    </div>
+                                    <div class="column">
+                                        <p class="has-text-weight-bold is-size-7"> @item.CreateDateTime.ToString("yyyy-MM-dd hh:mm")</p>
+                                    </div>
                                 </div>
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7"> 2022-07-29 10:20:30</p>
+                                <div class="columns">
+                                    <div class="column is-size-6">
+                                        @item.Body
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="columns">
-                                <div class="column is-size-6">
-                                    Ingestion faield on datasource 2.
-                                </div>
-                            </div>
-                            <div class="tags are-small is-right">
-                                <span class="tag is-danger">Faield</span>
-                                <span class="tag is-primary">See logs...</span>
-                            </div>
-                        </div>
-                        <div class="box mb-3">
-                            <div class="columns">
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7">
-                                        Datasource 3
-                                    </p>
-                                </div>
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7"> 2022-07-29 10:20:30</p>
+                                <div class="tags are-small is-right">
+                                    <span class="tag is-danger">@item.Criticality.GetDisplayDescription()</span>
+                                    <span class="tag is-primary">See logs...</span>
                                 </div>
                             </div>
-                            <div class="columns">
-                                <div class="column is-size-6">
-                                    Ingestion completed with errors.
-                                </div>
-                            </div>
-                            <div class="tags are-small is-right">
-                                <span class="tag is-warning">Errors</span>
-                                <span class="tag is-primary">See details...</span>
-                            </div>
-                        </div>
-                        <div class="box">
-                            <div class="columns">
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7">
-                                        Datasource 3
-                                    </p>
-                                </div>
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7"> 2022-07-29 10:20:30</p>
-                                </div>
-                            </div>
-                            <div class="columns">
-                                <div class="column is-size-6">
-                                    Ingestion completed with errors.
-                                </div>
-                            </div>
-                            <div class="tags are-small is-right">
-                                <span class="tag is-warning">Errors</span>
-                                <span class="tag is-primary">See details...</span>
-                            </div>
-                        </div>
+                        }
+                      
                     </div>
                 </div>
             </div>
@@ -118,53 +82,36 @@
         <div class="column h-100">
             <div class="card has-background-warning-light">
                 <header class="card-header has-background-primary">
-                    <img class="icon" src="_content/ClientUI.Components/icons/Schedule.png" />
+                    <img class="icon" src="_content/ClientUI.Components/icons/Schedule.png"/>
                     <p class="card-header-title has-text-white has-text-weight-bold pl-0">
                         Upcoming activities
                     </p>
                 </header>
                 <div class="card-content scrollbar-2 p-3">
                     <div class="content">
-                        <div class="box mb-3">
-                            <div class="columns">
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7">
-                                        Datasource 4
-                                    </p>
+                        @foreach (var item in notifications.Where(o => o.ItemGroup == ItemGroup.UpcomingActivity))
+                        {
+                            <div class="box mb-3">
+                                <div class="columns">
+                                    <div class="column">
+                                        <p class="has-text-weight-bold is-size-7">
+                                            @item.Title
+                                        </p>
+                                    </div>
+                                    <div class="column">
+                                        <p class="has-text-weight-bold is-size-7"> @item.CreateDateTime.ToString("yyyy-MM-dd hh:mm")</p>
+                                    </div>
                                 </div>
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7"> 2022-07-31 01:00:00</p>
+                                <div class="columns">
+                                    <div class="column is-size-6">
+                                        @item.Body
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="columns">
-                                <div class="column is-size-6">
-                                    Upcoming ingestion for datasource.
-                                </div>
-                            </div>
-                            <div class="tags are-small is-right">
-                                <span class="tag is-primary">See details...</span>
-                            </div>
-                        </div>
-                        <div class="box">
-                            <div class="columns">
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7">
-                                        Datasource 5
-                                    </p>
-                                </div>
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7"> 2022-07-31 02:00:00</p>
+                                <div class="tags are-small is-right">
+                                    <span class="tag is-primary">See details...</span>
                                 </div>
                             </div>
-                            <div class="columns">
-                                <div class="column is-size-6">
-                                    Upcoming ingestion for datascources.
-                                </div>
-                            </div>
-                            <div class="tags are-small is-right">
-                                <span class="tag is-primary">See details...</span>
-                            </div>
-                        </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -172,150 +119,39 @@
         <div class="column h-100">
             <div class="card has-background-warning-light">
                 <header class="card-header has-background-primary">
-                    <img class="icon" src="_content/ClientUI.Components/icons/History.png" /> 
+                    <img class="icon" src="_content/ClientUI.Components/icons/History.png"/>
                     <p class="card-header-title has-text-white has-text-weight-bold pl-0">
                         Activity Stream
                     </p>
                 </header>
                 <div class="card-content scrollbar-2 p-3">
                     <div class="content">
-                        <div class="box mb-3">
-                            <div class="columns">
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7">
-                                        Datasource 6
-                                    </p>
+                        @foreach (var item in notifications.Where(o => o.ItemGroup == ItemGroup.ActivityStream))
+                        {
+                            <div class="box mb-3">
+                                <div class="columns">
+                                    <div class="column">
+                                        <p class="has-text-weight-bold is-size-7">
+                                            @item.Title
+                                        </p>
+                                    </div>
+                                    <div class="column">
+                                        <p class="has-text-weight-bold is-size-7"> @item.CreateDateTime.ToString("yyyy-MM-dd hh:mm") </p>
+                                    </div>
                                 </div>
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7"> 2022-07-29 02:20:30</p>
+                                <div class="columns">
+                                    <div class="column is-size-6">
+                                        @item.Body
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="columns">
-                                <div class="column is-size-6">
-                                    Ingestion in progress...
-                                </div>
-                            </div>
-                            <div class="tags are-small is-right">
-                                <span class="tag is-primary">See details...</span>
-                            </div>
-                        </div>
-
-                         <div class="box mb-3">
-                            <div class="columns">
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7">
-                                        Datasource 6
-                                    </p>
-                                </div>
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7"> 2022-07-29 02:20:30</p>
+                                <div class="tags are-small is-right">
+                                    <span class="tag is-primary">See details...</span>
                                 </div>
                             </div>
-                            <div class="columns">
-                                <div class="column is-size-6">
-                                    Ingestion in progress...
-                                </div>
-                            </div>
-                            <div class="tags are-small is-right">
-                                <span class="tag is-primary">See details...</span>
-                            </div>
-                        </div>
-
-                         <div class="box mb-3">
-                            <div class="columns">
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7">
-                                        Datasource 6
-                                    </p>
-                                </div>
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7"> 2022-07-29 02:20:30</p>
-                                </div>
-                            </div>
-                            <div class="columns">
-                                <div class="column is-size-6">
-                                    Ingestion in progress...
-                                </div>
-                            </div>
-                            <div class="tags are-small is-right">
-                                <span class="tag is-primary">See details...</span>
-                            </div>
-                        </div>
-
-                         <div class="box mb-3">
-                            <div class="columns">
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7">
-                                        Datasource 6
-                                    </p>
-                                </div>
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7"> 2022-07-29 02:20:30</p>
-                                </div>
-                            </div>
-                            <div class="columns">
-                                <div class="column is-size-6">
-                                    Ingestion in progress...
-                                </div>
-                            </div>
-                            <div class="tags are-small is-right">
-                                <span class="tag is-primary">See details...</span>
-                            </div>
-                        </div>
-
-                         <div class="box mb-3">
-                            <div class="columns">
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7">
-                                        Datasource 6
-                                    </p>
-                                </div>
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7"> 2022-07-29 02:20:30</p>
-                                </div>
-                            </div>
-                            <div class="columns">
-                                <div class="column is-size-6">
-                                    Ingestion in progress...
-                                </div>
-                            </div>
-                            <div class="tags are-small is-right">
-                                <span class="tag is-primary">See details...</span>
-                            </div>
-                        </div>
-
-                        <div class="box">
-                            <div class="columns">
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7">
-                                        Datasource 1
-                                    </p>
-                                </div>
-                                <div class="column">
-                                    <p class="has-text-weight-bold is-size-7"> 2022-07-31 02:20:30</p>
-                                </div>
-                            </div>
-                            <div class="columns">
-                                <div class="column">
-                                    Ingestion completes
-                                </div>
-                            </div>
-                            <div class="tags are-small is-right">
-                                <span class="tag is-primary">See details...</span>
-                            </div>
-                        </div>
+                        }
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<ul id="notificationsList">
-    @foreach (var notification in notifications)
-    {
-        <li>@notification</li>
-    }
-</ul>
-
-
