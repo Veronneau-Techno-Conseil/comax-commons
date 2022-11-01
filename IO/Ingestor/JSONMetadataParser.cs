@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using Newtonsoft.Json;
 
@@ -8,7 +8,7 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
     {
         Regex replaceIndex = new Regex(@"(\[\d+\])");
         Dictionary<string, FieldMetaData> metaDictionary = new Dictionary<string, FieldMetaData>();
-        
+
         private string FormatName(string name)
         {
             var n = replaceIndex.Replace(name, "[]");
@@ -20,7 +20,7 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
             var n = Regex.Replace(name, @"(\[\d+\].)", string.Empty);
             return n;
         }
-        
+
         private void SetProperty(JsonReader jsonReader)
         {
             var name = FormatName(jsonReader.Path);

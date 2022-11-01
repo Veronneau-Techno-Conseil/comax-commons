@@ -40,7 +40,7 @@ namespace CommunAxiom.Commons.ClientUI.Server
             };
         }
 
-        public Startup(Microsoft.AspNetCore.Hosting.IWebHostEnvironment hostingEnvironment, IConfiguration configuration)
+        public Startup(IWebHostEnvironment hostingEnvironment, IConfiguration configuration)
         {
             Configuration = configuration;
             HostingEnvironment = hostingEnvironment;

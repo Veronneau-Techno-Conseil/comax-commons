@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
-
 	  <AssemblyName>CommunAxiom.Commons.Orleans</AssemblyName>
 	  <RootNamespace>CommunAxiom.Commons.Orleans</RootNamespace>
   </PropertyGroup>

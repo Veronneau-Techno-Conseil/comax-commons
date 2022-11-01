@@ -2,8 +2,8 @@
 
   <PropertyGroup>
 	  <TargetFramework>netstandard2.1</TargetFramework>
-	  <AssemblyName>Comax.Commons.Orchestrator.MailboxGrain</AssemblyName>
-	  <RootNamespace>Comax.Commons.Orchestrator.MailboxGrain</RootNamespace>
+	  <AssemblyName>Comax.Commons.Orchestrator.PublicBoard</AssemblyName>
+	  <RootNamespace>Comax.Commons.Orchestrator.PublicBoard</RootNamespace>
 	   <LangVersion>10.0</LangVersion>
   </PropertyGroup>
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Comax.Commons.Orchestrator.MailGrain
+namespace Comax.Commons.Orchestrator.Contracts.EventMailbox
 {
     public class MailMessage
     {

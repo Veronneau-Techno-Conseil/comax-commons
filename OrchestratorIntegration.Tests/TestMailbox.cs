@@ -17,9 +17,8 @@ namespace OrchestratorIntegration.Tests
             var cf = new ClientFactory(Cluster.ServiceProvider, Cluster.Configuration);
             await cf.WithClusterClient(async c =>
             {
-                var mb = c.GetMailbox("Test mailbox");
+                var mb = await c.GetEventMailbox(Guid.Empty);
                 var testCall = await mb.HasMail();
-
             });
         }
     }
