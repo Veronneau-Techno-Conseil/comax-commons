@@ -25,6 +25,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommunAxiom.Commons.Client.Contracts.Grains.Dispatch;
+using CommunAxiom.Commons.Client.Grains.DispatchGrain;
 
 namespace CommunAxiom.Commons.Client.DevSilo.Silos
 {
@@ -61,6 +63,7 @@ namespace CommunAxiom.Commons.Client.DevSilo.Silos
                     services.AddSingleton<IPortfolio, Portfolios>();
                     services.AddSingleton<IProject, Projects>();
                     services.AddSingleton<IReplication, Replications>();
+                    services.AddSingleton<IDispatch, Dispatch>();
 
                 })
                 //configure application parts for each grain

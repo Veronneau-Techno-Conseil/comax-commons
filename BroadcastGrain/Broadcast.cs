@@ -1,5 +1,4 @@
-﻿using CommunAxiom.Commons.Client.Contracts;
-using CommunAxiom.Commons.Client.Contracts.Broadcast;
+﻿using CommunAxiom.Commons.Client.Contracts.Broadcast;
 using CommunAxiom.Commons.Orleans;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using Orleans;
