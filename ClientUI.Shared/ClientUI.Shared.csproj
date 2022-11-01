@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <AssemblyName>CommunAxiom.Commons.ClientUI.Shared</AssemblyName>
+        <RootNamespace>CommunAxiom.Commons.ClientUI.Shared</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <WarningLevel>4</WarningLevel>
+        <NoWarn>1701;1702;8618;8602;8603;8601;8625</NoWarn>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Blazorise" Version="1.0.6" />
+        <PackageReference Include="Blazorise.TreeView" Version="1.0.6" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Localization" Version="2.2.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="6.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.8" />
+        <PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+        <PackageReference Include="Blazored.Toast" Version="3.2.2" />
+        <PackageReference Include="BlazorPro.Spinkit" Version="1.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.8" />
+        <PackageReference Include="Radzen.Blazor" Version="3.20.4" />
+        <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="6.0.8" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Contracts\Contracts.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="JsonLocalizer\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="JsonLocalizer\" />
+        <None Remove="Microsoft.Extensions.FileProviders.Embedded" />
+        <None Remove="Resources\LoginViewModel\en.json" />
+        <None Remove="Resources\LoginViewModel\fr.json" />
+        <None Remove="Resources\StdMessageService\en.json" />
+        <None Remove="Resources\StdMessageService\fr.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Resources\LoginViewModel\en.json" />
+        <EmbeddedResource Include="Resources\LoginViewModel\fr.json" />
+        <EmbeddedResource Include="Resources\StdMessageService\en.json" />
+        <EmbeddedResource Include="Resources\StdMessageService\fr.json" />
+    </ItemGroup>
+</Project>

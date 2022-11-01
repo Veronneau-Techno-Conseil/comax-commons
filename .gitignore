@@ -1,3 +1,16 @@
 **/bin/**/*
 **/obj/**/*
 .vs/**/*.*
+/DevSilo/Default
+/DevSilo/Default-log
+/DevSilo/PubSubStore
+/DevSilo/PubSubStore-log
+/Silo/Default
+/Silo/Default-log
+/Silo/PubSubStore
+/Silo/PubSubStore-log
+node_modules
+/Silo/SiloStore.db
+/Silo/SiloStore-log.db
+/Silo/PubSubStore.db
+/Silo/PubSubStore-log.db

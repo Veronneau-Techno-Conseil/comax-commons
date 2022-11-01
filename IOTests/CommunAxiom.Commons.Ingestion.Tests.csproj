@@ -1,0 +1,70 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>1701;1702;8618;8625</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Deedle" Version="2.5.0" />
+    <PackageReference Include="coverlet.collector" Version="3.1.2"><IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+<PrivateAssets>all</PrivateAssets>
+</PackageReference>
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="FluentAssertions" Version="6.7.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.0" />
+    <PackageReference Include="Moq" Version="4.18.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="NUnit" />
+    <None Remove="NUnit3TestAdapter" />
+    <None Remove="DataSource\" />
+    <None Remove="FluentAssertions" />
+    <None Remove="Moq" />
+    <None Remove="Microsoft.NET.Test.Sdk" />
+    <None Remove="Ingestor\" />
+    <None Remove="Validators\" />
+    <None Remove="Samples\" />
+    <None Remove="Samples\Configurations\" />
+    <None Remove="Samples\Files\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DataSource\" />
+    <Folder Include="Samples\Configurations\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IO\CommunAxiom.Commons.Ingestion.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Samples\Configurations\datasource.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\fieldMetaDataData.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\fieldMetaDataConfig.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Files\DataFile.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Files\sample2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Files\sample1.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Files\sample1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

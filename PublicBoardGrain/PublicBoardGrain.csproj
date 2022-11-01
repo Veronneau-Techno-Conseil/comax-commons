@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>netstandard2.1</TargetFramework>
+	  <AssemblyName>Comax.Commons.Orchestrator.PublicBoard</AssemblyName>
+	  <RootNamespace>Comax.Commons.Orchestrator.PublicBoard</RootNamespace>
+	   <LangVersion>10.0</LangVersion>
+  </PropertyGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+		<PackageReference Include="Microsoft.Orleans.Runtime.Abstractions" Version="3.6.5" />
+		<PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="3.6.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
+	  <ProjectReference Include="..\Orleans\Orleans.csproj" />
+	</ItemGroup>
+
+</Project>

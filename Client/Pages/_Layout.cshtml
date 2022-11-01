@@ -1,0 +1,47 @@
+﻿@using CommunAxiom.Commons.ClientUI.Server.Pages
+@using Microsoft.AspNetCore.Components.Web
+@namespace CommunAxiom.Commons.ClientUI
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Commun Axiom - Commons</title>
+    <base href="/" />
+    <link href="manifest.json" rel="manifest" />
+    <link rel="icon" href="commons.ico" />
+
+    <link href="_content/ClientUI.Components/styles.min.css" rel="stylesheet" />
+    <!--<link href="_content/BlazingChat.Components/css/app-light.css" rel="stylesheet" id="theme" />
+    <link href="BlazingChat.Client.styles.css" rel="stylesheet" />-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <link href="_content/Blazorise/blazorise.css" rel="stylesheet" />
+    <link href="_content/Blazorise.Bulma/blazorise.bulma.css" rel="stylesheet" />
+    <link href="_content/Blazorise.TreeView/blazorise.treeview.css" rel="stylesheet" />
+
+    <link href="_content/Radzen.Blazor/css/default-base.css" rel="stylesheet">
+    <link href="_content/Blazored.Toast/blazored-toast.min.css" rel="stylesheet" />
+    <link href="_content/BlazorPro.Spinkit/spinkit.min.css" rel="stylesheet" />
+    <link href="_content/ClientUI.Components/notifications.css" rel="stylesheet" />
+    <component type="typeof(Metadata)" render-mode="ServerPrerendered" />
+
+</head>
+
+<body>
+    <div id="app">
+        @RenderBody()
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+    <script src="_content/ClientUI.Components/site.js"></script>
+</body>
+
+</html>
+
+
+

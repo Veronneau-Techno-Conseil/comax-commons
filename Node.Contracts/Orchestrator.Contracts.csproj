@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<AssemblyName>Comax.Commons.Orchestrator.Contracts</AssemblyName>
+		<RootNamespace>Comax.Commons.Orchestrator.Contracts</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		
+		
+		<PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator" Version="3.6.5" />
+		<PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="3.6.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Orleans\Orleans.csproj" />
+		<ProjectReference Include="..\Shared\Shared.csproj" />
+	</ItemGroup>
+
+</Project>

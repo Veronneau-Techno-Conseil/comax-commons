@@ -1,0 +1,96 @@
+﻿@using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
+@using Microsoft.Extensions.Hosting
+@using Microsoft.Extensions.Localization
+@using Microsoft.AspNetCore.SignalR.Client
+@inject HttpClient _httpClient
+@inject NavigationManager _navigationManager
+@inject IAccessTokenService _accessTokenService
+@inject AuthenticationStateProvider _stateProvider
+@inject IStringLocalizer<MainMenu> _localizer
+@inject IJSRuntime JsRuntime
+@inject IHostEnvironment _environment
+
+<nav class="navbar is-white" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <NavLink class="navbar-item" href="/">
+                <img src="_content/ClientUI.Components/images/Commons.png" />
+                <strong>@_localizer["Commons"]</strong>
+            </NavLink>
+            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navMenuIndex">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div @ref=navMenuIndex id="navMenuIndex" class="navbar-menu">
+            <div class="navbar-start">
+                <AuthorizeView>
+                    <Authorized>
+                        <NavLink class="navbar-item" href="dashboard" Match="NavLinkMatch.All">
+                            <img class="icon-25" src="_content/ClientUI.Components/icons/Home.png" />
+                            @_localizer["Dashboard"]
+                        </NavLink>
+                    </Authorized>
+                </AuthorizeView>
+
+                @if (_environment.IsDevelopment())
+                {
+                    <NavLink class="navbar-item" href="test_grain" Match="NavLinkMatch.All">
+                        <img class="icon-25" src="_content/ClientUI.Components/icons/Commons.png" />
+                        @_localizer["Test grains"]
+                    </NavLink>
+                }
+
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <NavLink class="navbar-item" href="portfolio" Match="NavLinkMatch.All">
+                        <img class="icon-25" src="_content/ClientUI.Components/icons/Portfolio.png" />
+                        @_localizer["Portfolio"]
+                    </NavLink>
+                </div>
+
+                <NavLink class="navbar-item" href="about" Match="NavLinkMatch.All">
+                    <img class="icon-25" src="_content/ClientUI.Components/icons/Commons.png" />
+                    @_localizer["About"]
+                </NavLink>
+            </div>
+
+            <div class="navbar-end">
+                <AuthorizeView>
+                    <Authorized>
+                        <span class="navbar-item">
+                            @User?.Name
+                        </span>
+
+                        <span id="criticalNotifications" class="navbar-item">
+                            <div class='ikrNoti_Counter'>@criticalNotifications.Count()</div>
+                            <div class='ikrNoti_Button' style="background: #2E467C" @onclick="HideShowNotifications"></div>
+                            <div class='ikrNotifications' style="display:@notificationsBox !important" @onclick=HideShowNotifications>
+                                <h3>Critical Notifications (<span class='notiCounterOnHead'> @criticalNotifications.Count() </span>)</h3>
+                                <div>
+                                    @foreach (var notification in criticalNotifications)
+                                    {
+                                        <div>
+                                            <h4>@notification</h4>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </span>
+
+                        <a class="navbar-item" @onclick="Logout">
+                            <img alt="Log off" class="image is-32x32" src="https://djp65hxq6jm81.cloudfront.net/uploads/735de877-33df-42ce-a423-af091d396e7c/Logout.png" />
+                        </a>
+                    </Authorized>
+                    <NotAuthorized>
+                        <NavLink class="navbar-item" href="login" Match="NavLinkMatch.All">
+                            @_localizer["Log in"]
+                        </NavLink>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </div>
+</nav>
+

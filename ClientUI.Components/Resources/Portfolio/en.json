@@ -1,0 +1,16 @@
+﻿{
+  "ListPortfolios": "List Portfolios",
+  "Type": "Type",
+  "NoPortfoliosAdded": "No Portfolios Added Yet",
+  "Create": "Create",
+  "SelectType": "Select Type",
+  "Parent": "Parent",
+  "SelectParent": "Select Parent",
+  "NameIsNotUnique": "Portfolio Name is not Unique",
+
+  "AddPortfolio": "Create Portfolio",
+  "PortfolioName": "Name",
+  "Save": "Save",
+  "Cancel": "Cancel",
+  "NameIsRequired": "Name is required!"
+}
