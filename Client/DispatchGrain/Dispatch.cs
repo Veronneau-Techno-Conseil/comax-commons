@@ -1,9 +1,12 @@
-﻿using Comax.Commons.Orchestrator.EventMailboxGrain;
+﻿using Comax.Commons.Orchestrator.Contracts.EventMailbox;
+using Comax.Commons.Orchestrator.EventMailboxGrain;
+using CommunAxiom.Commons.Client.ClusterEventStream.Extentions;
 using CommunAxiom.Commons.Client.Contracts.Grains.Dispatch;
+using CommunAxiom.Commons.Client.Grains.DispatchGrain.RuleEngine;
 using CommunAxiom.Commons.Orleans;
 using CommunAxiom.Commons.Orleans.Security;
-using CommunAxiom.Commons.Shared.RuleEngine;
 using Orleans;
+using Orleans.Streams;
 
 namespace CommunAxiom.Commons.Client.Grains.DispatchGrain
 {
@@ -11,20 +14,31 @@ namespace CommunAxiom.Commons.Client.Grains.DispatchGrain
     [AuthorizeClaim(ClaimType = "https://orchestrator.communaxiom.org/mailbox")]
     public class Dispatch : Grain, IDispatch
     {
-        private readonly EventMailboxBusiness _eventMailboxBusiness;
+        private EventMailboxBusiness _eventMailboxBusiness;
+ 
         public override async Task OnActivateAsync()
         {
-            _eventMailboxBusiness = new EventMailboxBusiness(this.GetStreamProvider(Constants.DefaultStream));
-            _eventMailboxBusiness.Init(_storageState);
+            var streamProvider = GetStreamProvider(Constants.DefaultStream);
+            var grainFactory = new GrainFactory(GrainFactory);
+            
+            _eventMailboxBusiness = new EventMailboxBusiness(streamProvider, grainFactory);
 
-            var streamProvider = GetStreamProvider(Constants.DefaultNamespace);
-            var key = this.GetPrimaryKey();
-            var stream = streamProvider.GetEventStream();//GetStream<Message>(key, EventMailboxConstants.MAILBOX_STREAM_NS);
+            var stream = streamProvider.GetEventStream();
 
             await stream.SubscribeAsync(async (msg, seqToken) =>
             {
-                // Pipe through business rule engine
-                // await _eventMailboxBusiness.SendMail(mm);
+                var dispatchRuleEngine = new DispatchRuleEngine(streamProvider);
+                
+                await dispatchRuleEngine.Process(msg);
+
+                await _eventMailboxBusiness.DropMail(new MailMessage
+                {
+                    From = msg.From,
+                    MsgId = msg.Id,
+                    ReceivedDate = DateTime.UtcNow,
+                    Subject = msg.Subject,
+                    Type = msg.Type
+                });
             });
             
         }
