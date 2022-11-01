@@ -43,6 +43,11 @@ namespace Comax.Commons.Orchestrator
         /// <returns></returns>
         public static ISiloHostBuilder SetDefaults(this ISiloHostBuilder siloHostBuilder, out IConfiguration configuration)
         {
+            siloHostBuilder.ConfigureLogging(opts =>
+            {
+                opts.AddConsole();
+                opts.SetMinimumLevel(LogLevel.Debug);
+            });
             siloHostBuilder.SetConfiguration(out configuration);
             siloHostBuilder.SetClustering();
             siloHostBuilder.SetEndPoints();
@@ -83,6 +88,11 @@ namespace Comax.Commons.Orchestrator
         public static ISiloHostBuilder SetStreamProviders(this ISiloHostBuilder siloHostBuilder)
         {
             siloHostBuilder.AddSimpleMessageStreamProvider(Constants.DefaultStream);
+            siloHostBuilder.AddSimpleMessageStreamProvider(Constants.ImplicitStream, opts =>
+            {
+                opts.FireAndForgetDelivery = true;
+            });
+
             return siloHostBuilder;
         }
 

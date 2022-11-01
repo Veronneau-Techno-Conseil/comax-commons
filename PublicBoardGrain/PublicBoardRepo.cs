@@ -13,7 +13,5 @@ namespace Comax.Commons.Orchestrator.MailboxGrain
         {
             _storageState = storageState;
         }
-
-
     }
 }

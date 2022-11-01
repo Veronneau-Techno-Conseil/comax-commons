@@ -14,7 +14,9 @@ namespace CommunAxiom.Commons.Orleans.Security
             var o = RequestContext.Get("cp"); 
             if(o == null)
                 return null;
-            return (ClaimsPrincipal)o;
+            var cc = (ClaimsContainer)o;
+            var cp = cc.GetPrincipal();
+            return cp;
         }
     }
 }

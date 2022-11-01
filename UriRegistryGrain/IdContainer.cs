@@ -1,8 +1,11 @@
-﻿namespace Comax.Commons.Orchestrator.UriRegistryGrain
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Comax.Commons.Orchestrator.UriRegistryGrain
 {
     public class IdContainer
     {
-        public string Guid { get; set; }
-        
+        public Guid? Guid { get; set; }
     }
 }

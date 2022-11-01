@@ -2,8 +2,8 @@
   "OIDC": {
     "Authority": "https://accounts.communaxiom.org/",
     "Scopes": "openid offline_access roles profile email",
-    "ClientId": "",
-    "Secret": ""
+    "ClientId": "tractavissent_expetendum_multoque_monstret",
+    "Secret": "a7b5dd54-cfc9-4423-bee2-04344a6d1f04"
   },
   "ClientOIDC": {
     "Authority": "https://accounts.communaxiom.org/",
@@ -24,7 +24,12 @@
     "FileName": "./PubSubStore.db"
   },
   "TestUser": {
-    "username": "test@comax.org",
+    "username": "usera@vertechcon.net",
     "password": "Tester123!"
-  }
+  },
+  "TestUserB": {
+    "username": "userb@vertechcon.net",
+    "password": "Tester123!"
+  },
+  "CentralApiUrl": "https://central.communaxiom.org"
 }

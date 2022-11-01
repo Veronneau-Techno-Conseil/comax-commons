@@ -57,6 +57,7 @@ var applicationSettingsSection = builder.Configuration;
 builder.Services.Configure<ApplicationSettings>(options => { applicationSettingsSection.Bind(options); });
 
 
+
 // SEO Services
 builder.Services.AddScoped<MetadataTransferService>();
 builder.Services.AddMemoryCache();

@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
-	  <AssemblyName>Comax.Commons.Orchestrator.EventMailboxGrain</AssemblyName>
-	  <RootNamespace>Comax.Commons.Orchestrator.EventMailboxGrain</RootNamespace>
-	  <LangVersion>10.0</LangVersion>
+	<AssemblyName>Comax.Commons.Orchestrator.EventMailboxGrain</AssemblyName>
+	<RootNamespace>Comax.Commons.Orchestrator.EventMailboxGrain</RootNamespace>
+	<LangVersion>10.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
