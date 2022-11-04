@@ -17,8 +17,6 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.6.5" />
       <PackageReference Include="Microsoft.Orleans.Runtime.Abstractions" Version="3.6.5" />
-        <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="3.6.5" />
     </ItemGroup>
 
 </Project>
