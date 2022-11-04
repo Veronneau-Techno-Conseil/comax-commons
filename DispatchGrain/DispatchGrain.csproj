@@ -8,9 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\ClusterEventStream\ClusterEvent.csproj" />
-      <ProjectReference Include="..\..\Contracts\Contracts.csproj" />
-      <ProjectReference Include="..\..\IEventMailbox\EventMailboxGrain.csproj" />
+      <ProjectReference Include="..\ClusterEventStream\ClusterEvent.csproj" />
+      <ProjectReference Include="..\Contracts\Contracts.csproj" />
+      <ProjectReference Include="..\IEventMailbox\EventMailboxGrain.csproj" />
+      <ProjectReference Include="..\Contracts\Contracts.csproj" />
     </ItemGroup>
 
     <ItemGroup>
