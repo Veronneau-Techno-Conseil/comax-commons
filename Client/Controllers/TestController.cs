@@ -16,16 +16,13 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
         {
             _clusterClient = clusterClient;
         }
-        public TestController()
-        {
-            
-        }
+        
         [HttpGet("TestDispatch")]
         public async Task<IActionResult> Get()
         {
             await _clusterClient.WithClusterClient(async cc =>
             {
-                await cc.GetIngestion("Portfolios").Run();
+                await cc.GetIngestion("Ingestion").Run();
             });
             
             return Ok();

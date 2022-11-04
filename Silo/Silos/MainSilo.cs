@@ -1,10 +1,10 @@
-﻿using CommunAxiom.Commons.Client.Contracts.Account;
+﻿using System;
+using CommunAxiom.Commons.Client.Contracts.Account;
 using CommunAxiom.Commons.Client.Contracts.Auth;
 using CommunAxiom.Commons.Client.Contracts.Dataset;
 using CommunAxiom.Commons.Client.Contracts.Datasource;
 using CommunAxiom.Commons.Client.Contracts.DataTransfer;
 using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
-using CommunAxiom.Commons.Client.Contracts.Grains.Scheduler;
 using CommunAxiom.Commons.Client.Contracts.Ingestion;
 using CommunAxiom.Commons.Client.Contracts.Project;
 using CommunAxiom.Commons.Client.Contracts.Replication;
@@ -24,6 +24,13 @@ using ProjectGrain;
 using ReplicationGrain;
 using SchedulerGrain;
 using System.Threading.Tasks;
+using CommunAxiom.Commons.Client.Contracts.Broadcast;
+using CommunAxiom.Commons.Client.Contracts.Grains.Dispatch;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Grains.DispatchGrain;
+using CommunAxiom.Commons.Ingestion;
+using CommunAxiom.Commons.Ingestion.DataSource;
+using CommunAxiom.Commons.Ingestion.Ingestor;
 
 namespace CommunAxiom.Commons.Client.Silo
 {
@@ -64,14 +71,38 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<PortfolioBusiness, PortfolioBusiness>();
                     services.AddSingleton<IProject, Projects>();
                     services.AddSingleton<IReplication, Replications>();
-                    services.AddSingleton<IScheduler, Scheduler>();
                     services.AddSingleton<SchedulerBusiness, SchedulerBusiness>();
                     services.AddSingleton<SchedulerRepo, SchedulerRepo>();
+                    services.AddSingleton<IDispatch, Dispatch>();       
+                    services.AddSingleton<IBroadcast, Grains.BroadcastGrain.Broadcast>();
 
                     services.AddSingleton<ISettingsProvider, SiloSettingsProvider>();
                     services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
                     services.AddSingleton<IIncomingGrainCallFilter, AccessControlFilter>();
 
+                    services.AddSingleton<Importer, Importer>();
+
+                    services.AddSingleton<IDataSourceFactory, DataSourceFactory>();
+                    services.AddSingleton<IIngestorFactory, IngestorFactory>();
+
+                    
+                    // data sources
+
+                    services.AddScoped<TextDataSourceReader>();
+            
+                    services.AddTransient<Func<DataSourceType, IDataSourceReader>>(provider => key =>
+                    {
+                        switch (key)
+                        {
+                            case DataSourceType.FILE:
+                                return provider.GetService<TextDataSourceReader>();
+                            case DataSourceType.API:
+                                return null;
+                        }
+
+                        return null;
+                    });
+                    
                 })
                 //configure application parts for each grain
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Accounts).Assembly).WithReferences())
@@ -82,8 +113,10 @@ namespace CommunAxiom.Commons.Client.Silo
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Portfolios).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Projects).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Replications).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Grains.BroadcastGrain.Broadcast).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Dispatch).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Scheduler).Assembly).WithReferences());
-
+            
             var silo = builder.Build();
             await silo.StartAsync();
             _silo = silo;
@@ -93,10 +126,7 @@ namespace CommunAxiom.Commons.Client.Silo
         static void ConfigureIdentitty(IServiceCollection services)
         {
             
-            services.AddTransient<Shared.OIDC.OIDCSettings>(services =>
-            {
-                return SiloShared.Conf.OIDCConfig.Config;
-            });
+            services.AddTransient(services => SiloShared.Conf.OIDCConfig.Config);
         }
 
         public static async Task StopSilo()

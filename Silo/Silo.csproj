@@ -14,7 +14,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
-	<PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="3.6.5" />
 	<PackageReference Include="Microsoft.Orleans.Core" Version="3.6.5" />
 	<PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.6.5" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.6.5" />
@@ -27,6 +28,8 @@
     <ProjectReference Include="..\DatasetGrain\DatasetGrain.csproj" />
     <ProjectReference Include="..\DatasourceGrain\DatasourceGrain.csproj" />
     <ProjectReference Include="..\DataTransferGrain\DataTransferGrain.csproj" />
+    <ProjectReference Include="..\DispatchGrain\DispatchGrain.csproj" />   
+    <ProjectReference Include="..\BroadcastGrain\BroadcastGrain.csproj" />
     <ProjectReference Include="..\IngestionGrain\IngestionGrain.csproj" />
     <ProjectReference Include="..\LiteDbStorageProvider\LiteDbStorageProvider.csproj" />
     <ProjectReference Include="..\PortfolioGrain\PortfolioGrain.csproj" />

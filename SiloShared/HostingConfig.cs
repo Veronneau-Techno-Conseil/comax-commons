@@ -39,7 +39,6 @@ namespace CommunAxiom.Commons.Client.SiloShared
         /// <returns></returns>
         public static ISiloHostBuilder SetDefaults(this ISiloHostBuilder siloHostBuilder, out IConfiguration configuration)
         {
-
             siloHostBuilder.SetConfiguration(out configuration);
             siloHostBuilder.SetClustering();
             siloHostBuilder.SetEndPoints();
