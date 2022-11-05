@@ -9,6 +9,7 @@
   </PropertyGroup>
 	
   <ItemGroup>
+    <ProjectReference Include="..\MembershipProvider\MembershipProvider.csproj" />
     <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
     <ProjectReference Include="..\Orleans\Orleans.csproj" />
   </ItemGroup>

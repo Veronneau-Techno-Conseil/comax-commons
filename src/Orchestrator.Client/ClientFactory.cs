@@ -11,8 +11,11 @@ using Orleans.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Comax.Commons.Orchestrator.MembershipProvider;
+using MongoDB.Driver;
 
 namespace Comax.Commons.Orchestrator.Client
 {
@@ -44,7 +47,20 @@ namespace Comax.Commons.Orchestrator.Client
                     .ConfigureApplicationParts(parts =>
                     {
                         parts.AddFromApplicationBaseDirectory();
-                    }).UseLocalhostClustering(30001)
+                    })
+                    //.UseStaticClustering(new IPEndPoint(IPAddress.Parse(configuration["gatewayIp"]), int.Parse(configuration["gatewayPort"])))
+                    .UseMongoDBClustering(mo =>
+                    {
+                        mo.DatabaseName = "clustermembers";
+                        mo.ClientName = "member_mongo";
+                        mo.CollectionConfigurator = cs =>
+                        {
+                            cs.WriteConcern = WriteConcern.Acknowledged;
+                            cs.ReadConcern = ReadConcern.Local;
+                        };
+
+                    })
+                    //.UseLocalhostClustering(30001)
                     .AddOutgoingGrainCallFilter(serviceProvider.GetService<SecureTokenOutgoingFilter>())
                     .AddSimpleMessageStreamProvider(Constants.DefaultStream);
             return b;

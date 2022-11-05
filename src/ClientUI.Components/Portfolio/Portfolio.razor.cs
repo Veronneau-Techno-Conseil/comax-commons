@@ -225,7 +225,9 @@ namespace ClientUI.Components.Portfolio
         
         public async Task OnFileChanged(FileChangedEventArgs e)
         {
-            FieldMetaDataList.Clear();
+            
+            if (e.Files == null || e.Files.Length == 0)
+                return;
 
             var fileStream = e.Files[0];
             SelectedFileName = fileStream.Name;
@@ -242,6 +244,7 @@ namespace ClientUI.Components.Portfolio
                     {
                         var source = Sources.Values.FirstOrDefault(x => x.Name == "SampleFile");
                         source.Value = fileContent;
+                        source.DisplayValue = SelectedFileName;
                     }
                 }
             }
@@ -342,16 +345,22 @@ namespace ClientUI.Components.Portfolio
         public async Task SaveFieldMetaData()
         {
             await PortfolioViewModel.SaveFieldMetaData(SelectedPortfolio.Id.ToString(), FieldMetaDataList);
-            FieldMetaDataList.Clear();
+            
+            var result = await PortfolioViewModel.GetSourceState(SelectedPortfolio.Id.ToString());
+
+            if (result.Fields != null)
+            {
+                FieldMetaDataList = result.Fields;
+            }
         }
 
 
         private void OnFieldMetadataSelected(DataSourceConfiguration sourceConfiguration)
         {
-            FieldMetaDataList.Clear();
 
             if (sourceConfiguration.Name =="SampleFile" && !string.IsNullOrEmpty(sourceConfiguration.Value))
             {
+                FieldMetaDataList.Clear();
                 FieldMetaDataList.AddRange(MetadataParser.ReadMetadata(sourceConfiguration.Value));
             }
         }

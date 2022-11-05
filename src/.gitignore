@@ -14,3 +14,4 @@ node_modules
 /Silo/SiloStore-log.db
 /Silo/PubSubStore.db
 /Silo/PubSubStore-log.db
+**/*.db

@@ -18,6 +18,7 @@ namespace CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration
         public int? Index { get; set; }
 
         public string Value { get; set; }
+        public string DisplayValue { get; set; }
     }
 
 }

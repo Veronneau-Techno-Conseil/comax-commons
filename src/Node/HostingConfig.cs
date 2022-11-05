@@ -17,6 +17,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Comax.Commons.Orchestrator.Contracts;
 using CommunAxiom.Commons.Orleans;
+using static IdentityModel.ClaimComparer;
+using MongoDB.Driver;
 
 namespace Comax.Commons.Orchestrator
 {
@@ -29,9 +31,10 @@ namespace Comax.Commons.Orchestrator
         /// </summary>
         /// <param name="sc"></param>
         /// <returns></returns>
-        public static IServiceCollection SetServerServices(this IServiceCollection sc)
+        public static IServiceCollection SetServerServices(this IServiceCollection sc, IConfiguration configuration)
         {
             sc.AddHostedService<HeartbeatService>();
+            
             return sc;
         }
 
@@ -41,16 +44,18 @@ namespace Comax.Commons.Orchestrator
         /// <param name="siloHostBuilder"></param>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        public static ISiloHostBuilder SetDefaults(this ISiloHostBuilder siloHostBuilder, out IConfiguration configuration)
+        public static ISiloHostBuilder SetDefaults(this ISiloHostBuilder siloHostBuilder, Action<IServiceCollection, IConfiguration> configureServices)
         {
             siloHostBuilder.ConfigureLogging(opts =>
             {
                 opts.AddConsole();
                 opts.SetMinimumLevel(LogLevel.Debug);
             });
+            IConfiguration configuration = null;
             siloHostBuilder.SetConfiguration(out configuration);
-            siloHostBuilder.SetClustering();
-            siloHostBuilder.SetEndPoints();
+            siloHostBuilder.ConfigureServices(sc => configureServices(sc, configuration));
+            siloHostBuilder.SetClustering(configuration);
+            siloHostBuilder.SetEndPoints(configuration);
             siloHostBuilder.SetStreamProviders();
             siloHostBuilder.SetClusterOptions();
             return siloHostBuilder;
@@ -60,10 +65,14 @@ namespace Comax.Commons.Orchestrator
         /// </summary>
         /// <param name="siloHostBuilder"></param>
         /// <returns></returns>
-        public static ISiloHostBuilder SetClustering(this ISiloHostBuilder siloHostBuilder)
+        public static ISiloHostBuilder SetClustering(this ISiloHostBuilder siloHostBuilder, IConfiguration configuration)
         {
             //TODO: Add support to multisilo cluster
-            return siloHostBuilder.UseLocalhostClustering();
+            if (configuration["advertisedIp"].StartsWith("127.0.0.1")){
+               return siloHostBuilder.UseLocalhostClustering();
+            }
+            return siloHostBuilder;
+            //return siloHostBuilder.UseDevelopmentClustering(new IPEndPoint(IPAddress.Parse(configuration["advertisedIp"]), int.Parse(configuration["gatewayPort"])));
         }
 
         /// <summary>
@@ -71,12 +80,32 @@ namespace Comax.Commons.Orchestrator
         /// </summary>
         /// <param name="siloHostBuilder"></param>
         /// <returns></returns>
-        public static ISiloHostBuilder SetEndPoints(this ISiloHostBuilder siloHostBuilder)
+        public static ISiloHostBuilder SetEndPoints(this ISiloHostBuilder siloHostBuilder, IConfiguration configuration)
         {
             // the silo port was modified from the default because the option range for that port falls in an unauthorized range
-            siloHostBuilder.ConfigureEndpoints(siloPort: 7718, gatewayPort: 30001);
+            
+            siloHostBuilder.ConfigureEndpoints(siloPort: int.Parse(configuration["siloPort"]), gatewayPort: int.Parse(configuration["gatewayPort"]));
             // TODO: use configuration to set the IP Address
-            siloHostBuilder.Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback);
+            if (configuration["advertisedIp"].StartsWith("127.0.0.1"))
+            {
+                siloHostBuilder.Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Parse(configuration["advertisedIp"]));
+            }
+            //else
+            //{
+            //    siloHostBuilder.Configure<EndpointOptions>(options =>
+            //    {
+            //        // Port to use for Silo-to-Silo
+            //        options.SiloPort = int.Parse(configuration["siloPort"]);
+            //        // Port to use for the gateway
+            //        options.GatewayPort = int.Parse(configuration["gatewayPort"]);
+            //        // IP Address to advertise in the cluster
+            //        options.AdvertisedIPAddress = IPAddress.Parse(configuration["advertisedIp"]);
+            //        // The socket used for silo-to-silo will bind to this endpoint
+            //        options.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, int.Parse(configuration["gatewayPort"]));
+            //        // The socket used by the gateway will bind to this endpoint
+            //        options.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, int.Parse(configuration["siloPort"]));
+            //    });
+            //}
             return siloHostBuilder;
         }
 

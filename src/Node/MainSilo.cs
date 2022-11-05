@@ -20,6 +20,10 @@ using Comax.Commons.Orchestrator.MailboxGrain;
 using Comax.Commons.Orchestrator.Contracts.SOI;
 using Comax.Commons.Orchestrator.SOIGrain;
 using Comax.Commons.Orchestrator.MailGrain;
+using MongoDB.Driver;
+//using Orleans.Providers.MongoDB.Utils;
+using Comax.Commons.Orchestrator.MembershipProvider;
+using Orleans.Configuration;
 
 namespace Comax.Commons.Orchestrator
 {
@@ -38,13 +42,30 @@ namespace Comax.Commons.Orchestrator
             }
             // define the cluster configuration
             var builder = new SiloHostBuilder()
-                .SetDefaults(out var conf)
-                .UseDashboard()
-                .ConfigureServices(services =>
+                .SetDefaults((services, conf) =>
                 {
                     services.SetStorage(conf);
 
                     services.CentralGrainSetup();
+
+                    services.AddSingleton<IMongoClientFactory>(sp =>
+                    {
+                        return new MongoClientFactory(conf);
+                    });
+
+                    services.Configure<MongoDBOptions>(mo =>
+                    {
+                        mo.DatabaseName = "clustermembers";
+                        mo.ClientName = "member_mongo";
+                        mo.CollectionConfigurator = cs =>
+                        {
+                            cs.WriteConcern = WriteConcern.Acknowledged;
+                            cs.ReadConcern = ReadConcern.Local;
+                        };
+
+                    });
+
+                    services.AddSingleton<IMembershipTable, MongoMembershipTable>();
 
                     //register singleton services for each grain/interface
                     //services.AddSingleton<ISubjectOfInterest, SubjectOfInterest>();
@@ -63,9 +84,10 @@ namespace Comax.Commons.Orchestrator
                     services.AddSingleton<IEventMailbox, EventMailbox>();
 
                 })
+                .UseDashboard()
                 //configure application parts for each grain
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(PublicBoard).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts=>parts.AddApplicationPart(typeof(UriRegistry).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(UriRegistry).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(EventMailbox).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Mail).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(SubjectOfInterest).Assembly).WithReferences())

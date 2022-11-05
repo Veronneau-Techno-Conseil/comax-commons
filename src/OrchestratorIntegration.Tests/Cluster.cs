@@ -1,8 +1,10 @@
 ﻿using Comax.Commons.Orchestrator;
 using Comax.Commons.Orchestrator.Client;
 using Comax.Commons.Orchestrator.Contracts.ComaxSystem;
+using Comax.Commons.Orchestrator.MembershipProvider;
 using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.OIDC;
+using FluentAssertions.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,7 +31,7 @@ namespace OrchestratorIntegration.Tests
         public async Task RunBeforeAnyTests()
         {
             SetupTests();
-            await MainSilo.StartSilo();
+            //await MainSilo.StartSilo();
         }
 
         [OneTimeTearDown]
@@ -47,6 +49,11 @@ namespace OrchestratorIntegration.Tests
             ServiceCollection sc = new ServiceCollection();
             sc.AddSingleton<IConfiguration>(Configuration);
             sc.AddLogging(lb => lb.AddConsole());
+
+            sc.AddSingleton<IMongoClientFactory>(sp =>
+            {
+                return new MongoClientFactory(Configuration);
+            });
 
             /*
              * Client specific
@@ -81,6 +88,11 @@ namespace OrchestratorIntegration.Tests
                     var oidc = new OIDCSettings();
                     Configuration.Bind("ClientOIDC", oidc);
                     return new SecureTokenOutgoingFilter(logger, new TestTokenProvider(oidc, Configuration));
+                });
+
+                sc.AddSingleton<IMongoClientFactory>(sp =>
+                {
+                    return new MongoClientFactory(Configuration);
                 });
             }
         }

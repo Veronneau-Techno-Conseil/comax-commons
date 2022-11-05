@@ -15,7 +15,7 @@ namespace Comax.Commons.Orchestrator
                 .SetConfiguration(out var cfg)
                 .ConfigureServices((host, sc) =>
                 {
-                    sc.SetServerServices();
+                    sc.SetServerServices(cfg);
                     sc.AddLogging(lb => lb.AddConsole());
                 }).Build();
 
