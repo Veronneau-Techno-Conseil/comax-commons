@@ -69,8 +69,8 @@ namespace Comax.Commons.Orchestrator
         {
             //TODO: Add support to multisilo cluster
             if (configuration["advertisedIp"].StartsWith("127.0.0.1")){
-               return siloHostBuilder.UseLocalhostClustering();
-            }
+            return siloHostBuilder.UseLocalhostClustering();
+        }
             return siloHostBuilder;
             //return siloHostBuilder.UseDevelopmentClustering(new IPEndPoint(IPAddress.Parse(configuration["advertisedIp"]), int.Parse(configuration["gatewayPort"])));
         }
