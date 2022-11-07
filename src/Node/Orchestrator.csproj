@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>Comax.Commons.Orchestrator</AssemblyName>
+    <RootNamespace>Comax.Commons.Orchestrator</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+	  <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+	  <PackageReference Include="Microsoft.Orleans.Core" Version="3.6.5" />
+	  <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.6.5" />
+	  <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.6.5" />
+	  <PackageReference Include="MongoDB.Driver" Version="2.18.0" />
+	  <PackageReference Include="OrleansDashboard" Version="3.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CentralGrain\CentralGrain.csproj" />
+    <ProjectReference Include="..\IEventMailbox\EventMailboxGrain.csproj" />
+    <ProjectReference Include="..\LiteDbStorageProvider\LiteDbStorageProvider.csproj" />
+    <ProjectReference Include="..\MailGrain\MailGrain.csproj" />
+    <ProjectReference Include="..\MembershipProvider\MembershipProvider.csproj" />
+    <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
+    <ProjectReference Include="..\PublicBoardGrain\PublicBoardGrain.csproj" />
+    <ProjectReference Include="..\SOIGrain\SOIGrain.csproj" />
+    <ProjectReference Include="..\UriRegistryGrain\UriRegistryGrain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
