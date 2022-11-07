@@ -79,6 +79,10 @@ namespace CommunAxiom.Commons.Client.SiloShared
         public static ISiloHostBuilder SetStreamProviders(this ISiloHostBuilder siloHostBuilder)
         {
             siloHostBuilder.AddSimpleMessageStreamProvider(Constants.DefaultStream);
+            siloHostBuilder.AddSimpleMessageStreamProvider(Constants.ImplicitStream, opts =>
+            {
+                opts.FireAndForgetDelivery = true;
+            });
             return siloHostBuilder;
         }
 

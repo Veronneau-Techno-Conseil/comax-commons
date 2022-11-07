@@ -12,7 +12,7 @@ namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
 
         public Broadcast()
         {
-            _broadcastRulesEngine = new BroadcastRulesEngine(this.GetStreamProvider(Constants.DefaultStream));
+            _broadcastRulesEngine = new BroadcastRulesEngine(this.GetStreamProvider(Constants.ImplicitStream));
         }
 
         public Task Notify(Message message)

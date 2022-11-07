@@ -15,7 +15,7 @@ using Orleans.Concurrency;
 namespace Comax.Commons.Orchestrator.EventMailboxGrain
 {
     [Reentrant]
-    [ImplicitStreamSubscription(EventMailboxConstants.MAILBOX_STREAM_NS)]
+    [ImplicitStreamSubscription(EventMailboxConstants.MAILBOX_STREAM_INBOUND_NS)]
     [AuthorizeClaim(ClaimType = "https://orchestrator.communaxiom.org/mailbox")]
     public class EventMailbox: Grain, IEventMailbox
     {
@@ -66,7 +66,7 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
             var streamProvider = GetStreamProvider(Constants.ImplicitStream);
             var key = this.GetPrimaryKey();
             var stream = streamProvider.GetStream<Message>(
-                    key, EventMailboxConstants.MAILBOX_STREAM_NS);
+                    key, EventMailboxConstants.MAILBOX_STREAM_INBOUND_NS);
 
             await stream.SubscribeAsync(async (msg, seqToken) =>
             {

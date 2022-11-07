@@ -15,6 +15,9 @@ namespace CommunAxiom.Commons.Client.Grains.DispatchGrain.RuleEngine
 
         public async Task Execute(Message param)
         {
+            //TODO
+            //Fetch info from UriRegistryGrain
+            //var asyncStream = _streamProvider.GetStream<Message>( , EventMailboxConstants.MAILBOX_STREAM_INBOUND_NS)
             var asyncStream = _streamProvider.GetEventStream();
 
             await asyncStream.OnNextAsync(param);

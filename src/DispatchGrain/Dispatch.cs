@@ -10,15 +10,15 @@ using Orleans.Streams;
 
 namespace CommunAxiom.Commons.Client.Grains.DispatchGrain
 {
-    [ImplicitStreamSubscription(EventMailboxConstants.MAILBOX_STREAM_NS)]
+    [ImplicitStreamSubscription(Constants.DefaultNamespace)]
     [AuthorizeClaim]
     [StatelessWorker(1)]
     public class Dispatch : Grain, IDispatch
     {
         public override async Task OnActivateAsync()
         {
-            var streamProvider = GetStreamProvider(Constants.DefaultStream);
-            
+            var streamProvider = GetStreamProvider(Constants.ImplicitStream);
+
             var stream = streamProvider.GetEventStream();
 
             await stream.SubscribeAsync(async (msg, seqToken) =>
