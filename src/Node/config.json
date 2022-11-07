@@ -1,0 +1,36 @@
+{
+  "OIDC": {
+    "Authority": "https://accounts.communaxiom.org/",
+    "Scopes": "openid offline_access roles profile email",
+    "ClientId": "tractavissent_expetendum_multoque_monstret",
+    "Secret": "a7b5dd54-cfc9-4423-bee2-04344a6d1f04"
+  },
+  "LiteDbStorage": {
+    "Name": "LiteDbStorage",
+    "FileName": "./SiloStore.db"
+  },
+  "JObjectStore": {
+    "Name": "JObjectStore",
+    "FileName": "./SiloStore.db"
+  },
+  "PubSubStore": {
+    "Name": "PubSubStore",
+    "FileName": "./PubSubStore.db"
+  },
+  "CentralApiUrl": "https://central.communaxiom.org",
+  "siloPort": 7718,
+  "gatewayPort": 30001,
+  "advertisedIp": "10.10.2.2",
+  "member_mongo": {
+    "authDb": "admin",
+    "username": "orchAdmin",
+    "password": "JTFkU054Mmt6Vwo=",
+    "hosts": [
+      "10.13.40.20"
+    ],
+    "port": 27017,
+    "directConnection": true,
+    "useTls": false,
+    "allowInsecureTls": false
+  }
+}

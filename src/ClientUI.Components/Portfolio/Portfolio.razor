@@ -1,0 +1,249 @@
+﻿@page "/portfolio"
+
+@using Blazorise
+@using Blazorise.TreeView;
+@using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+
+<div class="container.is-fullhd">
+  <div class="columns">
+    <div class="column">
+      <div class="card">
+        <div class="card-content">
+          <div class="content">
+            <TreeView Nodes="PortfolioListResult"
+                      GetChildNodes="@(item => item.Children)"
+                      HasChildNodes="@(item => item.Children?.Any() == true)"
+                      @bind-SelectedNode="SelectedPortfolio"
+                      @bind-ExpandedNodes="ExpandedPortfolio">
+              <NodeContent>
+                <img class="icon-25" src="@PortfolioViewModel.GetIcon(context.Type)" />
+                <span @onclick="() => ShowCard(context)" class="ml-2 mr-2 has-text-weight-bold icon-pos"> @context.Text </span>
+                @if (context.Type != PortfolioType.Dataset)
+                {
+                  <img class="icon-25" src="_content/ClientUI.Components/icons/Add.png" @onclick="() => ShowModal(context)" />
+                }
+              </NodeContent>
+            </TreeView>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="column is-two-thirds">
+      <div class="card" hidden="@HideCard">
+        <div class="card-content">
+          <div class="content">
+            <h4 class="mb-4"> @SelectedPortfolio.Text </h4>
+            <div class="columns">
+              <div class="column">
+                <label>Description</label>
+                <article class="mt-2 message is-warning">
+                  <div class="message-body">
+                    @SelectedPortfolio.Description
+                  </div>
+                </article>
+              </div>
+            </div>
+            <Tabs SelectedTab="@SelectedTab" SelectedTabChanged="@OnSelectedTab">
+              <Items>
+                <Tab Name="tab1">Input data structure</Tab>
+                <Tab Name="tab2">Transformations</Tab>
+                <Tab Name="tab3">Version history</Tab>
+              </Items>
+              <Content>
+                <TabPanel Name="tab1" Class="p-2">
+                  <SpinLoader IsLoading="IsLoading">
+                    <LoadingTemplate>
+                      <div class="col-12" style="background-color: lightgray; height:400px; vertical-align:middle">
+                        <br /><br />
+                        <Chase Center="true" Color="blue" Size="70px"></Chase>
+                      </div>
+                    </LoadingTemplate>
+                    <ContentTemplate>
+                      <h6>Data Source</h6>
+                      <div class="columns m-2">
+                        <div class="column is-one-fifth">
+                          <label>Source Type</label>
+                          <select class="select" @onchange="OnChangeDatasource">
+                            @foreach (var datasource in PortfolioViewModel.GetDatasources())
+                            {
+                              <option value=@datasource>@datasource</option>
+                            }
+                          </select>
+                        </div>
+                        <div class="column">
+                          <label>File Name</label>
+                          <div style="display:flex">
+                            <FileEdit Placeholder="No File chosen" ClassNames="input is-primary" Changed="@OnFileChanged" />
+                            <img style="top: 6px;left: 6px;" class="icon-25" src="_content/ClientUI.Components/icons/Open.png" />
+                          </div>
+
+                        </div>
+                        <div class="column is-two-quarters">
+                          <img @onclick="SaveConfig" style="cursor: pointer;" class="icon-25 is-pulled-right" src="_content/ClientUI.Components/icons/Save.png" />
+                        </div>
+                      </div>
+                      <div class="columns">
+                        @foreach (var datasource in Sources)
+                        {
+                          switch (datasource.Value.FieldType)
+                          {
+                            case ConfigurationFieldType.File:
+                              <div class="column" style="cursor: pointer;" @onclick="() => OnFieldMetadataSelected(datasource.Value)">
+                                <Label>
+                                  @datasource.Value.Name
+                                </Label>
+                                <TextEdit class="text-input" ReadOnly="true" Text="@datasource.Value.DisplayValue" />
+                              </div>
+                              break;
+                            default:
+                              <div class="column" style="cursor: pointer;" @onclick="() => OnFieldMetadataSelected(datasource.Value)">
+                                <Label>
+                                  @datasource.Value.Name
+                                </Label>
+                                <TextEdit class="text-input" Text="@datasource.Value.Value" />
+                              </div>
+                              break;
+                          }
+                        }
+                      </div>
+                      @* <h6>Versioning Strategy</h6> *@
+                      @* <div class="columns"> *@
+                      @*     <div class="column is-one-fifth"> *@
+                      @*         <label>Strategy</label> *@
+                      @*         <div class="dropdown"> *@
+                      @*             <div class="dropdown-trigger"> *@
+                      @*                 <button class="button" aria-haspopup="true" aria-controls="dropdown-menu"> *@
+                      @*                     <span> Upsert / DS per import / Incremental</span> *@
+                      @*                     <span class="icon is-small"> *@
+                      @*                         <i class="fas fa-angle-down" aria-hidden="true"></i> *@
+                      @*                     </span> *@
+                      @*                 </button> *@
+                      @*             </div> *@
+                      @*             <div class="dropdown-menu" id="dropdown-menu" role="menu"> *@
+                      @*                 <div class="dropdown-content"> *@
+                      @*                     <a href="#" class="dropdown-item"> *@
+                      @*                         Dropdown item *@
+                      @*                     </a> *@
+                      @*                     <a class="dropdown-item"> *@
+                      @*                         Other dropdown item *@
+                      @*                     </a> *@
+                      @*                     <a href="#" class="dropdown-item is-active"> *@
+                      @*                         Active dropdown item *@
+                      @*                     </a> *@
+                      @*                     <a href="#" class="dropdown-item"> *@
+                      @*                         Other dropdown item *@
+                      @*                     </a> *@
+                      @*                     <hr class="dropdown-divider"> *@
+                      @*                     <a href="#" class="dropdown-item"> *@
+                      @*                         With a divider *@
+                      @*                     </a> *@
+                      @*                 </div> *@
+                      @*             </div> *@
+                      @*         </div> *@
+                      @*     </div> *@
+                      @* </div> *@
+                      <h6>
+                        Data Description
+                        <img @onclick="AddNewRow" style="cursor: pointer;" class="icon-25 m-2 is-pulled-right" src="_content/ClientUI.Components/icons/Add.png" />
+                        <img @onclick="SaveFieldMetaData" style="cursor: pointer;" class="icon-25 m-2 is-pulled-right" src="_content/ClientUI.Components/icons/Save.png" />
+                      </h6>
+                      <div class="columns">
+                        <div class="column">
+                          <ListGroup>
+                            @foreach (var field in FieldMetaDataList.OrderBy(x => x.Index.Value))
+                            {
+                              <ListGroupItem>
+                                <div class="columns">
+                                  <div class="column is-four-fifths">
+                                    <div class="columns">
+                                      <div class="column">
+                                        <Label>Name</Label>
+                                        <TextEdit class="text-input" @bind-Text="@field.FieldName" />
+                                      </div>
+                                      <div class="column">
+                                        <Label>Type</Label>
+                                        <select class="select" @bind="field.FieldType" style="width: 100%;">
+                                          @foreach (var type in Enum.GetValues(typeof(FieldType)))
+                                          {
+                                            <option value=@type>@type</option>
+                                          }
+                                        </select>
+                                      </div>
+                                      <div class="column">
+                                        <Label>Display Name</Label>
+                                        <TextEdit class="text-input" @bind-Text="@field.DisplayName" />
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="column">
+                                    <img @onclick="() => OnFieldDelete(field)" style="cursor: pointer;" class="icon-25 is-pulled-right" src="_content/ClientUI.Components/icons/Delete.png" />
+                                    <img hidden="@GetHiddenUp(field)" style="cursor: pointer;" @onclick="() => ArrowUp(field)" class="icon-25 mr-2 is-pulled-right" src="_content/ClientUI.Components/icons/ArrowWide.png" />
+                                    <img hidden="@GetHiddenDown(field)" style="cursor: pointer;" @onclick="() => ArrowDown(field)" class="icon-25 mr-2 img-down is-pulled-right" src="_content/ClientUI.Components/icons/ArrowWide.png" />
+                                  </div>
+                                </div>
+                                <div class="columns">
+                                  <div class="column">
+                                    <Label>Description</Label>
+                                    <TextEdit class="text-input" @bind-Text="@field.Description" />
+                                  </div>
+                                </div>
+
+                                @if (field.FieldType == FieldType.Lookup)
+                                {
+                                  <div class="columns">
+                                    <div class="column">
+                                      <Label>Valid list CSV</Label>
+                                      <TextEdit class="text-input" @bind-Text="@field.Configuration" />
+                                    </div>
+                                  </div>
+                                }
+                              </ListGroupItem>
+                            }
+                          </ListGroup>
+                        </div>
+                      </div>
+                    </ContentTemplate>
+                  </SpinLoader>
+
+                </TabPanel>
+                <TabPanel Name="tab2">
+                  Content for Transformations.
+                </TabPanel>
+                <TabPanel Name="tab3">
+                  Version history.
+                </TabPanel>
+              </Content>
+            </Tabs>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <Modal @ref="ModalRefefence">
+    <ModalContent Centered>
+      <ModalHeader>
+        <ModalTitle>@Localizer["AddPortfolio"]</ModalTitle>
+      </ModalHeader>
+      <ModalBody>
+        <Field>
+          <FieldLabel>@Localizer["PortfolioName"]</FieldLabel>
+          <TextEdit @bind-Text="@ModalViewModel.Name" PlaceHolder="Name..." />
+        </Field>
+        <Field>
+          <Select TValue="string" SelectedValueChanged="@OnChangeType">
+            @foreach (var type in _types)
+            {
+              <SelectItem Value=@type>@type</SelectItem>
+            }
+          </Select>
+        </Field>
+      </ModalBody>
+      <ModalFooter>
+        <Button Color="Color.Light" Clicked="@OnModalCancel">@Localizer["Cancel"]</Button>
+        <Button Color="Color.Success" Clicked="@OnModalSave">@Localizer["Save"]</Button>
+      </ModalFooter>
+    </ModalContent>
+  </Modal>
+
+</div>
