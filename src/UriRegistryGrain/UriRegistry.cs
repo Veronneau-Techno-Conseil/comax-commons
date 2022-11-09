@@ -1,12 +1,12 @@
 ﻿using Orleans;
-using Comax.Commons.Orchestrator.Contracts.UriRegistry;
 using System.Threading.Tasks;
 using Orleans.Runtime;
 using System;
 using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Orleans;
+using CommunAxiom.Commons.CommonsShared.Contracts.UriRegistry;
 
-namespace Comax.Commons.Orchestrator.UriRegistryGrain
+namespace CommunAxiom.Commons.CommonsShared.UriRegistryGrain
 {
     [AuthorizeClaim]
     public class UriRegistry: Grain, IUriRegistry

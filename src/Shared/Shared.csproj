@@ -4,7 +4,8 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <RootNamespace>CommunAxiom.Commons.Shared</RootNamespace>
+    <AssemblyName>CommunAxiom.Commons.Shared</AssemblyName>
+    <RootNamespace>CommunAxiom.Commons.Shared</RootNamespace>
 	  <LangVersion>10.0</LangVersion>
   </PropertyGroup>
 

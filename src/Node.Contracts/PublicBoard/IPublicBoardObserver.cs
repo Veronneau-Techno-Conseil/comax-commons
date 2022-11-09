@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Comax.Commons.Orchestrator.Contracts.Mailbox
+namespace Comax.Commons.Orchestrator.Contracts.PublicBoard
 {
     public interface IPublicBoardObserver : IGrainObserver
     {

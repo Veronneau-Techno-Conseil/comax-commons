@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Comax.Commons.Orchestrator.Contracts.EventMailbox
+namespace CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox
 {
     public static class EventMailboxConstants
     {

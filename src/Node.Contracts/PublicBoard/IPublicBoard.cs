@@ -6,7 +6,7 @@ using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using Orleans;
 
-namespace Comax.Commons.Orchestrator.Contracts.Mailbox
+namespace Comax.Commons.Orchestrator.Contracts.PublicBoard
 {
     [AuthorizeClaim()]
     public interface IPublicBoard : IGrainWithGuidKey

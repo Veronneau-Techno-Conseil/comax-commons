@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Comax.Commons.Orchestrator.Contracts.UriRegistry
+namespace CommunAxiom.Commons.CommonsShared.Contracts.UriRegistry
 {
     public class UserTuple
     {

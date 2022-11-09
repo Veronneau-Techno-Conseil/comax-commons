@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Comax.Commons.Orchestrator.CentralGrain
+namespace CommunAxiom.Commons.CommonsShared.CentralGrain
 {
     public class SvcFactory
     {

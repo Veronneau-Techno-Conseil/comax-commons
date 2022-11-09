@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-	  <AssemblyName>Comax.Commons.Orchestrator.MailGrain</AssemblyName>
-	  <RootNamespace>Comax.Commons.Orchestrator.MailGrain</RootNamespace>
+	  <AssemblyName>CommunAxiom.Commons.CommonsShared.MailGrain</AssemblyName>
+	  <RootNamespace>CommunAxiom.Commons.CommonsShared.MailGrain</RootNamespace>
 	  <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>

@@ -1,7 +1,4 @@
-﻿using Comax.Commons.Orchestrator.Contracts.Mailbox;
-using Comax.Commons.Orchestrator.Contracts.UriRegistry;
-using Comax.Commons.Orchestrator.Contracts.EventMailbox;
-using Orleans.Streams;
+﻿using Orleans.Streams;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,6 +8,9 @@ using CommunAxiom.Commons.Shared.RuleEngine;
 using Comax.Commons.Orchestrator.Contracts.SOI;
 using Orleans;
 using CommunAxiom.Commons.Shared;
+using CommunAxiom.Commons.CommonsShared.Contracts.UriRegistry;
+using Comax.Commons.Orchestrator.Contracts.PublicBoard;
+using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
 
 namespace Comax.Commons.Orchestrator.Contracts.ComaxSystem
 {

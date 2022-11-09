@@ -4,11 +4,11 @@ using Orleans.Runtime;
 using Orleans.Streams;
 using System;
 using System.Threading.Tasks;
-using Comax.Commons.Orchestrator.Contracts.EventMailbox;
 using CommunAxiom.Commons.Shared;
-using Comax.Commons.Orchestrator.Contracts.Mail;
+using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
+using CommunAxiom.Commons.CommonsShared.Contracts.Mail;
 
-namespace Comax.Commons.Orchestrator.EventMailboxGrain
+namespace CommunAxiom.Commons.CommonsShared.EventMailboxGrain
 {
     public class EventMailboxBusiness
     {

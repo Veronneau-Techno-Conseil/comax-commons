@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using Orleans;
 
-namespace Comax.Commons.Orchestrator.Contracts.Mail
+namespace CommunAxiom.Commons.CommonsShared.Contracts.Mail
 {
     public interface IMail : IGrainWithGuidKey
     {

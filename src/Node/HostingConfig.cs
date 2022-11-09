@@ -34,7 +34,7 @@ namespace Comax.Commons.Orchestrator
         public static IServiceCollection SetServerServices(this IServiceCollection sc, IConfiguration configuration)
         {
             sc.AddHostedService<HeartbeatService>();
-            
+
             return sc;
         }
 
@@ -68,9 +68,10 @@ namespace Comax.Commons.Orchestrator
         public static ISiloHostBuilder SetClustering(this ISiloHostBuilder siloHostBuilder, IConfiguration configuration)
         {
             //TODO: Add support to multisilo cluster
-            if (configuration["advertisedIp"].StartsWith("127.0.0.1")){
-            return siloHostBuilder.UseLocalhostClustering();
-        }
+            if (configuration["advertisedIp"].StartsWith("127.0.0.1"))
+            {
+                return siloHostBuilder.UseLocalhostClustering();
+            }
             return siloHostBuilder;
             //return siloHostBuilder.UseDevelopmentClustering(new IPEndPoint(IPAddress.Parse(configuration["advertisedIp"]), int.Parse(configuration["gatewayPort"])));
         }
@@ -83,15 +84,19 @@ namespace Comax.Commons.Orchestrator
         public static ISiloHostBuilder SetEndPoints(this ISiloHostBuilder siloHostBuilder, IConfiguration configuration)
         {
             // the silo port was modified from the default because the option range for that port falls in an unauthorized range
-            
-            siloHostBuilder.ConfigureEndpoints(siloPort: int.Parse(configuration["siloPort"]), gatewayPort: int.Parse(configuration["gatewayPort"]));
+
             // TODO: use configuration to set the IP Address
             if (configuration["advertisedIp"].StartsWith("127.0.0.1"))
             {
-                siloHostBuilder.Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Parse(configuration["advertisedIp"]));
+                //siloHostBuilder.Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Parse(configuration["advertisedIp"]));
+                siloHostBuilder.ConfigureEndpoints(siloPort: 7718, gatewayPort: 30001);
+                // TODO: use configuration to set the IP Address
+                siloHostBuilder.Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback);
             }
-            //else
-            //{
+            else
+            {
+                siloHostBuilder.ConfigureEndpoints(siloPort: int.Parse(configuration["siloPort"]), gatewayPort: int.Parse(configuration["gatewayPort"]));
+            }
             //    siloHostBuilder.Configure<EndpointOptions>(options =>
             //    {
             //        // Port to use for Silo-to-Silo
