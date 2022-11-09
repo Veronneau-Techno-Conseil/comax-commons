@@ -22,15 +22,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CentralGrain\CentralGrain.csproj" />
-    <ProjectReference Include="..\IEventMailbox\EventMailboxGrain.csproj" />
-    <ProjectReference Include="..\LiteDbStorageProvider\LiteDbStorageProvider.csproj" />
-    <ProjectReference Include="..\MailGrain\MailGrain.csproj" />
-    <ProjectReference Include="..\MembershipProvider\MembershipProvider.csproj" />
-    <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
-    <ProjectReference Include="..\PublicBoardGrain\PublicBoardGrain.csproj" />
-    <ProjectReference Include="..\SOIGrain\SOIGrain.csproj" />
-    <ProjectReference Include="..\UriRegistryGrain\UriRegistryGrain.csproj" />
+      <ProjectReference Include="..\CentralGrain\CentralGrain.csproj" />
+      <ProjectReference Include="..\IEventMailbox\EventMailboxGrain.csproj" />
+      <ProjectReference Include="..\LiteDbStorageProvider\LiteDbStorageProvider.csproj" />
+      <ProjectReference Include="..\MailGrain\MailGrain.csproj" />
+      <ProjectReference Include="..\MembershipProvider\MembershipProvider.csproj" />
+      <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
+      <ProjectReference Include="..\PublicBoardGrain\PublicBoardGrain.csproj" />
+      <ProjectReference Include="..\SOIGrain\SOIGrain.csproj" />
+      <ProjectReference Include="..\UriRegistryGrain\UriRegistryGrain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -62,6 +62,8 @@ namespace SchedulerGrain
         public async Task<IEnumerable<Schedulers>> GetDueSchedulers()
         {
             var schedulersList = await GetSchedulersList();
+            if (schedulersList.Schedulers == null)
+                return null;
             var filteredSchedulers = schedulersList.Schedulers.AsQueryable().Where(x => x.NextExecutionTime.ToUniversalTime() <= DateTime.UtcNow);
             return filteredSchedulers;
         }

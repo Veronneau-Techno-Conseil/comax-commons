@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Comax.Commons.Orchestrator.CentralGrain
+namespace CommunAxiom.Commons.CommonsShared.CentralGrain
 {
     [StatelessWorker(1)]
     [Reentrant]

@@ -38,31 +38,39 @@ namespace Comax.Commons.Orchestrator.Client
                     if (conf != null)
                         conf.Configure(services);
                 })
-                    .ConfigureLogging(logging =>logging.AddConsole())
-                    .Configure<ClusterOptions>(options =>
-                    {
-                        options.ClusterId = "0.0.1-a1";
-                        options.ServiceId = "OrchestratorCluster";
-                    })
-                    .ConfigureApplicationParts(parts =>
-                    {
-                        parts.AddFromApplicationBaseDirectory();
-                    })
-                    //.UseStaticClustering(new IPEndPoint(IPAddress.Parse(configuration["gatewayIp"]), int.Parse(configuration["gatewayPort"])))
-                    .UseMongoDBClustering(mo =>
-                    {
-                        mo.DatabaseName = "clustermembers";
-                        mo.ClientName = "member_mongo";
-                        mo.CollectionConfigurator = cs =>
-                        {
-                            cs.WriteConcern = WriteConcern.Acknowledged;
-                            cs.ReadConcern = ReadConcern.Local;
-                        };
+                .ConfigureLogging(logging => logging.AddConsole())
+                .Configure<ClusterOptions>(options =>
+                {
+                    options.ClusterId = "0.0.1-a1";
+                    options.ServiceId = "OrchestratorCluster";
+                })
+                .ConfigureApplicationParts(parts =>
+                {
+                    parts.AddFromApplicationBaseDirectory();
+                });
 
-                    })
-                    //.UseLocalhostClustering(30001)
-                    .AddOutgoingGrainCallFilter(serviceProvider.GetService<SecureTokenOutgoingFilter>())
-                    .AddSimpleMessageStreamProvider(Constants.DefaultStream);
+            if (configuration["client_mode"] == "local")
+            {
+                b.UseLocalhostClustering(30001);
+            }
+            else
+            {
+                b.UseMongoDBClustering(mo =>
+                {
+                    mo.DatabaseName = "clustermembers";
+                    mo.ClientName = "member_mongo";
+                    mo.CollectionConfigurator = cs =>
+                    {
+                        cs.WriteConcern = WriteConcern.Acknowledged;
+                        cs.ReadConcern = ReadConcern.Local;
+                    };
+
+                });
+            }
+                
+            b.AddOutgoingGrainCallFilter(serviceProvider.GetService<SecureTokenOutgoingFilter>())
+                .AddSimpleMessageStreamProvider(Constants.DefaultStream);
+            
             return b;
         }
 
@@ -122,7 +130,7 @@ namespace Comax.Commons.Orchestrator.Client
         }
 
         public async Task<(IOrchestratorClient, TResult)> WithUnmanagedClient<TResult>(Func<IOrchestratorClient, Task<TResult>> action)
-                {
+        {
             Counter c = new Counter();
             var builder = GetBuilder();
             var client = builder.Build();
@@ -132,7 +140,7 @@ namespace Comax.Commons.Orchestrator.Client
         }
 
         private Func<Exception, Task<bool>> GetRetryFilter(Counter c)
-            {
+        {
             return async (Exception exception) =>
             {
                 serviceProvider.GetService<ILogger>()?.LogWarning(
@@ -147,12 +155,12 @@ namespace Comax.Commons.Orchestrator.Client
                 c.Value++;
                 return true;
             };
-            }
+        }
 
-                private class Counter
-            {
-                public int Value { get; set; } = 0;
-            }
+        private class Counter
+        {
+            public int Value { get; set; } = 0;
+        }
 
     }
 }

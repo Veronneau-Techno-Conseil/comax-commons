@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Comax.Commons.Orchestrator.Contracts.EventMailbox;
 using CommunAxiom.Commons.Orleans;
 using Orleans;
 using Orleans.Streams;
 using Orleans.Runtime;
 using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.RuleEngine;
-using Comax.Commons.Orchestrator.Contracts.Mail;
 using Orleans.Concurrency;
+using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
+using CommunAxiom.Commons.CommonsShared.Contracts.Mail;
 
-namespace Comax.Commons.Orchestrator.EventMailboxGrain
+namespace CommunAxiom.Commons.CommonsShared.EventMailboxGrain
 {
     [Reentrant]
-    [ImplicitStreamSubscription(EventMailboxConstants.MAILBOX_STREAM_NS)]
+    [ImplicitStreamSubscription(EventMailboxConstants.MAILBOX_STREAM_INBOUND_NS)]
     [AuthorizeClaim(ClaimType = "https://orchestrator.communaxiom.org/mailbox")]
     public class EventMailbox: Grain, IEventMailbox
     {
@@ -66,7 +66,7 @@ namespace Comax.Commons.Orchestrator.EventMailboxGrain
             var streamProvider = GetStreamProvider(Constants.ImplicitStream);
             var key = this.GetPrimaryKey();
             var stream = streamProvider.GetStream<Message>(
-                    key, EventMailboxConstants.MAILBOX_STREAM_NS);
+                    key, EventMailboxConstants.MAILBOX_STREAM_INBOUND_NS);
 
             await stream.SubscribeAsync(async (msg, seqToken) =>
             {

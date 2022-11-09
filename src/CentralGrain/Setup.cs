@@ -6,7 +6,7 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace Comax.Commons.Orchestrator.CentralGrain
+namespace CommunAxiom.Commons.CommonsShared.CentralGrain
 {
     public static class ServiceCollectionExtensions
     {

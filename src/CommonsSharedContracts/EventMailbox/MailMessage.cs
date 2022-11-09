@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Comax.Commons.Orchestrator.Contracts.EventMailbox
+namespace CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox
 {
     public class MailMessage
     {

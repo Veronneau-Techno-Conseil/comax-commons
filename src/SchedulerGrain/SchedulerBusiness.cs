@@ -87,6 +87,10 @@ namespace SchedulerGrain
                 await CreateSchedulersList();
             }
             var dueSchedulers = await _schedulerRepo.GetDueSchedulers();
+
+            if (dueSchedulers == null)
+                return;
+
             foreach (var scheduler in dueSchedulers)
             {
                 //call ingestion grain here

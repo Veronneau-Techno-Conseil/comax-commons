@@ -1,5 +1,5 @@
 ﻿using Comax.Commons.Orchestrator.Client;
-using Comax.Commons.Orchestrator.Contracts.EventMailbox;
+using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
 using CommunAxiom.Commons.Orleans;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using CommunAxiom.Commons.Shared.RulesEngine;

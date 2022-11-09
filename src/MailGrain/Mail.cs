@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Comax.Commons.Orchestrator.Contracts.Mail;
+using CommunAxiom.Commons.CommonsShared.Contracts.Mail;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using Orleans;
 using Orleans.Runtime;

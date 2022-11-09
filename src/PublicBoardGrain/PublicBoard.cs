@@ -1,5 +1,5 @@
 ﻿using Comax.Commons.Orchestrator.Contracts;
-using Comax.Commons.Orchestrator.Contracts.Mailbox;
+using Comax.Commons.Orchestrator.Contracts.PublicBoard;
 using CommunAxiom.Commons.Orleans;
 using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.RuleEngine;

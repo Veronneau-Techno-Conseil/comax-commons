@@ -26,6 +26,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonsSharedContracts\CommonsSharedContracts.csproj" />
     <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
     <ProjectReference Include="..\Node\Orchestrator.csproj" />
     <ProjectReference Include="..\Orchestrator.Client\Orchestrator.Client.csproj" />
@@ -38,6 +39,5 @@
   </ItemGroup>
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug'">
     <!-- Ensure Node.js is installed -->
-    <Exec WorkingDirectory="$(MSBuildProjectDirectory)\bin\Debug\net6.0\" Command="del *.db" />
   </Target>
 </Project>

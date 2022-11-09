@@ -16,9 +16,9 @@ namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
 
         public async Task Execute(Message param)
         {
-            var _asyncStream = _streamProvider.GetEventStream();
+            var asyncStream = _streamProvider.GetEventStream();
 
-            await _asyncStream.OnNextAsync(param);
+            await asyncStream.OnNextAsync(param);
         }
     }
 }

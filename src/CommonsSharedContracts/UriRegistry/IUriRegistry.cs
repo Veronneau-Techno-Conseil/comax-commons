@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Comax.Commons.Orchestrator.Contracts.UriRegistry
+namespace CommunAxiom.Commons.CommonsShared.Contracts.UriRegistry
 {
     public interface IUriRegistry: IGrainWithStringKey
     {

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Orleans;
 
-namespace Comax.Commons.Orchestrator.Contracts.EventMailbox
+namespace CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox
 {
     public interface IEventMailbox:IGrainWithGuidKey
     {

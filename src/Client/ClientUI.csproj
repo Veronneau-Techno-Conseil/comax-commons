@@ -29,9 +29,9 @@
 		<PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
 		<PackageReference Include="OpenIddict.Abstractions" Version="3.1.1" />
-		<PackageReference Include="Blazorise" Version="1.0.6"/>
-		<PackageReference Include="Blazorise.Bulma" Version="1.0.6"/>
-		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.0.6"/>
+		<PackageReference Include="Blazorise" Version="1.0.6" />
+		<PackageReference Include="Blazorise.Bulma" Version="1.0.6" />
+		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.0.6" />
 		
 	</ItemGroup>
 	<ItemGroup>
@@ -45,12 +45,21 @@
 		<ProjectReference Include="..\ClientUI.Components\ClientUI.Components.csproj" />
 		<ProjectReference Include="..\ClientUI.Shared\ClientUI.Shared.csproj" />
 		<ProjectReference Include="..\ClusterClient\ClusterClient.csproj" />
+		<ProjectReference Include="..\ClusterEventStream\ClusterEvent.csproj" />
 		<ProjectReference Include="..\Contracts\Contracts.csproj" />
+		<ProjectReference Include="..\IEventMailbox\EventMailboxGrain.csproj" />
+		<ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
 	
 	</ItemGroup>
   <ItemGroup>
     <Content Update="electron.manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="DispatchGrain\bin\Debug\netstandard2.1\DispatchGrain.deps.json" />
+    <_ContentIncludedByDefault Remove="DispatchGrain\obj\DispatchGrain.csproj.nuget.dgspec.json" />
+    <_ContentIncludedByDefault Remove="DispatchGrain\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="DispatchGrain\obj\project.packagespec.json" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿using Comax.Commons.Orchestrator.Contracts.Mailbox;
+﻿using Comax.Commons.Orchestrator.Contracts.PublicBoard;
 using Orleans.Runtime;
 using System;
 using System.Collections.Generic;

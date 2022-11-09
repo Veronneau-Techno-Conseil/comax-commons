@@ -31,7 +31,7 @@ namespace OrchestratorIntegration.Tests
         public async Task RunBeforeAnyTests()
         {
             SetupTests();
-            //await MainSilo.StartSilo();
+            await MainSilo.StartSilo();
         }
 
         [OneTimeTearDown]
