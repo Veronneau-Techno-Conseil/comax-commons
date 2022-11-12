@@ -1,0 +1,624 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Referee",
+    "version": "1.0"
+  },
+  "paths": {
+    "/Membership/CleanupDefunctSiloEntries": {
+      "post": {
+        "tags": [
+          "Membership"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/Membership/DeleteMembershipTableEntries": {
+      "post": {
+        "tags": [
+          "Membership"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteMembershipEntriesRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteMembershipEntriesRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteMembershipEntriesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/Membership/InitializeMembershipTable": {
+      "post": {
+        "tags": [
+          "Membership"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitializeMembershipTableRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitializeMembershipTableRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitializeMembershipTableRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/Membership/InsertRow": {
+      "post": {
+        "tags": [
+          "Membership"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsertRowRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsertRowRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsertRowRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/InsertRowResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InsertRowResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InsertRowResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Membership/ReadAll": {
+      "get": {
+        "tags": [
+          "Membership"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipTableData"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipTableData"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipTableData"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Membership/ReadRow": {
+      "post": {
+        "tags": [
+          "Membership"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiloAddress"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiloAddress"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiloAddress"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipTableData"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipTableData"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipTableData"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Membership/UpdateIAmAlive": {
+      "post": {
+        "tags": [
+          "Membership"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembershipEntry"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembershipEntry"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembershipEntry"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/Membership/UpdateRow": {
+      "post": {
+        "tags": [
+          "Membership"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRowRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRowRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRowRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateRowResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateRowResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateRowResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AddressFamily": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          28,
+          29,
+          65536,
+          65537,
+          -1
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "CleanupRequest": {
+        "type": "object",
+        "properties": {
+          "beforeDate": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DeleteMembershipEntriesRequest": {
+        "type": "object",
+        "properties": {
+          "clusterId": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "InitializeMembershipTableRequest": {
+        "type": "object",
+        "properties": {
+          "tryInitTableVersion": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "InsertRowRequest": {
+        "type": "object",
+        "properties": {
+          "entry": {
+            "$ref": "#/components/schemas/MembershipEntry"
+          },
+          "tableVersion": {
+            "$ref": "#/components/schemas/TableVersion"
+          }
+        },
+        "additionalProperties": false
+      },
+      "InsertRowResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "IPAddress": {
+        "type": "object",
+        "properties": {
+          "addressFamily": {
+            "$ref": "#/components/schemas/AddressFamily"
+          },
+          "scopeId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "isIPv6Multicast": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isIPv6LinkLocal": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isIPv6SiteLocal": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isIPv6Teredo": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isIPv6UniqueLocal": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "isIPv4MappedToIPv6": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "address": {
+            "type": "integer",
+            "format": "int64",
+            "deprecated": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "IPEndPoint": {
+        "type": "object",
+        "properties": {
+          "addressFamily": {
+            "$ref": "#/components/schemas/AddressFamily"
+          },
+          "address": {
+            "$ref": "#/components/schemas/IPAddress"
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MembershipEntry": {
+        "type": "object",
+        "properties": {
+          "siloAddress": {
+            "$ref": "#/components/schemas/SiloAddress"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SiloStatus"
+          },
+          "suspectTimes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiloAddressDateTimeTuple"
+            },
+            "nullable": true
+          },
+          "proxyPort": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hostName": {
+            "type": "string",
+            "nullable": true
+          },
+          "siloName": {
+            "type": "string",
+            "nullable": true
+          },
+          "roleName": {
+            "type": "string",
+            "nullable": true
+          },
+          "updateZone": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "faultZone": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "iAmAliveTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MembershipEntryStringTuple": {
+        "type": "object",
+        "properties": {
+          "item1": {
+            "$ref": "#/components/schemas/MembershipEntry"
+          },
+          "item2": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MembershipTableData": {
+        "type": "object",
+        "properties": {
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MembershipEntryStringTuple"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "version": {
+            "$ref": "#/components/schemas/TableVersion"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SiloAddress": {
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "$ref": "#/components/schemas/IPEndPoint"
+          },
+          "generation": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "isClient": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SiloAddressDateTimeTuple": {
+        "type": "object",
+        "properties": {
+          "item1": {
+            "$ref": "#/components/schemas/SiloAddress"
+          },
+          "item2": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SiloStatus": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "TableVersion": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "versionEtag": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateRowRequest": {
+        "type": "object",
+        "properties": {
+          "entry": {
+            "$ref": "#/components/schemas/MembershipEntry"
+          },
+          "etag": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "tableVersion": {
+            "$ref": "#/components/schemas/TableVersion"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateRowResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

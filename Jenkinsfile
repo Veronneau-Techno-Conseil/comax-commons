@@ -18,7 +18,7 @@ pipeline {
                     }
                     
                     // Get some code from a GitHub repository
-                    git branch: '$BRANCH_NAME', url: 'https://github.com/Veronneau-Techno-Conseil/comax-accounts.git'
+                    git branch: '$BRANCH_NAME', url: 'https://github.com/Veronneau-Techno-Conseil/comax-commons.git'
                 
                     version = readFile('VERSION').trim()
                     chartVersion = readFile('./helm/VERSION').trim()
@@ -26,31 +26,25 @@ pipeline {
                 }
             }
         }
-        stage('Node compile') {
-            steps {
-                nodejs(nodeJSInstallationName: 'NodeJs') {
-                    sh 'cd "src/Accounts/" && npm install'
-                    sh 'cd "src/Accounts/" && node ./browserify.js'
-                    sh 'cd "src/Accounts/" && npx gulp min'
-                }
-            }
-        }
+        
         stage('Build') {
             steps {
+                
                 script {
-                    def customImage = docker.build("registry.vtck3s.lan/comax-accounts:latest")
+                    def orch = docker.build("registry.vtck3s.lan/comax-orchestrator:latest", "-f ./orchestrator.Dockerfile .")
+                    orch.push()
+                    orch.push(patch)
+                }
+                sh 'echo "Build registry.vtck3s.lan/comax-orchestrator:${version} pushed to registry \n" >> SUMMARY'
+				
+				script {
+                    def customImage = docker.build("registry.vtck3s.lan/comax-referee:latest", "-f ./referee.Dockerfile .")
                     customImage.push()
                     customImage.push(patch)
                 }
-                sh 'echo "Build registry.vtck3s.lan/comax-accounts:${version} pushed to registry \n" >> SUMMARY'
-
-                script {
-                    def centralapi = docker.build("registry.vtck3s.lan/comax-central:latest", "-f ./central.Dockerfile .")
-                    centralapi.push()
-                    centralapi.push(patch)
-                }
-                sh 'echo "Build registry.vtck3s.lan/comax-central:${version} pushed to registry \n" >> SUMMARY'
-            }
+                sh 'echo "Build registry.vtck3s.lan/comax-referee:${version} pushed to registry \n" >> SUMMARY'
+            
+			}
 
             post {
                 success {
@@ -60,17 +54,17 @@ pipeline {
                 }                
             }
         }
-        stage('Prep Helm') {
+        stage('Prep Helm Orchestrator') {
             steps {
                 sh 'mkdir penv && python3 -m venv ./penv'
                 sh '. penv/bin/activate && pwd && ls -l && pip install -r ./build/requirements.txt && python3 ./build/processchart.py'
-                sh 'curl -k https://charts.vtck3s.lan/api/charts/comax-accounts/${chartVersion} | jq \'.name | "DEPLOY"\' > CHART_ACTION'
+                sh 'curl -k https://charts.vtck3s.lan/api/charts/comax-orchestrator/${chartVersion} | jq \'.name | "DEPLOY"\' > CHART_ACTION'
                 script {
                     chartAction = readFile('CHART_ACTION').replace('"','').trim()
                 }
             }
         }
-        stage('Helm') {
+        stage('Helm Orchestrator') {
             when{
                 expression {
                     return chartAction == "DEPLOY"
@@ -82,11 +76,11 @@ pipeline {
                     sh 'helm repo update --repository-config ${repos}'
                     sh 'helm dependency update ./helm/ --repository-config ${repos}'
                     sh 'helm package ./helm/ --repository-config ${repos}'
-                    sh 'CHARTVER=$(cat ./helm/VERSION) && curl -k --data-binary "@comax-accounts-$CHARTVER.tgz" https://charts.vtck3s.lan/api/charts'
+                    sh 'CHARTVER=$(cat ./helm/VERSION) && curl -k --data-binary "@comax-orchestrator-$CHARTVER.tgz" https://charts.vtck3s.lan/api/charts'
                 }
             }
         }
-        stage('SKIP Helm') {
+        stage('SKIP Helm Orchestrator') {
             when{
                 expression {
                     return chartAction != "DEPLOY"
@@ -96,7 +90,7 @@ pipeline {
                 sh 'echo "Skipped helm chart deployment du to preexisting chart version ${chartVersion} \n" >> SUMMARY'
             }
         }
-        stage('Prepare Application deployment') {
+        stage('Prepare Application deployment Orchestrator') {
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release')
@@ -106,10 +100,10 @@ pipeline {
                 withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos')]) {
                     sh 'helm repo update --repository-config ${repos}'
                     sh 'helm dependency update ./helm --repository-config ${repos}'
-                    sh 'helm list -n cx-accounts --output=json --kubeconfig $kubecfg > HELM_LIST'
+                    sh 'helm list -n cx-orch --output=json --kubeconfig $kubecfg > HELM_LIST'
                     sh 'cat HELM_LIST'
-                    sh 'jq \'select(.[].name == "accounts") | select(.[].status == "deployed") | "upgrade" \' HELM_LIST > DEPLOY_ACTION'
-                    sh 'jq \'select(.[].name == "accounts") | select(.[].status != "deployed") | "uninstall" \' HELM_LIST > SHOULD_UNINSTALL'
+                    sh 'jq \'select(.[].name == "orchestrator") | select(.[].status == "deployed") | "upgrade" \' HELM_LIST > DEPLOY_ACTION'
+                    sh 'jq \'select(.[].name == "orchestrator") | select(.[].status != "deployed") | "uninstall" \' HELM_LIST > SHOULD_UNINSTALL'
                     sh 'cat DEPLOY_ACTION && cat SHOULD_UNINSTALL'
                     script {
                         deployAction = readFile('DEPLOY_ACTION').replace('"','').trim()
@@ -120,7 +114,7 @@ pipeline {
                 }
             }
         }
-        stage('Uninstall Application deployment') {
+        stage('Uninstall Application deployment Orchestrator') {
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && shouldUninstall == 'uninstall'
@@ -128,11 +122,11 @@ pipeline {
             }
             steps {
                 withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos')]) {
-                    sh 'helm -n cx-accounts uninstall accounts --kubeconfig ${kubecfg}'
+                    sh 'helm -n cx-orch uninstall orchestrator --kubeconfig ${kubecfg}'
                 }
             }
         }
-        stage('Install Application deployment') {
+        stage('Install Application deployment Orchestrator') {
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && deployAction != "upgrade"
@@ -140,23 +134,123 @@ pipeline {
             }
             steps {
                 echo "Deploy action: ${deployAction}"
-                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos'), file(credentialsId: 'accountsvalues', variable: 'accountsvalues')]) {
-                    sh 'helm -n cx-accounts install accounts ./helm/ --kubeconfig ${kubecfg} --repository-config ${repos} -f ${accountsvalues}'
+                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos'), file(credentialsId: 'orchvalues', variable: 'orchvalues')]) {
+                    sh 'helm -n cx-orch install orchestrator ./helm/ --kubeconfig ${kubecfg} --repository-config ${repos} -f ${orchvalues}'
                 }
             }
         }
-        stage('Upgrade Application deployment') {
+        stage('Upgrade Application deployment Orchestrator') {
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && deployAction == "upgrade"
                 }
             }
             steps {
-                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos'), file(credentialsId: 'accountsvalues', variable: 'accountsvalues')]) {
-                    sh 'helm -n cx-accounts upgrade accounts ./helm/ --kubeconfig ${kubecfg} --repository-config ${repos} -f ${accountsvalues}'
+                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos'), file(credentialsId: 'orchvalues', variable: 'orchvalues')]) {
+                    sh 'helm -n cx-orch upgrade orchestrator ./helm/ --kubeconfig ${kubecfg} --repository-config ${repos} -f ${orchvalues}'
                 }
             }
         }
+		
+		
+        stage('Prep Helm Referee') {
+            steps {
+                sh 'mkdir penv && python3 -m venv ./penv'
+                sh '. penv/bin/activate && pwd && ls -l && pip install -r ./build/requirements.txt && python3 ./build/processchart.py'
+                sh 'curl -k https://charts.vtck3s.lan/api/charts/comax-referee/${chartVersion} | jq \'.name | "DEPLOY"\' > CHART_ACTION'
+                script {
+                    chartAction = readFile('CHART_ACTION').replace('"','').trim()
+                }
+            }
+        }
+        stage('Helm Referee') {
+            when{
+                expression {
+                    return chartAction == "DEPLOY"
+                }
+            }
+            steps {
+                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos')]) {
+                    sh 'helm lint ./helm_referee/'
+                    sh 'helm repo update --repository-config ${repos}'
+                    sh 'helm dependency update ./helm_referee/ --repository-config ${repos}'
+                    sh 'helm package ./helm_referee/ --repository-config ${repos}'
+                    sh 'CHARTVER=$(cat ./helm_referee/VERSION) && curl -k --data-binary "@comax-referee-$CHARTVER.tgz" https://charts.vtck3s.lan/api/charts'
+                }
+            }
+        }
+        stage('SKIP Helm Referee') {
+            when{
+                expression {
+                    return chartAction != "DEPLOY"
+                }
+            }
+            steps {
+                sh 'echo "Skipped helm chart deployment du to preexisting chart version ${chartVersion} \n" >> SUMMARY'
+            }
+        }
+        stage('Prepare Application deployment Referee') {
+            when{
+                expression {
+                    return env.BRANCH_NAME.startsWith('release')
+                }
+            }
+            steps {
+                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos')]) {
+                    sh 'helm repo update --repository-config ${repos}'
+                    sh 'helm dependency update ./helm_referee --repository-config ${repos}'
+                    sh 'helm list -n cx-referee --output=json --kubeconfig $kubecfg > HELM_LIST'
+                    sh 'cat HELM_LIST'
+                    sh 'jq \'select(.[].name == "referee") | select(.[].status == "deployed") | "upgrade" \' HELM_LIST > DEPLOY_ACTION'
+                    sh 'jq \'select(.[].name == "referee") | select(.[].status != "deployed") | "uninstall" \' HELM_LIST > SHOULD_UNINSTALL'
+                    sh 'cat DEPLOY_ACTION && cat SHOULD_UNINSTALL'
+                    script {
+                        deployAction = readFile('DEPLOY_ACTION').replace('"','').trim()
+                        shouldUninstall = readFile('SHOULD_UNINSTALL').replace('"','').trim()
+                    }
+                    echo "Deploy action: ${deployAction}"
+                    echo "Should uninstall: ${shouldUninstall}"
+                }
+            }
+        }
+        stage('Uninstall Application deployment Referee') {
+            when{
+                expression {
+                    return env.BRANCH_NAME.startsWith('release') && shouldUninstall == 'uninstall'
+                }
+            }
+            steps {
+                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos')]) {
+                    sh 'helm -n cx-referee uninstall referee --kubeconfig ${kubecfg}'
+                }
+            }
+        }
+        stage('Install Application deployment Referee') {
+            when{
+                expression {
+                    return env.BRANCH_NAME.startsWith('release') && deployAction != "upgrade"
+                }
+            }
+            steps {
+                echo "Deploy action: ${deployAction}"
+                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos'), file(credentialsId: 'refereevalues', variable: 'refereevalues')]) {
+                    sh 'helm -n cx-referee install referee ./helm_referee/ --kubeconfig ${kubecfg} --repository-config ${repos} -f ${refereevalues}'
+                }
+            }
+        }
+        stage('Upgrade Application deployment Referee') {
+            when{
+                expression {
+                    return env.BRANCH_NAME.startsWith('release') && deployAction == "upgrade"
+                }
+            }
+            steps {
+                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos'), file(credentialsId: 'refereevalues', variable: 'refereevalues')]) {
+                    sh 'helm -n cx-referee upgrade referee ./helm_referee/ --kubeconfig ${kubecfg} --repository-config ${repos} -f ${refereevalues}'
+                }
+            }
+        }
+		
         stage('Finalize') {
             steps {
                 script {

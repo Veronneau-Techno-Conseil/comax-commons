@@ -97,20 +97,7 @@ namespace Comax.Commons.Orchestrator
             {
                 siloHostBuilder.ConfigureEndpoints(siloPort: int.Parse(configuration["siloPort"]), gatewayPort: int.Parse(configuration["gatewayPort"]));
             }
-            //    siloHostBuilder.Configure<EndpointOptions>(options =>
-            //    {
-            //        // Port to use for Silo-to-Silo
-            //        options.SiloPort = int.Parse(configuration["siloPort"]);
-            //        // Port to use for the gateway
-            //        options.GatewayPort = int.Parse(configuration["gatewayPort"]);
-            //        // IP Address to advertise in the cluster
-            //        options.AdvertisedIPAddress = IPAddress.Parse(configuration["advertisedIp"]);
-            //        // The socket used for silo-to-silo will bind to this endpoint
-            //        options.GatewayListeningEndpoint = new IPEndPoint(IPAddress.Any, int.Parse(configuration["gatewayPort"]));
-            //        // The socket used by the gateway will bind to this endpoint
-            //        options.SiloListeningEndpoint = new IPEndPoint(IPAddress.Any, int.Parse(configuration["siloPort"]));
-            //    });
-            //}
+           
             return siloHostBuilder;
         }
 
