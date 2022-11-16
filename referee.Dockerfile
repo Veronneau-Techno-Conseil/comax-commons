@@ -29,4 +29,8 @@ EXPOSE 7287
 RUN chown 1000: ./
 RUN chmod -R u+x ./
 USER 1000
-ENTRYPOINT ["dotnet", "/Referee.dll"]
+
+RUN echo "$(pwd)"
+RUN ls -l
+
+ENTRYPOINT ["dotnet", "/app/Referee.dll"]

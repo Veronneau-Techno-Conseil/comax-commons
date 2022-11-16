@@ -27,10 +27,6 @@ spec:
       serviceAccountName: {{ include "comax-referee.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      volumes:
-      - name: datastore
-        persistentVolumeClaim:
-          claimName: {{ .Values.pvcName }}
 
       containers:
         - name: {{ .Chart.Name }}
@@ -42,9 +38,6 @@ spec:
             - name: http
               containerPort: 7287
               protocol: TCP
-          volumeMounts:
-          - name: datastore
-            mountPath: "/data"
           env:
           - name: Urls
             value: {{ .Values.urls }}
@@ -98,3 +91,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
