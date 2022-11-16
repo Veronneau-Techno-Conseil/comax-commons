@@ -2,6 +2,7 @@
 {
     public class InitializeMembershipTableRequest
     {
-        public bool TryInitTableVersion { get; internal set; }
+        public bool TryInitTableVersion { get; set; }
+
     }
 }

@@ -39,16 +39,9 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
                 throw new NullReferenceException("There is no data source configuration!");
             }
 
-            var dataSourceConfiguration = _configurations.FirstOrDefault(x => x.Key == "SampleFile").Value;
+            var dataSourceConfiguration = _configurations.FirstOrDefault(x => x.Key == "FilePath").Value;
 
-            var file = JsonConvert.DeserializeObject<FileModel>(dataSourceConfiguration.Value);
-
-            if (file == null)
-            {
-                throw new NullReferenceException("File wasn't able to deserialized!");
-            }
-
-            return new FileStream(Path.Combine(file.Path, file.Name), FileMode.Open, FileAccess.Read);
+            return new FileStream(dataSourceConfiguration.Value, FileMode.Open, FileAccess.Read);
 
         }
 

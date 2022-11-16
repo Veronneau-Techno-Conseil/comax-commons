@@ -1,7 +1,7 @@
 ﻿using Comax.Commons.Orchestrator;
+using Comax.Commons.Orchestrator.ApiMembershipProvider;
 using Comax.Commons.Orchestrator.Client;
 using Comax.Commons.Orchestrator.Contracts.ComaxSystem;
-using Comax.Commons.Orchestrator.MembershipProvider;
 using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.OIDC;
 using FluentAssertions.Common;
@@ -50,10 +50,6 @@ namespace OrchestratorIntegration.Tests
             sc.AddSingleton<IConfiguration>(Configuration);
             sc.AddLogging(lb => lb.AddConsole());
 
-            sc.AddSingleton<IMongoClientFactory>(sp =>
-            {
-                return new MongoClientFactory(Configuration);
-            });
 
             /*
              * Client specific
@@ -90,10 +86,9 @@ namespace OrchestratorIntegration.Tests
                     return new SecureTokenOutgoingFilter(logger, new TestTokenProvider(oidc, Configuration));
                 });
 
-                sc.AddSingleton<IMongoClientFactory>(sp =>
-                {
-                    return new MongoClientFactory(Configuration);
-                });
+                sc.AddSingleton<ISettingsProvider>(x=> new ConfigSettingsProvider("ClientOIDC", Configuration));
+                sc.AddSingleton<ISvcClientFactory, SvcClientFactory>();
+                sc.AddApiProvider(c => Configuration.GetSection("membership").Bind(c));
             }
         }
     }

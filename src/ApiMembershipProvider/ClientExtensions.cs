@@ -16,10 +16,10 @@ namespace Comax.Commons.Orchestrator.ApiMembershipProvider
         /// <summary>
         /// Configure client to use MongoGatewayListProvider
         /// </summary>
-        public static IClientBuilder UseMongoDBClustering(this IClientBuilder builder,
-            Action<MongoDBOptions> configurator = null)
+        public static IClientBuilder UseApiClustering(this IClientBuilder builder,
+            Action<ApiMembershipClientConfig> configurator = null)
         {
-            return builder.ConfigureServices(services => services.AddMongoDBGatewayListProvider(configurator));
+            return builder.ConfigureServices(services => services.AddApiProvider(configurator));
         }
 
         /// <summary>
@@ -28,29 +28,23 @@ namespace Comax.Commons.Orchestrator.ApiMembershipProvider
         public static IClientBuilder UseMongoDBClustering(this IClientBuilder builder,
             IConfiguration configuration)
         {
-            return builder.ConfigureServices(services => services.AddMongoDBGatewayListProvider(configuration));
+            return builder.ConfigureServices(services => services.AddApiProvider(configuration));
         }
 
-        /// <summary>
-        /// Configure silo to use MongoGatewayListProvider.
-        /// </summary
-        public static IServiceCollection AddMongoDBGatewayListProvider(this IServiceCollection services,
-            Action<MongoDBOptions> configurator = null)
+        public static IServiceCollection AddApiProvider(this IServiceCollection services,
+            Action<ApiMembershipClientConfig> configurator = null)
         {
             services.Configure(configurator ?? (x => { }));
-            services.AddSingleton<IGatewayListProvider, MongoGatewayListProvider>();
+            services.AddSingleton<IGatewayListProvider, ApiGatewayListProvider>();
 
             return services;
         }
 
-        /// <summary>
-        /// Configure silo to use MongoGatewayListProvider.
-        /// </summary>
-        public static IServiceCollection AddMongoDBGatewayListProvider(this IServiceCollection services,
+        public static IServiceCollection AddApiProvider(this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.Configure<MongoDBOptions>(configuration);
-            services.AddSingleton<IGatewayListProvider, MongoGatewayListProvider>();
+            services.Configure<ApiMembershipClientConfig>(configuration);
+            services.AddSingleton<IGatewayListProvider, ApiGatewayListProvider>();
 
             return services;
         }

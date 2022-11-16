@@ -2,6 +2,6 @@
 {
     public class CleanupRequest
     {
-        public DateTimeOffset BeforeDate { get; internal set; }
+        public DateTime BeforeDate { get; set; }
     }
 }

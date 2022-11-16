@@ -4,8 +4,8 @@ namespace Referee.Contracts
 {
     public class UpdateRowRequest
     {
-        public MembershipEntry Entry { get; internal set; }
-        public string Etag { get; internal set; }
-        public TableVersion TableVersion { get; internal set; }
+        public MembershipEntry Entry { get; set; }
+        public string Etag { get; set; }
+        public TableVersion TableVersion { get; set; }
     }
 }

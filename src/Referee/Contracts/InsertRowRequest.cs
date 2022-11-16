@@ -4,7 +4,7 @@ namespace Referee.Contracts
 {
     public class InsertRowRequest
     {
-        public MembershipEntry Entry { get; internal set; }
-        public TableVersion TableVersion { get; internal set; }
+        public MembershipEntry Entry { get; set; }
+        public TableVersion TableVersion { get; set; }
     }
 }

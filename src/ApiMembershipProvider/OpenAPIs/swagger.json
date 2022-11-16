@@ -305,43 +305,6 @@
   },
   "components": {
     "schemas": {
-      "AddressFamily": {
-        "enum": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          28,
-          29,
-          65536,
-          65537,
-          -1
-        ],
-        "type": "integer",
-        "format": "int32"
-      },
       "CleanupRequest": {
         "type": "object",
         "properties": {
@@ -395,64 +358,6 @@
         },
         "additionalProperties": false
       },
-      "IPAddress": {
-        "type": "object",
-        "properties": {
-          "addressFamily": {
-            "$ref": "#/components/schemas/AddressFamily"
-          },
-          "scopeId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "isIPv6Multicast": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isIPv6LinkLocal": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isIPv6SiteLocal": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isIPv6Teredo": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isIPv6UniqueLocal": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "isIPv4MappedToIPv6": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "address": {
-            "type": "integer",
-            "format": "int64",
-            "deprecated": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "IPEndPoint": {
-        "type": "object",
-        "properties": {
-          "addressFamily": {
-            "$ref": "#/components/schemas/AddressFamily"
-          },
-          "address": {
-            "$ref": "#/components/schemas/IPAddress"
-          },
-          "port": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
       "MembershipEntry": {
         "type": "object",
         "properties": {
@@ -460,12 +365,13 @@
             "$ref": "#/components/schemas/SiloAddress"
           },
           "status": {
-            "$ref": "#/components/schemas/SiloStatus"
+            "type": "integer",
+            "format": "int32"
           },
           "suspectTimes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SiloAddressDateTimeTuple"
+              "$ref": "#/components/schemas/SuspectTimeTuple"
             },
             "nullable": true
           },
@@ -504,7 +410,7 @@
         },
         "additionalProperties": false
       },
-      "MembershipEntryStringTuple": {
+      "MembershipEntryTuple": {
         "type": "object",
         "properties": {
           "item1": {
@@ -523,10 +429,9 @@
           "members": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MembershipEntryStringTuple"
+              "$ref": "#/components/schemas/MembershipEntryTuple"
             },
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "version": {
             "$ref": "#/components/schemas/TableVersion"
@@ -537,22 +442,22 @@
       "SiloAddress": {
         "type": "object",
         "properties": {
-          "endpoint": {
-            "$ref": "#/components/schemas/IPEndPoint"
-          },
-          "generation": {
+          "address": {
             "type": "integer",
-            "format": "int32",
-            "readOnly": true
+            "format": "int64"
           },
-          "isClient": {
-            "type": "boolean",
-            "readOnly": true
+          "port": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gen": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
       },
-      "SiloAddressDateTimeTuple": {
+      "SuspectTimeTuple": {
         "type": "object",
         "properties": {
           "item1": {
@@ -565,19 +470,6 @@
         },
         "additionalProperties": false
       },
-      "SiloStatus": {
-        "enum": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6
-        ],
-        "type": "integer",
-        "format": "int32"
-      },
       "TableVersion": {
         "type": "object",
         "properties": {
@@ -587,8 +479,7 @@
           },
           "versionEtag": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           }
         },
         "additionalProperties": false

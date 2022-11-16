@@ -16,7 +16,6 @@ using Comax.Commons.Orchestrator.SOIGrain;
 using Comax.Commons.Orchestrator.MailGrain;
 using MongoDB.Driver;
 //using Orleans.Providers.MongoDB.Utils;
-using Comax.Commons.Orchestrator.MembershipProvider;
 using Orleans.Configuration;
 using Comax.Commons.Orchestrator.Contracts.PublicBoard;
 using CommunAxiom.Commons.CommonsShared.CentralGrain;
@@ -24,6 +23,7 @@ using CommunAxiom.Commons.CommonsShared.Contracts.UriRegistry;
 using CommunAxiom.Commons.CommonsShared.UriRegistryGrain;
 using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
 using CommunAxiom.Commons.CommonsShared.EventMailboxGrain;
+using Comax.Commons.Orchestrator.ApiMembershipProvider;
 
 namespace Comax.Commons.Orchestrator
 {
@@ -48,24 +48,8 @@ namespace Comax.Commons.Orchestrator
 
                     services.CentralGrainSetup();
 
-                    services.AddSingleton<IMongoClientFactory>(sp =>
-                    {
-                        return new MongoClientFactory(conf);
-                    });
-
-                    services.Configure<MongoDBOptions>(mo =>
-                    {
-                        mo.DatabaseName = "clustermembers";
-                        mo.ClientName = "member_mongo";
-                        mo.CollectionConfigurator = cs =>
-                        {
-                            cs.WriteConcern = WriteConcern.Acknowledged;
-                            cs.ReadConcern = ReadConcern.Local;
-                        };
-
-                    });
-
-                    services.AddSingleton<IMembershipTable, MongoMembershipTable>();
+                    services.AddSingleton<ISvcClientFactory, SvcClientFactory>();
+                    services.AddSingleton<IMembershipTable, ApiMembershipProvider.ApiMembershipProvider>();
 
                     //register singleton services for each grain/interface
                     //services.AddSingleton<ISubjectOfInterest, SubjectOfInterest>();

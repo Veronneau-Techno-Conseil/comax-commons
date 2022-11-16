@@ -20,17 +20,9 @@
   "CentralApiUrl": "https://central.communaxiom.org",
   "siloPort": 7718,
   "gatewayPort": 30001,
-  "advertisedIp": "127.0.0.1",
-  "member_mongo": {
-    "authDb": "admin",
-    "username": "orchAdmin",
-    "password": "JTFkU054Mmt6Vwo=",
-    "hosts": [
-      "10.13.40.20"
-    ],
-    "port": 27017,
-    "directConnection": true,
-    "useTls": false,
-    "allowInsecureTls": false
+  "advertisedIp": "10.10.2.2",
+
+  "membership": {
+    "host": "https://localhost:7287"
   }
 }

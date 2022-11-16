@@ -16,7 +16,7 @@ namespace Comax.Commons.Orchestrator.MembershipProvider
         /// <summary>
         /// Configure client to use MongoGatewayListProvider
         /// </summary>
-        public static IClientBuilder UseMongoDBClustering(this IClientBuilder builder,
+        public static IClientBuilder UseApiClusteringClustering(this IClientBuilder builder,
             Action<MongoDBOptions> configurator = null)
         {
             return builder.ConfigureServices(services => services.AddMongoDBGatewayListProvider(configurator));

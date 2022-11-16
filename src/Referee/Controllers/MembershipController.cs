@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Orleans;
-using Orleans.Runtime;
+
 using Referee.Contracts;
 
 namespace Referee.Controllers
@@ -10,8 +9,8 @@ namespace Referee.Controllers
     [Route("[controller]")]
     public class MembershipController : Controller
     {
-        private readonly IMembershipTable _membershipTable;
-        public MembershipController(IMembershipTable membershipTable)
+        private readonly Orleans.IMembershipTable _membershipTable;
+        public MembershipController(Orleans.IMembershipTable membershipTable)
         {
             _membershipTable = membershipTable;
         }
@@ -41,9 +40,11 @@ namespace Referee.Controllers
         [HttpPost("InsertRow")]
         public async Task<InsertRowResponse> InsertRow(InsertRowRequest request)
         {
+            var retVal = await _membershipTable.InsertRow(request.Entry.ToOrleans(), request.TableVersion.ToOrleans());
+
             var res = new InsertRowResponse
             {
-                Success = await _membershipTable.InsertRow(request.Entry, request.TableVersion)
+                Success = retVal
             };
             return res;
         }
@@ -52,28 +53,30 @@ namespace Referee.Controllers
         [HttpGet("ReadAll")]
         public async Task<MembershipTableData> ReadAll()
         {
-            return await _membershipTable.ReadAll();
+            var res = await _membershipTable.ReadAll();
+            return Contracts.MembershipTableData.Parse(res);
         }
 
         [Authorize("Reader")]
         [HttpPost("ReadRow")]
         public async Task<MembershipTableData> ReadRow(SiloAddress key)
         {
-            return await (_membershipTable.ReadRow(key));
+            var res = await (_membershipTable.ReadRow(key.ToOrleans()));
+            return MembershipTableData.Parse(res);
         }
 
         [Authorize("Actor")]
         [HttpPost("UpdateIAmAlive")]
-        public Task UpdateIAmAlive(MembershipEntry entry)
+        public async Task UpdateIAmAlive(MembershipEntry entry)
         {
-            return _membershipTable.UpdateIAmAlive(entry);
+            await _membershipTable.UpdateIAmAlive(entry.ToOrleans());
         }
 
         [Authorize("Actor")]
         [HttpPost("UpdateRow")]
         public async Task<UpdateRowResponse> UpdateRow(UpdateRowRequest request)
         {
-            var res = new UpdateRowResponse { Success = await _membershipTable.UpdateRow(request.Entry, request.Etag, request.TableVersion) };
+            var res = new UpdateRowResponse { Success = await _membershipTable.UpdateRow(request.Entry.ToOrleans(), request.Etag, request.TableVersion.ToOrleans()) };
             return res;
         }
     }

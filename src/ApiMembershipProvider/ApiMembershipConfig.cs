@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Comax.Commons.Orchestrator.ApiMembershipProvider
 {
-    public class MongoMembershipConfig
+    public class ApiMembershipConfig
     {
         public string authDb { get; set; }
         public string username { get; set; }

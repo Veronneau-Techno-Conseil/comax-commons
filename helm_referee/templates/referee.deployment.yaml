@@ -40,12 +40,14 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.orch.gatewayport }}
+              containerPort: 7287
               protocol: TCP
           volumeMounts:
           - name: datastore
             mountPath: "/data"
           env:
+          - name: Urls
+            value: {{ .Values.urls }}
           - name: OIDC__Authority
             value: {{ .Values.oidc.auth }}
           - name: OIDC__Scopes
@@ -57,22 +59,21 @@ spec:
               secretKeyRef:
                 name: {{ include "comax-referee.secretName" . }}
                 key: OIDC__Secret
-          - name: LiteDbStorage__FileName
-            value: /data/SiloStore.db
-          - name: JObjectStore__FileName
-            value: /data/SiloStore.db
-          - name: PubSubStore__FileName
-            value: /data/PubSubStore.db
-          - name: CentralApiUrl
-            value: {{ .Values.centralApiUrl }}
-          - name: siloPort
-            value: "7718"
-          - name: gatewayPort
-            value: "30001"
-          - name: advertisedIp
+          
+          - name: member_mongo__authDb
+            value: admin
+          - name: member_mongo__username
+            value: membership
+          - name: member_mongo__password
             valueFrom:
-              fieldRef:
-                fieldPath: status.podIP
+              secretKeyRef: 
+                name: refereee-mongo-membership-password
+                key: password
+          - name: member_mongo__host
+            value: {{ include "comax-referee-mongodb.fullSvcName" . }}
+          - name: member_mongo__port
+            value: "27017"
+            
           # livenessProbe:
           #   httpGet:
           #     path: /

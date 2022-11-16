@@ -13,6 +13,12 @@ Expand the full service name.
 {{- printf "%s.%s.svc.cluster.local" ( include "comax-referee.name" . ) .Release.Namespace -}}
 {{- end }}
 
+{{/*
+Expand the full service name.
+*/}}
+{{- define "comax-referee-mongodb.fullSvcName" -}}
+{{- printf "referee-mongodb.%s.svc.cluster.local" .Release.Namespace -}}
+{{- end }}
 
 {{/*
 Expand the name of the cert secret.

@@ -35,17 +35,10 @@
   "siloPort": 7718,
   "gatewayPort": 30001,
   "advertisedIp": "127.0.0.1",
-  "member_mongo": {
-    "authDb": "admin",
-    "username": "orchAdmin",
-    "password": "JTFkU054Mmt6Vwo=",
-    "hosts": [
-      "10.13.40.20"
-    ],
-    "port": 27017,
-    "directConnection": true,
-    "useTls": false,
-    "allowInsecureTls": false
-  },
-  "client_mode": "local"
+  
+  "client_mode": "local",
+  "membership": {
+    "host": "https://localhost:7287",
+    "cacheDuration": "00:05:00"
+  }
 }

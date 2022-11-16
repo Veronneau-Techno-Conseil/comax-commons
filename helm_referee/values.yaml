@@ -14,17 +14,17 @@ imagePullSecrets: []
 nameOverride: "cxref"
 fullnameOverride: ""
 pvcName: "refdatastore"
-orch:
-  siloport: 7718
-  gatewayport: 30001
 
-urls: "http://*:8080"
-centralApiUrl: "https://central.api.com"
+urls: "http://*:7287"
+centralApiUrl: "https://referee.api.com"
 oidc:
   auth: "https://oidc.auth/"
   scopes: "openid offline_access roles profile email"
   clientId: ""
   secret: ""
+mongodb:
+  adminPassword:
+  membershipPassword:
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -65,7 +65,7 @@ ingress:
   tls: 
   - hosts:
       - host.domain.com
-    secretName: "orchestratortls"
+    secretName: "refereetls"
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

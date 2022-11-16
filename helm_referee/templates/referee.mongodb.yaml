@@ -1,0 +1,71 @@
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: referee-mongodb
+spec:
+  members: 1
+  security:
+    authentication:
+      ignoreUnknownUsers: true
+      modes:
+      - SCRAM4
+    roles:
+    - db: admin
+      privileges:
+      - actions:
+        - find
+        - insert
+        - remove
+        - update
+        resource:
+          collection: ""
+          db: clustermembers
+      role: member
+      roles: []
+  type: ReplicaSet
+  users:
+  - db: admin
+    name: orchAdmin
+    passwordSecretRef:
+      name: refereee-mongo-admin-password
+    roles:
+    - db: admin
+      name: clusterAdmin
+    - db: admin
+      name: userAdminAnyDatabase
+    - db: admin
+      name: readWriteAnyDatabase
+    scramCredentialsSecretName: my-scram
+  - db: admin
+    name: membership
+    passwordSecretRef:
+      name: refereee-mongo-membership-password
+    roles:
+    - db: admin
+      name: member
+    scramCredentialsSecretName: member-scram
+  version: 4.2.6
+status:
+  currentMongoDBMembers: 1
+  currentStatefulSetReplicas: 1
+  mongoUri: mongodb://orch-mongodb-0.orch-mongodb-svc.mongodb.svc.cluster.local:27017/?replicaSet=orch-mongodb
+  phase: Running
+  version: 4.2.6
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: refereee-mongo-admin-password
+  namespace: mongodb
+type: Opaque
+stringData:
+  password: {{ .Values.mongodb.adminPassword }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: refereee-mongo-membership-password
+  namespace: mongodb
+type: Opaque
+stringData:
+  password: {{ .Values.mongodb.membershipPassword }}

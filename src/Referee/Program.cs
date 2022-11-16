@@ -4,8 +4,11 @@ using MongoDB.Driver;
 using Orleans;
 using System.Security.Cryptography.X509Certificates;
 using OpenIddict.Validation.AspNetCore;
+using Orleans.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.AddConsole();
 
 Console.WriteLine($"Using kestrel on {builder.Configuration["Urls"]}...");
 builder.WebHost.UseKestrel(opts =>
@@ -28,7 +31,10 @@ builder.Services.Configure<OidcConfig>(x => builder.Configuration.GetSection("OI
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(x=> {
+        x.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -48,6 +54,12 @@ builder.Services.Configure<MongoDBOptions>(mo =>
         cs.ReadConcern = ReadConcern.Local;
     };
 
+});
+
+builder.Services.Configure<ClusterOptions>(options =>
+{
+    options.ClusterId = "0.0.1-a1";
+    options.ServiceId = "OrchestratorCluster";
 });
 
 builder.Services.AddSingleton<IMembershipTable, MongoMembershipTable>();
@@ -96,7 +108,15 @@ builder.Services.AddAuthorization(opt =>
 
     opt.AddPolicy("Actor", builder =>
     {
-        builder.RequireClaim("https://referee.communaxiom.org/actor", "access");
+        builder.RequireAssertion(ctxt =>
+        {
+            //var con = (HttpContext)ctxt.Resource;
+            //con.Request.Body.Position = 0;
+            //StreamReader rdr = new StreamReader(con.Request.Body);
+            //var res = rdr.ReadToEndAsync().GetAwaiter().GetResult();
+            return ctxt.User.HasClaim(x => x.Type == "https://referee.communaxiom.org/actor");
+        });
+        //builder.RequireClaim("https://referee.communaxiom.org/actor", "access");
     });
 });
 
@@ -106,7 +126,10 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+if (builder.Configuration["Urls"].StartsWith("https"))
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

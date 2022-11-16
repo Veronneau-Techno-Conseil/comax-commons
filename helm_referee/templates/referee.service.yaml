@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "comax-orchestrator.fullname" . }}
+  name: {{ include "comax-referee.fullname" . }}
   labels:
-    {{- include "comax-orchestrator.labels" . | nindent 4 }}
+    {{- include "comax-referee.labels" . | nindent 4 }}
   {{- with .Values.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -12,11 +12,11 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.orch.gatewayport }}
+      targetPort: 7287
       protocol: TCP
       name: http
   selector:
-    {{- include "comax-orchestrator.selectorLabels" . | nindent 4 }}
+    {{- include "comax-referee.selectorLabels" . | nindent 4 }}
   {{- if .Values.service.loadBalancerClass }}
   loadBalancerClass: {{.Values.service.loadBalancerClass}}
   {{- end }}
