@@ -35,11 +35,16 @@ pipeline {
                     orch.push()
                     orch.push(patch)
                 }
-                sh 'echo "Build registry.vtck3s.lan/comax-orchestrator:${patch} pushed to registry \n" >> SUMMARY'
 
-				sh 'docker buildx build -t registry.vtck3s.lan/comax-orchestrator:${patch}-arm64 --platform linux/arm64 -f orchestrator.Dockerfile .'
-                sh 'docker tag registry.vtck3s.lan/comax-orchestrator:latest-arm64 registry.vtck3s.lan/comax-orchestrator:${patch}-arm64'
-				
+                sh """
+                    patch=$(cat VERSION)
+                    echo "Build registry.vtck3s.lan/comax-orchestrator:${patch} pushed to registry \n" >> SUMMARY
+
+                    docker buildx build -t registry.vtck3s.lan/comax-orchestrator:latest-arm64 -t registry.vtck3s.lan/comax-orchestrator:${patch}-arm64 --platform linux/arm64 -f orchestrator.Dockerfile .
+                    docker push registry.vtck3s.lan/comax-orchestrator:latest-arm64
+                    docker push registry.vtck3s.lan/comax-orchestrator:${patch}-arm64
+                """
+                
                 script {
                     def customImage = docker.build("registry.vtck3s.lan/comax-referee:latest", "-f ./referee.Dockerfile .")
                     customImage.push()
