@@ -19,6 +19,7 @@ using Comax.Commons.Orchestrator.Contracts;
 using CommunAxiom.Commons.Orleans;
 using static IdentityModel.ClaimComparer;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 
 namespace Comax.Commons.Orchestrator
 {
@@ -85,17 +86,22 @@ namespace Comax.Commons.Orchestrator
         {
             // the silo port was modified from the default because the option range for that port falls in an unauthorized range
 
+            siloHostBuilder.ConfigureEndpoints(siloPort: int.Parse(configuration["siloPort"]), gatewayPort: int.Parse(configuration["gatewayPort"]));
+            
             // TODO: use configuration to set the IP Address
             if (configuration["advertisedIp"].StartsWith("127.0.0.1"))
             {
-                //siloHostBuilder.Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Parse(configuration["advertisedIp"]));
-                siloHostBuilder.ConfigureEndpoints(siloPort: 7718, gatewayPort: 30001);
                 // TODO: use configuration to set the IP Address
                 siloHostBuilder.Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback);
             }
             else
             {
-                siloHostBuilder.ConfigureEndpoints(siloPort: int.Parse(configuration["siloPort"]), gatewayPort: int.Parse(configuration["gatewayPort"]));
+                siloHostBuilder.Configure<EndpointOptions>(options => {
+                    options.AdvertisedIPAddress = IPAddress.Parse(configuration["advertisedIp"]);
+                    options.SiloListeningEndpoint = IPEndPoint.Parse($"{configuration["listeningEndpoint"]}:{configuration["siloPort"]}");
+                    options.GatewayListeningEndpoint = IPEndPoint.Parse($"{configuration["listeningEndpoint"]}:{configuration["gatewayPort"]}");
+                Console.WriteLine($"STARTUP: Advertizing: {configuration["advertisedIp"]}, SiloEndpoint: {configuration["listeningEndpoint"]}:{configuration["siloPort"]}, GatewayEndpoint: {configuration["listeningEndpoint"]}:{configuration["gatewayPort"]}");
+                });
             }
            
             return siloHostBuilder;
@@ -155,11 +161,13 @@ namespace Comax.Commons.Orchestrator
         {
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddJsonFile("./config.json");
+            configurationBuilder.AddEnvironmentVariables();
             configuration = configurationBuilder.Build();
 
             return siloHostBuilder.ConfigureAppConfiguration(app =>
             {
                 app.AddJsonFile("./config.json");
+                app.AddEnvironmentVariables();
             });
         }
 
@@ -167,11 +175,13 @@ namespace Comax.Commons.Orchestrator
         {
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddJsonFile("./config.json");
+            configurationBuilder.AddEnvironmentVariables();
             configuration = configurationBuilder.Build();
 
             return siloHostBuilder.ConfigureAppConfiguration(app =>
             {
                 app.AddJsonFile("./config.json");
+                app.AddEnvironmentVariables();
             });
         }
     }

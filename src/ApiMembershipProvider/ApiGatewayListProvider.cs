@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Orleans.Messaging;
+using Orleans.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +38,7 @@ namespace Comax.Commons.Orchestrator.ApiMembershipProvider
             {
                 var svc = await _refereeClientFact.GetRefereeSvc();
                 var lst = await svc.ReadAllAsync();
-                _uris = lst.Members.Select(x => x.Item1.SiloAddress.GetUri(x.Item1.ProxyPort)).ToList();
+                _uris = lst.Members.Where(x=>x.Item1.Status == (int)SiloStatus.Active).Select(x => x.Item1.SiloAddress.GetUri(x.Item1.ProxyPort)).ToList();
                 _lastFetch = DateTime.UtcNow;
             }
             return _uris;

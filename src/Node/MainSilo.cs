@@ -58,7 +58,9 @@ namespace Comax.Commons.Orchestrator
 
                     services.AddSingleton<ISettingsProvider, OrchestratorSettingsProvider>();
                     services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
-                    services.AddSingleton<IIncomingGrainCallFilter, AccessControlFilter>();
+                    services.AddSingleton<IIncomingGrainCallFilter, AuthRequiredAccessControlFilter>();
+                    services.AddSingleton<IOutgoingGrainCallFilter, SiloSourcedOutgoingFilter>();
+
                     services.AddSingleton<ITokenProvider, ClientTokenProvider>();
                     services.AddTransient<HttpClient>();
 

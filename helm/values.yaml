@@ -37,6 +37,9 @@ serviceAccount:
 
 podAnnotations: {}
 
+advertisedIp: ""
+listeningEndpoint: ""
+
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
@@ -48,13 +51,18 @@ securityContext:
   runAsGroup: 2000
 
 service:
-  type: ClusterIP
-  port: 80
-  annotations: {}
-  loadBalancerClass: ""
+  type: LoadBalancer
+  ports:
+  - port: 30001
+    targetPort: 30001 
+    name: gateway
+  annotations:
+    metallb.universe.tf/address-pool: soempool
+    metallb.universe.tf/loadBalancerIPs: someip
+  loadBalancerClass: "metallb"
 
 ingress:
-  enabled: true
+  enabled: false
   annotations: 
     cert-manager.io/cluster-issuer: "vault-issuer"
     ingress.kubernetes.io/protocol: https

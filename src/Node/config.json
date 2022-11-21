@@ -20,9 +20,10 @@
   "CentralApiUrl": "https://central.communaxiom.org",
   "siloPort": 7718,
   "gatewayPort": 30001,
-  "advertisedIp": "10.10.2.2",
+  "advertisedIp": "127.0.0.1",
+  "listeningEndpoint": "0.0.0.0",
 
   "membership": {
-    "host": "https://localhost:7287"
+    "host": "https://referee.communaxiom.org"
   }
 }

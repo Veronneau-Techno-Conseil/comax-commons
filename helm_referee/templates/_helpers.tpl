@@ -17,7 +17,7 @@ Expand the full service name.
 Expand the full service name.
 */}}
 {{- define "comax-referee-mongodb.fullSvcName" -}}
-{{- printf "referee-mongodb.%s.svc.cluster.local" .Release.Namespace -}}
+{{- printf "referee-mongodb-svc.%s.svc.cluster.local" .Release.Namespace -}}
 {{- end }}
 
 {{/*

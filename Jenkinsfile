@@ -36,8 +36,11 @@ pipeline {
                     orch.push(patch)
                 }
                 sh 'echo "Build registry.vtck3s.lan/comax-orchestrator:${version} pushed to registry \n" >> SUMMARY'
+
+				sh 'docker buildx build --platform linux/arm64 -t registry.vtck3s.lan/comax-orchestrator:latest-arm64 -f ./orchestrator.Dockerfile .'
+                sh 'docker tag registry.vtck3s.lan/comax-orchestrator:latest-arm64 registry.vtck3s.lan/comax-orchestrator:${version}-arm64'
 				
-				script {
+                script {
                     def customImage = docker.build("registry.vtck3s.lan/comax-referee:latest", "-f ./referee.Dockerfile .")
                     customImage.push()
                     customImage.push(patch)
@@ -71,7 +74,7 @@ pipeline {
                 }
             }
             steps {
-                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos')]) {
+                withCredentials([file(credentialsId: 'edgek3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos')]) {
                     sh 'helm lint ./helm/'
                     sh 'helm repo update --repository-config ${repos}'
                     sh 'helm dependency update ./helm/ --repository-config ${repos}'
@@ -97,10 +100,10 @@ pipeline {
                 }
             }
             steps {
-                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos')]) {
+                withCredentials([file(credentialsId: 'edgek3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos')]) {
                     sh 'helm repo update --repository-config ${repos}'
                     sh 'helm dependency update ./helm --repository-config ${repos}'
-                    sh 'helm list -n cx-orch --output=json --kubeconfig $kubecfg > HELM_LIST'
+                    sh 'helm list -n comax-commons --output=json --kubeconfig $kubecfg > HELM_LIST'
                     sh 'cat HELM_LIST'
                     sh 'jq \'select(.[].name == "orchestrator") | select(.[].status == "deployed") | "upgrade" \' HELM_LIST > DEPLOY_ACTION'
                     sh 'jq \'select(.[].name == "orchestrator") | select(.[].status != "deployed") | "uninstall" \' HELM_LIST > SHOULD_UNINSTALL'
@@ -121,8 +124,8 @@ pipeline {
                 }
             }
             steps {
-                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos')]) {
-                    sh 'helm -n cx-orch uninstall orchestrator --kubeconfig ${kubecfg}'
+                withCredentials([file(credentialsId: 'edgek3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos')]) {
+                    sh 'helm -n comax-commons uninstall orchestrator --kubeconfig ${kubecfg}'
                 }
             }
         }
@@ -134,8 +137,8 @@ pipeline {
             }
             steps {
                 echo "Deploy action: ${deployAction}"
-                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos'), file(credentialsId: 'orchvalues', variable: 'orchvalues')]) {
-                    sh 'helm -n cx-orch install orchestrator ./helm/ --kubeconfig ${kubecfg} --repository-config ${repos} -f ${orchvalues}'
+                withCredentials([file(credentialsId: 'edgek3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos'), file(credentialsId: 'orchvalues', variable: 'orchvalues')]) {
+                    sh 'helm -n comax-commons install orchestrator ./helm/ --kubeconfig ${kubecfg} --repository-config ${repos} -f ${orchvalues}'
                 }
             }
         }
@@ -146,8 +149,8 @@ pipeline {
                 }
             }
             steps {
-                withCredentials([file(credentialsId: 'pdsk3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos'), file(credentialsId: 'orchvalues', variable: 'orchvalues')]) {
-                    sh 'helm -n cx-orch upgrade orchestrator ./helm/ --kubeconfig ${kubecfg} --repository-config ${repos} -f ${orchvalues}'
+                withCredentials([file(credentialsId: 'edgek3s', variable: 'kubecfg'), file(credentialsId: 'helmrepos', variable: 'repos'), file(credentialsId: 'orchvalues', variable: 'orchvalues')]) {
+                    sh 'helm -n comax-commons upgrade orchestrator ./helm/ --kubeconfig ${kubecfg} --repository-config ${repos} -f ${orchvalues}'
                 }
             }
         }

@@ -38,7 +38,7 @@
   
   "client_mode": "local",
   "membership": {
-    "host": "https://localhost:7287",
+    "host": "https://referee.communaxiom.org",
     "cacheDuration": "00:05:00"
   }
 }

@@ -132,11 +132,13 @@ namespace CommunAxiom.Commons.Client.SiloShared
         {
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddJsonFile("./config.json");
+            configurationBuilder.AddEnvironmentVariables();
             configuration = configurationBuilder.Build();
 
             return siloHostBuilder.ConfigureAppConfiguration(app =>
             {
                 app.AddJsonFile("./config.json");
+                app.AddEnvironmentVariables();
             });
         }
 
@@ -144,11 +146,13 @@ namespace CommunAxiom.Commons.Client.SiloShared
         {
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddJsonFile("./config.json");
+            configurationBuilder.AddEnvironmentVariables();
             configuration = configurationBuilder.Build();
 
             return siloHostBuilder.ConfigureAppConfiguration(app =>
             {
                 app.AddJsonFile("./config.json");
+                app.AddEnvironmentVariables();
             });
         }
 

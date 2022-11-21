@@ -66,6 +66,15 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
                             FieldType = ConfigurationFieldType.File,
                             Value = JsonConvert.SerializeObject(new FileModel { Name = "sample1.txt", Path = "Samples/Files" })
                         }
+                    },
+                    {
+                        "FilePath",
+                        new DataSourceConfiguration
+                        {
+                            Name = "FilePath",
+                            FieldType = ConfigurationFieldType.File,
+                            Value = "Samples/Files/sample1.txt"
+                        }
                     }
                 }
             });

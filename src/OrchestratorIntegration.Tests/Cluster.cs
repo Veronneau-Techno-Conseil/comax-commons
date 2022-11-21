@@ -22,6 +22,7 @@ namespace OrchestratorIntegration.Tests
     [SetUpFixture]
     public class Cluster
     {
+        public static bool NoAuth { get; set; }
         public static IConfiguration Configuration { get; set; }
         public static IServiceProvider ServiceProvider { get; set; }
 
@@ -31,19 +32,22 @@ namespace OrchestratorIntegration.Tests
         public async Task RunBeforeAnyTests()
         {
             SetupTests();
-            await MainSilo.StartSilo();
+            if (Configuration["client_mode"] == "local")
+                await MainSilo.StartSilo();
         }
 
         [OneTimeTearDown]
         public async Task RunAfterAnyTests()
         {
-            await MainSilo.StopSilo();
+            if (Configuration["client_mode"] == "local")
+                await MainSilo.StopSilo();
         }
 
         public static void SetupTests()
         {
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddJsonFile("./config.json");
+            configurationBuilder.AddEnvironmentVariables();
             Configuration = configurationBuilder.Build();
 
             ServiceCollection sc = new ServiceCollection();

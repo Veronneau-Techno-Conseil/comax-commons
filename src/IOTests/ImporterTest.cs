@@ -58,6 +58,15 @@ namespace CommunAxiom.Commons.Ingestion.Tests
                             FieldType = ConfigurationFieldType.File,
                             Value = JsonConvert.SerializeObject(new FileModel { Name = "sample1.txt", Path = "Samples/Files" })
                         }
+                    },
+                    {
+                        "FilePath",
+                        new DataSourceConfiguration
+                        {
+                            Name = "FilePath",
+                            FieldType = ConfigurationFieldType.File,
+                            Value = "Samples/Files/sample1.txt"
+                        }
                     }
                 }
             };
@@ -96,6 +105,15 @@ namespace CommunAxiom.Commons.Ingestion.Tests
                             Name = "SampleFile",
                             FieldType = ConfigurationFieldType.File,
                             Value = JsonConvert.SerializeObject(new FileModel { Name = "sample2.txt", Path = "Samples/Files" })
+                        }
+                    },
+                    {
+                        "FilePath",
+                        new DataSourceConfiguration
+                        {
+                            Name = "FilePath",
+                            FieldType = ConfigurationFieldType.File,
+                            Value = "Samples/Files/sample2.txt" 
                         }
                     }
                 }
