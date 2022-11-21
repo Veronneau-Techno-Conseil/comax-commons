@@ -37,7 +37,7 @@ pipeline {
                 }
 
                 sh '''
-                    patch=$(cat VERSION)
+                    patch=$(cat VERSION)|tr -d '[:space:]'
                     echo "Build registry.vtck3s.lan/comax-orchestrator:${patch} pushed to registry \n" >> SUMMARY
 
                     docker buildx build -t registry.vtck3s.lan/comax-orchestrator:latest-arm64 -t registry.vtck3s.lan/comax-orchestrator:${patch}-arm64 --platform linux/arm64 -f orchestrator.Dockerfile .
