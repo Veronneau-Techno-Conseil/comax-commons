@@ -37,8 +37,7 @@ pipeline {
                 }
                 sh 'echo "Build registry.vtck3s.lan/comax-orchestrator:${version} pushed to registry \n" >> SUMMARY'
 
-                sh 'docker buildx use arm64bld'
-				sh 'docker buildx build --platform linux/arm64 -t registry.vtck3s.lan/comax-orchestrator:latest-arm64 -f ./orchestrator.Dockerfile .'
+				sh 'docker buildx build -t registry.vtck3s.lan/comax-orchestrator:1.25-alpine-arm64 --platform linux/arm64 -f orchestrator.Dockerfile .'
                 sh 'docker tag registry.vtck3s.lan/comax-orchestrator:latest-arm64 registry.vtck3s.lan/comax-orchestrator:${version}-arm64'
 				
                 script {
