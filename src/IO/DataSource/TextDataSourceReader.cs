@@ -40,7 +40,7 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 
             var dataSourceConfiguration = _configurations.FirstOrDefault(x => x.Key == "FilePath").Value;
 
-            return new FileStream(dataSourceConfiguration.Value.Value, FileMode.Open, FileAccess.Read);
+            return new FileStream(dataSourceConfiguration.Value, FileMode.Open, FileAccess.Read);
         }
 
         /*
