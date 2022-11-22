@@ -10,16 +10,21 @@ def getText(path):
     f.close()
     return retVal
 
+def processTemplate(vnum: str, template: str, tgt_folder: str):
+    env = Environment(
+        loader=PackageLoader("model"),
+        autoescape=select_autoescape()
+    )
+    chartVersion = getText(f"{tgt_folder}/VERSION")
+    tpl = env.get_template(template)
+    tgt = open(f"{tgt_folder}/Chart.yaml", "w")
+    tgt.write(tpl.render(version=vnum, chartVersion=chartVersion))
+    tgt.close()
+
+
 version = getText("./VERSION")
-chartVersion = getText("./helm/VERSION")
 
-env = Environment(
-    loader=PackageLoader("model"),
-    autoescape=select_autoescape()
-)
+processTemplate(version, "Chart.yaml.jinja", "./helm")
 
-template = env.get_template("Chart.yaml.jinja")
+processTemplate(version, "RefereeChart.yaml.jinja", "./helm_referee")
 
-tgt = open("./helm/Chart.yaml", "w")
-tgt.write(template.render(version=version, chartVersion=chartVersion))
-tgt.close()
