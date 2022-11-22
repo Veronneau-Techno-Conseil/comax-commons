@@ -82,6 +82,15 @@ namespace Ingestion.Grain.Tests
                             Value = JsonConvert.SerializeObject(new FileModel
                                 { Name = "sample1.txt", Path = "Samples/Files" })
                         }
+                    },
+                    {
+                        "FilePath",
+                        new DataSourceConfiguration
+                        {
+                            Name = "FilePath",
+                            FieldType = ConfigurationFieldType.File,
+                            Value = "Samples/Files/sample1.txt"
+                        }
                     }
                 },
                 DataSourceType = DataSourceType.FILE,

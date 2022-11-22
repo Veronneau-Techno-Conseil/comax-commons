@@ -9,13 +9,7 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Comax.Commons.Orchestrator.MembershipProvider;
-using MongoDB.Driver;
+using Comax.Commons.Orchestrator.ApiMembershipProvider;
 
 namespace Comax.Commons.Orchestrator.Client
 {
@@ -32,6 +26,9 @@ namespace Comax.Commons.Orchestrator.Client
         private IClientBuilder GetBuilder()
         {
             var b = new ClientBuilder()
+                .ConfigureAppConfiguration((ctxt, cb)=> {
+                    cb.AddConfiguration(configuration);
+                })
                 .ConfigureServices(services =>
                 {
                     var conf = serviceProvider.GetService<IOrchestratorClientConfig>();
@@ -55,16 +52,9 @@ namespace Comax.Commons.Orchestrator.Client
             }
             else
             {
-                b.UseMongoDBClustering(mo =>
+                b.UseApiClustering(mo =>
                 {
-                    mo.DatabaseName = "clustermembers";
-                    mo.ClientName = "member_mongo";
-                    mo.CollectionConfigurator = cs =>
-                    {
-                        cs.WriteConcern = WriteConcern.Acknowledged;
-                        cs.ReadConcern = ReadConcern.Local;
-                    };
-
+                    configuration.GetSection("membership").Bind(mo);
                 });
             }
                 

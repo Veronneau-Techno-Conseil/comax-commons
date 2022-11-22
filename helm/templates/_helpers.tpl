@@ -13,14 +13,6 @@ Expand the full service name.
 {{- printf "%s.%s.svc.cluster.local" ( include "comax-orchestrator.name" . ) .Release.Namespace -}}
 {{- end }}
 
-
-{{/*
-Expand the name of the cert secret.
-*/}}
-{{- define "comax-orchestrator.certSecretName" -}}
-{{- printf "%s-depltls" ( include "comax-orchestrator.name" . ) -}}
-{{- end }}
-
 {{/*
 Expand the name of the chart.
 */}}

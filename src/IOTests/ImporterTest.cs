@@ -58,6 +58,15 @@ namespace CommunAxiom.Commons.Ingestion.Tests
                             FieldType = ConfigurationFieldType.File,
                             Value = "Samples/files/sample1.txt"
                         }
+                    },
+                    {
+                        "FilePath",
+                        new DataSourceConfiguration
+                        {
+                            Name = "FilePath",
+                            FieldType = ConfigurationFieldType.File,
+                            Value = "Samples/Files/sample1.txt"
+                        }
                     }
                 }
             };
@@ -103,6 +112,15 @@ namespace CommunAxiom.Commons.Ingestion.Tests
                             Name = "SampleFile",
                             FieldType = ConfigurationFieldType.File,
                             Value = "Samples/files/sample1.txt"
+                        }
+                    },
+                    {
+                        "FilePath",
+                        new DataSourceConfiguration
+                        {
+                            Name = "FilePath",
+                            FieldType = ConfigurationFieldType.File,
+                            Value = "Samples/Files/sample2.txt" 
                         }
                     }
                 }

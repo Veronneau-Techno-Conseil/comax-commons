@@ -1,10 +1,10 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ include "comax-orchestrator.certSecretName" . }}
+  name: {{ include "comax-referee.certSecretName" . }}
 spec:
   dnsNames:
-  - {{ include "comax-orchestrator.fullSvcName" . }}
+  - {{ include "comax-referee.fullSvcName" . }}
   {{- range .Values.ingress.tls }}
   {{- range .hosts }}
   - {{ . | quote }}
@@ -14,7 +14,7 @@ spec:
     group: cert-manager.io
     kind: ClusterIssuer
     name: vault-issuer
-  secretName: {{ include "comax-orchestrator.certSecretName" . }}
+  secretName: {{ include "comax-referee.certSecretName" . }}
   usages:
   - digital signature
   - key encipherment

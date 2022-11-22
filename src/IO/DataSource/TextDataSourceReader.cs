@@ -38,9 +38,9 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
                 throw new NullReferenceException("There is no data source configuration!");
             }
 
-            var dataSourceConfiguration = _configurations.FirstOrDefault(x => x.Key == "SampleFile");
+            var dataSourceConfiguration = _configurations.FirstOrDefault(x => x.Key == "FilePath").Value;
 
-            return new FileStream(dataSourceConfiguration.Value.Value, FileMode.Open, FileAccess.Read);
+            return new FileStream(dataSourceConfiguration.Value, FileMode.Open, FileAccess.Read);
         }
 
         /*
