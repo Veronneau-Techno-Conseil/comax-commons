@@ -22,7 +22,7 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
         {
             await _clusterClient.WithClusterClient(async cc =>
             {
-                await cc.GetIngestion("Ingestion").Run();
+                await cc.GetIngestion("0a3905f7-0e1b-423e-ac4a-a84d2784adfb").Run();
             });
             
             return Ok();

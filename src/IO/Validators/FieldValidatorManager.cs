@@ -4,19 +4,18 @@ namespace CommunAxiom.Commons.Ingestion.Validators
 {
     public class ValidatorManager
     {
-        private ValidatorLookup _validatorLookup;
+        private readonly ValidatorLookup _validatorLookup;
 
-        public ValidatorManager()
+        public ValidatorManager(ValidatorLookup validatorLookup)
         {
-            _validatorLookup = new ValidatorLookup();
+            _validatorLookup = validatorLookup;
         }
 
         public void ConfigureFields(Action<IFieldValidatorOptions> options)
         {
             options(_validatorLookup);
         }
-
-
+        
         public void ConfigureConfigs(Action<IConfigValidatorOptions> options)
         {
             options(_validatorLookup);

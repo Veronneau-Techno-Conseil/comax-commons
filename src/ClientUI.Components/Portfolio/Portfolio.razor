@@ -83,24 +83,20 @@
                         </div>
                       </div>
                       <div class="columns">
-                        @foreach (var datasource in Sources)
+                        @foreach (var datasource in ConfigurationsKeyValuePairs)
                         {
                           switch (datasource.Value.FieldType)
                           {
                             case ConfigurationFieldType.File:
                               <div class="column" style="cursor: pointer;" @onclick="() => OnFieldMetadataSelected(datasource.Value)">
-                                <Label>
-                                  @datasource.Value.Name
-                                </Label>
-                                <TextEdit class="text-input" ReadOnly="true" Text="@datasource.Value.DisplayValue" />
+                                <Label>@datasource.Value.Name</Label>
+                                <TextEdit class="text-input" ReadOnly="@datasource.Value.IsReadonly" @bind-Text="@datasource.Value.DisplayValue" />
                               </div>
                               break;
                             default:
                               <div class="column" style="cursor: pointer;" @onclick="() => OnFieldMetadataSelected(datasource.Value)">
-                                <Label>
-                                  @datasource.Value.Name
-                                </Label>
-                                <TextEdit class="text-input" Text="@datasource.Value.Value" />
+                                <Label>@datasource.Value.Name</Label>
+                                <TextEdit class="text-input" ReadOnly="@datasource.Value.IsReadonly" @bind-Text="@datasource.Value.Value"/>
                               </div>
                               break;
                           }

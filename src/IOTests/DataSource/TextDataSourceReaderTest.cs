@@ -27,7 +27,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
             _configValidatorLookup = _mockRepository.Create<IConfigValidatorLookup>();
             _textDataSourceReader = new TextDataSourceReader(_configValidatorLookup.Object);
         }
-        
+
         [TearDown]
         public void TearDown()
         {
@@ -43,8 +43,17 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         }
 
         [Test]
-        public void WhenTextDataSourceReaderThenIngestionTypeShouldBeJSON()
+        public void WhenTextDataSourceReaderThenIngestionTypeShouldBeJson()
         {
+            _configValidatorLookup
+                .Setup(x => x.Get(It.IsAny<ConfigurationFieldType>()))
+                .Returns(new List<IConfigValidator>());
+            
+            _configValidatorLookup
+                .Setup(x => x.Get(It.IsAny<ConfigurationFieldType>(), It.IsAny<string>()))
+                .Returns(new List<IConfigValidator>());
+            
+            
             _textDataSourceReader.Setup();
             _textDataSourceReader.IngestorType.Should().Be(IngestorType.JSON);
         }
@@ -52,7 +61,15 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         [Test]
         public void ShouldReadDataReturnsStream()
         {
-            var file = new FileModel { Name = "sample1.txt", Path = "Samples/Files" };
+            _configValidatorLookup
+                .Setup(x => x.Get(It.IsAny<ConfigurationFieldType>()))
+                .Returns(new List<IConfigValidator>());
+            
+            _configValidatorLookup
+                .Setup(x => x.Get(It.IsAny<ConfigurationFieldType>(), It.IsAny<string>()))
+                .Returns(new List<IConfigValidator>());
+            
+            
             _textDataSourceReader.Setup(new SourceConfig
             {
                 DataSourceType = DataSourceType.FILE,
@@ -64,7 +81,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
                         {
                             Name = "SampleFile",
                             FieldType = ConfigurationFieldType.File,
-                            Value = JsonConvert.SerializeObject(new FileModel { Name = "sample1.txt", Path = "Samples/Files" })
+                            Value = "Samples/files/sample1.txt"
                         }
                     },
                     {
@@ -78,11 +95,13 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
                     }
                 }
             });
+            
             using var stream = _textDataSourceReader.ReadData();
-            var actual = ReadAsString(stream);
+            
+            var actual = ReadAsStream(stream);
 
-            var expected = ReadAsString(file);
-
+            var expected = ReadFile("Samples/files/sample1.txt");
+            
             actual.Should().Be(expected);
         }
 
@@ -91,8 +110,8 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         {
             Action act = () => _textDataSourceReader.ReadData();
             act.Should()
-                 .Throw<NullReferenceException>()
-                 .WithMessage("There is no data source configuration!");
+                .Throw<NullReferenceException>()
+                .WithMessage("There is no data source configuration!");
         }
 
 
@@ -104,35 +123,50 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
                 DataSourceType = DataSourceType.FILE,
                 Configurations = new Dictionary<string, DataSourceConfiguration>
                 {
-                    { "SampleFile", new DataSourceConfiguration { Name = "SampleFile", FieldType = ConfigurationFieldType.File }}
+                    {
+                        "SampleFile",
+                        new DataSourceConfiguration { Name = "SampleFile", Value = null, FieldType = ConfigurationFieldType.File }
+                    }
                 }
             };
 
-            var validators = new List<IConfigValidator> { new FileConfigValidator() };
-            _configValidatorLookup.Setup(x => x.ConfigValidators).Returns(validators);
-
+            var validators = new Dictionary<ConfigurationFieldType, IList<IConfigValidator>>
+            {
+                {
+                    ConfigurationFieldType.File,
+                    new List<IConfigValidator> { new FileConfigValidator() }
+                }
+            };
+            
+            _configValidatorLookup
+                .Setup(x => x.Get(It.IsAny<ConfigurationFieldType>()))
+                .Returns(new List<IConfigValidator>());
+            
+            _configValidatorLookup
+                .Setup(x => x.Get(It.IsAny<ConfigurationFieldType>(), It.IsAny<string>()))
+                .Returns(new List<IConfigValidator>());
+            
             _textDataSourceReader.Setup(sourceConfig);
 
             foreach (var actual in _textDataSourceReader.ValidateConfiguration())
             {
                 if (actual == null) continue;
 
-                actual.ErrorCode.Should().Be("The file type is required to set file name and file path");
+                actual.ErrorCode.Should().Be("File is not exists or file length is zero.");
                 actual.FieldName.Should().Be("SampleFile");
             }
         }
 
-        private string ReadAsString(Stream stream)
+        private string ReadAsStream(Stream stream)
         {
             using var sr = new StreamReader(stream);
             return sr.ReadToEnd();
         }
 
-        private string ReadAsString(FileModel file)
+        private string ReadFile(string filePath)
         {
-            using var expectedStream = new FileStream(Path.Combine(file.Path, file.Name), FileMode.Open, FileAccess.Read);
-            return ReadAsString(expectedStream);
+            using var expectedStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            return ReadAsStream(expectedStream);
         }
     }
 }
-

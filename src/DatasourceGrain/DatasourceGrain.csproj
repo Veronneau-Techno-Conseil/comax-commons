@@ -13,6 +13,10 @@
 		<AssemblyName>CommunAxiom.Commons.Client.Grains.DatasourceGrain</AssemblyName>
 		<RootNamespace>CommunAxiom.Commons.Client.Grains.DatasourceGrain</RootNamespace>
     </PackageReference>
+      <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.6.5">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

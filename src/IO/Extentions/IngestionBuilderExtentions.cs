@@ -11,8 +11,10 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
     {
         public static void AddIngestion(this IServiceCollection services)
         {
-            services.AddTransient<IFieldValidatorLookup, ValidatorLookup>();
-            services.AddTransient<IConfigValidatorLookup, ValidatorLookup>();
+            var validatorLookup = new ValidatorLookup();
+
+            services.AddSingleton<IFieldValidatorLookup>(validatorLookup);
+            services.AddSingleton<IConfigValidatorLookup>(validatorLookup);
 
             // data sources
 
@@ -33,6 +35,7 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
 
             // ingestors
             services.AddTransient<IIngestor, JsonIngestor>();
+            services.AddTransient<JsonIngestor>();
 
             // factories
             services.AddTransient<IDataSourceFactory, DataSourceFactory>();
@@ -40,19 +43,23 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
             services.AddTransient<IMetadataParser, JSONMetadataParser>();
             
             // validations
-            var fieldValidatorManager = new ValidatorManager();
+            var fieldValidatorManager = new ValidatorManager(validatorLookup);
             fieldValidatorManager.ConfigureFields(options =>
             {
-                options.Add(new RequiredFieldValidator());
-                options.Add(new NumberFieldValidator());
-                options.Add(new BooleanFieldValidator());
-                options.Add(new DateFieldValidator());
-                options.Add(new TextFieldValidator());
+                options.Add( "required", new RequiredFieldValidator());
+                options.Add(FieldType.Decimal, new NumberFieldValidator());
+                options.Add(FieldType.Integer, new NumberFieldValidator());
+                options.Add(FieldType.Boolean, new BooleanFieldValidator());
+                options.Add(FieldType.Date,new DateFieldValidator());
+                options.Add(FieldType.Text, new TextFieldValidator());
             });
 
             fieldValidatorManager.ConfigureConfigs(options =>
             {
-                options.Add(new FileConfigValidator());
+                options.Add(ConfigurationFieldType.File, new FileConfigValidator());
+                
+                options.Add("required", new RequiredConfigValidator());
+                // options.Add(ConfigurationFieldType.Date, new RequireConfigValidator());
             });
         }
 
