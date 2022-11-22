@@ -1,6 +1,5 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
-using Newtonsoft.Json;
 
 namespace CommunAxiom.Commons.Ingestion.Validators
 {
@@ -12,20 +11,36 @@ namespace CommunAxiom.Commons.Ingestion.Validators
             {
                 try
                 {
-                    var file = JsonConvert.DeserializeObject<FileModel>(configuration.Value);
+                    if (string.IsNullOrEmpty(configuration.Value))
+                    {
+                        throw new Exception();
+                    }
 
-                    if (file == null) throw new Exception();
+                    var fileInfo = new FileInfo(configuration.Value);
+
+                    if (fileInfo.Exists && fileInfo.Length > 0)
+                    {
+                        throw new Exception();
+                    }
                 }
                 catch
                 {
                     return new ValidationError
                     {
-                        ErrorCode = "The file type is required to set file name and file path",
+                        ErrorCode = "File is not exists or file length is zero.",
                         FieldName = configuration.Name
                     };
                 }
             }
             return null;
+        }
+    }
+
+    public class RequiredConfigValidator : IConfigValidator
+    {
+        public ValidationError Validate(DataSourceConfiguration configuration)
+        {
+            throw new NotImplementedException();
         }
     }
 }

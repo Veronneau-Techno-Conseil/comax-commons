@@ -50,16 +50,10 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
                 switch (entry.FieldType)
                 {
                     case FieldType.Date:
-                        if (fieldType == FieldType.Text)
-                            entry.FieldType = FieldType.Text;
-                        else
-                            entry.FieldType = FieldType.Object;
+                        entry.FieldType = fieldType == FieldType.Text ? FieldType.Text : FieldType.Object;
                         break;
                     case FieldType.Integer:
-                        if(fieldType == FieldType.Decimal)
-                            entry.FieldType = FieldType.Decimal;
-                        else
-                            entry.FieldType = FieldType.Object;
+                        entry.FieldType = fieldType == FieldType.Decimal ? FieldType.Decimal : FieldType.Object;
                         break;
                     default:
                         entry.FieldType = FieldType.Object;

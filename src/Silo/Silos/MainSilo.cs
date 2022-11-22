@@ -28,8 +28,10 @@ using CommunAxiom.Commons.Client.Contracts.Broadcast;
 using CommunAxiom.Commons.Client.Contracts.Grains.Dispatch;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Client.Grains.DispatchGrain;
+using CommunAxiom.Commons.Client.Grains.StorageGrain;
 using CommunAxiom.Commons.Ingestion;
 using CommunAxiom.Commons.Ingestion.DataSource;
+using CommunAxiom.Commons.Ingestion.Extentions;
 using CommunAxiom.Commons.Ingestion.Ingestor;
 
 namespace CommunAxiom.Commons.Client.Silo
@@ -56,7 +58,8 @@ namespace CommunAxiom.Commons.Client.Silo
                     ConfigureIdentitty(services);
 
                     services.SetStorage(conf);
-
+                    services.AddIngestion();
+                    
                     //register singleton services for each grain/interface
                     services.AddScoped<AccountRepo, AccountRepo>();
                     services.AddScoped<AccountBusiness, AccountBusiness>();
@@ -115,7 +118,8 @@ namespace CommunAxiom.Commons.Client.Silo
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Replications).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Grains.BroadcastGrain.Broadcast).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Dispatch).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Scheduler).Assembly).WithReferences());
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Scheduler).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(StorageGrain).Assembly).WithReferences());
             
             var silo = builder.Build();
             await silo.StartAsync();

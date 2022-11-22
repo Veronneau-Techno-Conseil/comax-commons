@@ -12,5 +12,7 @@
   "PortfolioName": "Name",
   "Save": "Save",
   "Cancel": "Cancel",
-  "NameIsRequired": "Name is required!"
+  "NameIsRequired": "Name is required!",
+  "FieldMetadataSaved": "Field metadata saved successfully.",
+  "DataConfigurationSaved": "Data Configuration saved successfully."
 }

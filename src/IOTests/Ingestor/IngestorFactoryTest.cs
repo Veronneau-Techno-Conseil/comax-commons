@@ -1,5 +1,4 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
-using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
 using CommunAxiom.Commons.Ingestion.Ingestor;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +13,6 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Ingestor
 	{
 		private MockRepository _mockRepository;
 		private Mock<IServiceProvider> _serviceProvider;
-		private Mock<IFieldValidatorLookup> _fieldValidatorLookup;
 
 		private IngestorFactory _ingestorFactory;
 
@@ -23,7 +21,6 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Ingestor
 		{
 			_mockRepository = new MockRepository(MockBehavior.Strict);
 			_serviceProvider = _mockRepository.Create<IServiceProvider>();
-			_fieldValidatorLookup = _mockRepository.Create<IFieldValidatorLookup>();
 
 			SetupMock();
 
@@ -37,9 +34,9 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Ingestor
 		}
 
 		[Test]
-		public void WhenIngestorTypeIsJSONThenIngestorFactoryShouldJsonIngestor()
+		public void WhenIngestorTypeIsJsonThenIngestorFactoryShouldJsonIngestor()
 		{
-			var jsonIngestor = new JsonIngestor(_fieldValidatorLookup.Object);
+			var jsonIngestor = new JsonIngestor();
 
 			_serviceProvider.Setup(x => x.GetService(typeof(JsonIngestor))).Returns(jsonIngestor);
 
@@ -51,7 +48,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Ingestor
 		public void WhenIngestorTypeIsNotFoundThenIngestorFactoryShouldThrowArgumentException()
 		{
 			var ingestorType = IngestorType.CSV;
-			var jsonIngestor = new JsonIngestor(_fieldValidatorLookup.Object);
+			var jsonIngestor = new JsonIngestor();
 
 			_serviceProvider.Setup(x => x.GetService(typeof(JsonIngestor))).Returns(jsonIngestor);
 
