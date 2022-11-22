@@ -1,10 +1,12 @@
-﻿namespace CommunAxiom.Commons.Client.Contracts.Ingestion.Validators
+﻿using System.Collections.Generic;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+
+namespace CommunAxiom.Commons.Client.Contracts.Ingestion.Validators
 {
     public interface IFieldValidatorLookup
     {
-        IFieldValidator? Get(string tag);
-
-        bool TryGet(string tag, out IFieldValidator validator);
+        IList<IFieldValidator> Get(FieldType configurationFieldType,
+            params string[] additionalValidators);
     }
 
 }

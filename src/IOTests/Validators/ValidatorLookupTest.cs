@@ -1,4 +1,4 @@
-﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
+﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.Validators;
 using FluentAssertions;
 using NUnit.Framework;
@@ -19,31 +19,19 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
         [Test]
         public void GetFieldValidator()
         {
-            _validatorLookup.Add(new RequiredFieldValidator());
-            var result = _validatorLookup.Get("required-field");
+            _validatorLookup.Add(FieldType.Boolean, new BooleanFieldValidator());
 
-            result.Should().BeOfType<RequiredFieldValidator>();
+            var result = _validatorLookup.Get(FieldType.Boolean);
+
+            result[0].Should().BeOfType<BooleanFieldValidator>();
         }
-
-        [Test]
-        public void TryGetFieldValidator()
-        {
-            _validatorLookup.Add(new RequiredFieldValidator());
-
-            IFieldValidator validator;
-
-            var result = _validatorLookup.TryGet("required-field", out validator);
-
-            result.Should().BeTrue();
-            validator.Should().BeOfType<RequiredFieldValidator>();
-        }
-
-
+        
         [Test]
         public void GetConfigValidator()
         {
-            _validatorLookup.Add(new FileConfigValidator());
-            var result = _validatorLookup.ConfigValidators;
+            _validatorLookup.Add(ConfigurationFieldType.File, new FileConfigValidator());
+            
+            var result = _validatorLookup.Get(ConfigurationFieldType.File);
 
             result[0].Should().BeOfType<FileConfigValidator>();
         }

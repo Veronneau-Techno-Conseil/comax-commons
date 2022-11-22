@@ -1,5 +1,4 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
-using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
 using CommunAxiom.Commons.Ingestion.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -10,12 +9,6 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
     public class JsonIngestor : IngestorBase, IIngestor
     {
         private IEnumerable<FieldMetaData> _fields;
-        private readonly IFieldValidatorLookup _fieldValidatorLookup;
-
-        public JsonIngestor(IFieldValidatorLookup fieldValidatorLookup)
-        {
-            _fieldValidatorLookup = fieldValidatorLookup;
-        }
 
         public void Configure(IEnumerable<FieldMetaData> fields)
         {
@@ -24,21 +17,25 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
 
         public async Task<IngestorResult> ParseAsync(Stream stream)
         {
-            IngestorResult ingestorResult = new IngestorResult();
+            var ingestorResult = new IngestorResult();
 
-            using (var streamReader = new StreamReader(stream))
-            using (JsonTextReader jsonTextReader = new JsonTextReader(streamReader))
+            using var streamReader = new StreamReader(stream);
+            using var jsonTextReader = new JsonTextReader(streamReader);
+            while (await jsonTextReader.ReadAsync())
             {
-                while (await jsonTextReader.ReadAsync())
+                if (jsonTextReader.Depth == 0 && (jsonTextReader.TokenType == JsonToken.StartArray ||
+                                                  jsonTextReader.TokenType == JsonToken.EndArray)) continue;
+                var row = await JObject.LoadAsync(jsonTextReader);
+
+                foreach (var result in Validate(row))
                 {
-                    if (jsonTextReader.Depth == 0 && (jsonTextReader.TokenType == JsonToken.StartArray || jsonTextReader.TokenType == JsonToken.EndArray)) continue;
-
-                    var row = await JObject.LoadAsync(jsonTextReader);
-
-                    foreach (var result in Validate(row))
+                    if (result != null)
                     {
-                        if (result != null) ingestorResult.Errors.Add((row, result));
-                        else ingestorResult.Rows.Add(row);
+                        ingestorResult.Errors.Add((row, result));
+                    }
+                    else
+                    {
+                        ingestorResult.Rows.Add(row);
                     }
                 }
             }
@@ -52,14 +49,9 @@ namespace CommunAxiom.Commons.Ingestion.Ingestor
             {
                 foreach (var validate in field.Validators)
                 {
-                    var lookup = _fieldValidatorLookup.Get(validate.Tag);
-                    if (lookup != null)
-                    {
-                        yield return lookup.Validate(field, row);
-                    }
+                    yield return validate.Validate(field, row);
                 }
             }
         }
     }
 }
-

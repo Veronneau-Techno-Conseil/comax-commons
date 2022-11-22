@@ -1,6 +1,7 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Ingestor;
+using Newtonsoft.Json.Linq;
 
 namespace CommunAxiom.Commons.Ingestion
 {
@@ -19,6 +20,18 @@ namespace CommunAxiom.Commons.Ingestion
         {
             var dataSourceReader = _sourceFactory.Create(sourceConfig.DataSourceType);
             dataSourceReader.Setup(sourceConfig);
+
+            var resultValidation = dataSourceReader.ValidateConfiguration();
+            if (resultValidation != null && resultValidation.Any())
+            {
+                var ingestorResult = new IngestorResult();
+                foreach (var result in resultValidation)
+                {
+                    ingestorResult.Errors.Add((null, result)!);
+                }
+                return Task.FromResult(ingestorResult);
+            }
+
             var stream = dataSourceReader.ReadData();
             var ingestor = _ingestionFactory.Create(dataSourceReader.IngestorType);
             ingestor.Configure(fieldMetaDatas);

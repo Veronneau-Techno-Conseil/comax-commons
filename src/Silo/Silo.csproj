@@ -36,6 +36,7 @@
     <ProjectReference Include="..\ReplicationGrain\ReplicationGrain.csproj" />
     <ProjectReference Include="..\SchedulerGrain\SchedulerGrain.csproj" />
     <ProjectReference Include="..\SiloShared\SiloShared.csproj" />
+    <ProjectReference Include="..\StorageGrain\StorageGrain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

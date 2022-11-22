@@ -8,11 +8,13 @@ namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
 {
     public class Broadcast : Grain, IBroadcast
     {
-        private readonly BroadcastRulesEngine _broadcastRulesEngine;
+        private BroadcastRulesEngine _broadcastRulesEngine;
 
-        public Broadcast()
+        public override Task OnActivateAsync()
         {
             _broadcastRulesEngine = new BroadcastRulesEngine(this.GetStreamProvider(Constants.ImplicitStream));
+
+            return base.OnActivateAsync();
         }
 
         public Task Notify(Message message)
@@ -20,5 +22,4 @@ namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
             return _broadcastRulesEngine.Process(message);
         }
     }
-
 }

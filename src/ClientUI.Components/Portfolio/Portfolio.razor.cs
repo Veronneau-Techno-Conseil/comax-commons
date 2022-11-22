@@ -1,3 +1,4 @@
+using Blazored.Toast.Services;
 using Blazorise;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.ClientUI.Shared.Extensions;
@@ -20,7 +21,7 @@ namespace ClientUI.Components.Portfolio
         [Inject] public IPortfolioViewModel PortfolioViewModel { get; set; }
         [Inject] public IStringLocalizer<Portfolio> Localizer { get; set; }
         [Inject] public IMetadataParser MetadataParser { get; set; }
-        
+        [Inject] private IToastService ToastService { get; set; }
         public string SelectedDataSource { get; private set; }
         
         public string SelectedTab = "tab1";
@@ -36,7 +37,7 @@ namespace ClientUI.Components.Portfolio
         private PortfolioTreeViewItem SelectedPortfolio { get; set; } = new PortfolioTreeViewItem();
         private bool HideCard { get; set; } = true;
 
-        private Dictionary<string, DataSourceConfiguration> Sources = new Dictionary<string, DataSourceConfiguration>();
+        private Dictionary<string, DataSourceConfiguration> ConfigurationsKeyValuePairs = new Dictionary<string, DataSourceConfiguration>();
 
         private void OnChangeType(string type)
         {
@@ -72,7 +73,7 @@ namespace ClientUI.Components.Portfolio
                 }
                 else
                 {
-                    Sources = result.Configurations;
+                    ConfigurationsKeyValuePairs = result.Configurations;
                     SelectedDataSource = result.DataSourceType.GetDisplayDescription();
                 }
             }
@@ -94,7 +95,7 @@ namespace ClientUI.Components.Portfolio
                 Configurations = new Dictionary<string, DataSourceConfiguration>()
             };
             importer.Configure(sourceConfig);
-            Sources = sourceConfig.Configurations;
+            ConfigurationsKeyValuePairs = sourceConfig.Configurations;
         }
 
         private Task ShowModal(PortfolioTreeViewItem currentPortfolio)
@@ -242,7 +243,7 @@ namespace ClientUI.Components.Portfolio
                     var fileContent = await reader.ReadToEndAsync();
                     if (!string.IsNullOrEmpty(fileContent))
                     {
-                        var source = Sources.Values.FirstOrDefault(x => x.Name == "SampleFile");
+                        var source = ConfigurationsKeyValuePairs.Values.FirstOrDefault(x => x.Name == "SampleFile");
                         source.Value = fileContent;
                         source.DisplayValue = SelectedFileName;
                     }
@@ -338,14 +339,18 @@ namespace ClientUI.Components.Portfolio
             await PortfolioViewModel.SaveConfig(this.SelectedPortfolio.Id.ToString(), new SourceConfig
             {
                 DataSourceType = Enum.Parse<DataSourceType>(SelectedDataSource),
-                Configurations = Sources
+                Configurations = ConfigurationsKeyValuePairs
             });
+            
+            ToastService.ShowSuccess(Localizer["DataConfigurationSaved"]);
         }
 
         public async Task SaveFieldMetaData()
         {
             await PortfolioViewModel.SaveFieldMetaData(SelectedPortfolio.Id.ToString(), FieldMetaDataList);
             
+            ToastService.ShowSuccess(Localizer["FieldMetadataSaved"]);
+
             var result = await PortfolioViewModel.GetSourceState(SelectedPortfolio.Id.ToString());
 
             if (result.Fields != null)

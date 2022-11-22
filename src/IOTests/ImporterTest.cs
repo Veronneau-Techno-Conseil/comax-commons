@@ -20,7 +20,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests
         private Mock<IIngestorFactory> _ingestorFactory;
         private Mock<IConfigValidatorLookup> _configValidatorLookup;
         private Mock<IFieldValidatorLookup> _fieldValidatorLookup;
-
+        
         private Importer _importer;
 
 
@@ -41,7 +41,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests
         {
             _mockRepository.Verify();
         }
-
+        
         [Test]
         public async Task WhenImporterReturnRows()
         {
@@ -56,7 +56,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests
                         {
                             Name = "SampleFile",
                             FieldType = ConfigurationFieldType.File,
-                            Value = JsonConvert.SerializeObject(new FileModel { Name = "sample1.txt", Path = "Samples/Files" })
+                            Value = "Samples/files/sample1.txt"
                         }
                     }
                 }
@@ -71,9 +71,16 @@ namespace CommunAxiom.Commons.Ingestion.Tests
 
             var fields = new List<FieldMetaData> { field };
 
-            _ingestorFactory.Setup(x => x.Create(IngestorType.JSON)).Returns(new JsonIngestor(_fieldValidatorLookup.Object));
-            _dataSourceFactory.Setup(x => x.Create(sourceConfig.DataSourceType)).Returns(new TextDataSourceReader(_configValidatorLookup.Object));
-            _fieldValidatorLookup.Setup(x => x.Get("required-field")).Returns(new RequiredFieldValidator());
+            _ingestorFactory.Setup(x => x.Create(IngestorType.JSON)).Returns(new JsonIngestor());
+            
+            _dataSourceFactory.Setup(x => x.Create(sourceConfig.DataSourceType))
+                .Returns(new TextDataSourceReader(_configValidatorLookup.Object));
+            
+            _configValidatorLookup.Setup(x => x.Get(It.IsAny<ConfigurationFieldType>()))
+                .Returns(new List<IConfigValidator> ());
+            
+            _configValidatorLookup.Setup(x => x.Get(It.IsAny<ConfigurationFieldType>(), It.IsAny<string>()))
+                .Returns(new List<IConfigValidator> ());
 
             var result = await _importer.Import(sourceConfig, fields);
 
@@ -95,7 +102,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests
                         {
                             Name = "SampleFile",
                             FieldType = ConfigurationFieldType.File,
-                            Value = JsonConvert.SerializeObject(new FileModel { Name = "sample2.txt", Path = "Samples/Files" })
+                            Value = "Samples/files/sample1.txt"
                         }
                     }
                 }
@@ -110,9 +117,15 @@ namespace CommunAxiom.Commons.Ingestion.Tests
 
             var fields = new List<FieldMetaData> { field };
 
-            _ingestorFactory.Setup(x => x.Create(IngestorType.JSON)).Returns(new JsonIngestor(_fieldValidatorLookup.Object));
+            _ingestorFactory.Setup(x => x.Create(IngestorType.JSON)).Returns(new JsonIngestor());
+            
             _dataSourceFactory.Setup(x => x.Create(sourceConfig.DataSourceType)).Returns(new TextDataSourceReader(_configValidatorLookup.Object));
-            _fieldValidatorLookup.Setup(x => x.Get("required-field")).Returns(new RequiredFieldValidator());
+            
+            _configValidatorLookup.Setup(x => x.Get(It.IsAny<ConfigurationFieldType>())).Returns(new List<IConfigValidator> ());
+            
+            _configValidatorLookup.Setup(x => x.Get(It.IsAny<ConfigurationFieldType>(), It.IsAny<string>())).Returns(new List<IConfigValidator> ());
+            
+            _fieldValidatorLookup.Setup(x => x.Get(FieldType.File)).Returns(new List<IFieldValidator> { new RequiredFieldValidator() });
 
             var result = await _importer.Import(sourceConfig, fields);
 
@@ -121,4 +134,3 @@ namespace CommunAxiom.Commons.Ingestion.Tests
         }
     }
 }
-
