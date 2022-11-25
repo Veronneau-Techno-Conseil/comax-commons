@@ -72,7 +72,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
             
             _textDataSourceReader.Setup(new SourceConfig
             {
-                DataSourceType = DataSourceType.FILE,
+                DataSourceType = DataSourceType.File,
                 Configurations = new Dictionary<string, DataSourceConfiguration>
                 {
                     {
@@ -120,7 +120,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         {
             var sourceConfig = new SourceConfig
             {
-                DataSourceType = DataSourceType.FILE,
+                DataSourceType = DataSourceType.File,
                 Configurations = new Dictionary<string, DataSourceConfiguration>
                 {
                     {

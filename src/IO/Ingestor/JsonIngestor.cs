@@ -5,7 +5,6 @@ using Newtonsoft.Json.Linq;
 
 namespace CommunAxiom.Commons.Ingestion.Ingestor
 {
-    [IngestionType(IngestorType.JSON)]
     public class JsonIngestor : IngestorBase, IIngestor
     {
         private IEnumerable<FieldMetaData> _fields;
