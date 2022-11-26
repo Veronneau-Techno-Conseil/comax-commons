@@ -81,10 +81,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
         public Dictionary<string, string> GetDatasources() => new()
         { 
             {
-                "JsonFile", "Json File"
-            },
-            {
-                "CsvFile", "Csv File"
+                "File", "File"
             }
         };
 
