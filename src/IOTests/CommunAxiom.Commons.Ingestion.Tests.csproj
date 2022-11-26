@@ -35,6 +35,9 @@
     <None Remove="Samples\" />
     <None Remove="Samples\Configurations\" />
     <None Remove="Samples\Files\" />
+    <None Update="Samples\Files\sample.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

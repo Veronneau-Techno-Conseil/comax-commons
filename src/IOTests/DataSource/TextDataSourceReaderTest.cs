@@ -35,14 +35,6 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         }
 
         [Test]
-        public void TextDataSourceReaderShouldHasIngestionTypeAttribute()
-        {
-            var attr = Attribute.GetCustomAttribute(typeof(TextDataSourceReader), typeof(DataSourceTypeAttribute));
-
-            attr.Should().NotBeNull();
-        }
-
-        [Test]
         public void WhenTextDataSourceReaderThenIngestionTypeShouldBeJson()
         {
             _configValidatorLookup
