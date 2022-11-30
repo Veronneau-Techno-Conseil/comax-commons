@@ -78,7 +78,12 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
             return $"_content/ClientUI.Components/icons/{iconName}.png";
         }
 
-        public List<string> GetDatasources() => new() { "FILE", "JSON_URL", "API" };
+        public Dictionary<string, string> GetDatasources() => new()
+        { 
+            {
+                "File", "File"
+            }
+        };
 
         public List<string> GetPortfolioTypes()
         {

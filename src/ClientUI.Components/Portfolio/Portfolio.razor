@@ -66,7 +66,7 @@
                           <select class="select" @onchange="OnChangeDatasource">
                             @foreach (var datasource in PortfolioViewModel.GetDatasources())
                             {
-                              <option value=@datasource>@datasource</option>
+                              <option value=@datasource.Key>@datasource.Value</option>
                             }
                           </select>
                         </div>
@@ -85,17 +85,18 @@
                       <div class="columns">
                         @foreach (var datasource in ConfigurationsKeyValuePairs)
                         {
+              
                           switch (datasource.Value.FieldType)
                           {
                             case ConfigurationFieldType.File:
                               <div class="column" style="cursor: pointer;" @onclick="() => OnFieldMetadataSelected(datasource.Value)">
-                                <Label>@datasource.Value.Name</Label>
+                                <Label>@datasource.Value.DisplayName</Label>
                                 <TextEdit class="text-input" ReadOnly="@datasource.Value.IsReadonly" @bind-Text="@datasource.Value.DisplayValue" />
                               </div>
                               break;
                             default:
                               <div class="column" style="cursor: pointer;" @onclick="() => OnFieldMetadataSelected(datasource.Value)">
-                                <Label>@datasource.Value.Name</Label>
+                                <Label>@datasource.Value.DisplayName</Label>
                                 <TextEdit class="text-input" ReadOnly="@datasource.Value.IsReadonly" @bind-Text="@datasource.Value.Value"/>
                               </div>
                               break;

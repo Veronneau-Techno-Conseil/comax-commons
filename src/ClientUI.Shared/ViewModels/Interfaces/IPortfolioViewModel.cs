@@ -13,8 +13,8 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 
         string GetIcon(PortfolioType portfolioType);
 
-        List<string> GetDatasources();
-
+        Dictionary<string, string> GetDatasources();
+        
         List<string> GetPortfolioTypes();
 
         Task SaveFieldMetaData(string id, List<FieldMetaData> fields);

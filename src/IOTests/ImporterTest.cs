@@ -47,7 +47,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests
         {
             var sourceConfig = new SourceConfig
             {
-                DataSourceType = DataSourceType.FILE,
+                DataSourceType = DataSourceType.File,
                 Configurations = new Dictionary<string, DataSourceConfiguration>
                 {
                     {
@@ -102,7 +102,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests
         {
             var sourceConfig = new SourceConfig
             {
-                DataSourceType = DataSourceType.FILE,
+                DataSourceType = DataSourceType.File,
                 Configurations = new Dictionary<string, DataSourceConfiguration>
                 {
                     {

@@ -2,9 +2,7 @@
 {
     public enum DataSourceType
     {
-        FILE = 0,
-        JSON_URL = 1,
-        API = 2
+        File = 0
     }
 }
 

@@ -83,29 +83,6 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
                     services.AddSingleton<IIncomingGrainCallFilter, AccessControlFilter>();
 
-                    services.AddSingleton<Importer, Importer>();
-
-                    services.AddSingleton<IDataSourceFactory, DataSourceFactory>();
-                    services.AddSingleton<IIngestorFactory, IngestorFactory>();
-
-                    
-                    // data sources
-
-                    services.AddScoped<TextDataSourceReader>();
-            
-                    services.AddTransient<Func<DataSourceType, IDataSourceReader>>(provider => key =>
-                    {
-                        switch (key)
-                        {
-                            case DataSourceType.FILE:
-                                return provider.GetService<TextDataSourceReader>();
-                            case DataSourceType.API:
-                                return null;
-                        }
-
-                        return null;
-                    });
-                    
                 })
                 //configure application parts for each grain
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Accounts).Assembly).WithReferences())

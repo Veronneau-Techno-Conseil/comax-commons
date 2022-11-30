@@ -1,11 +1,9 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
-using CommunAxiom.Commons.Ingestion.Attributes;
 using CommunAxiom.Commons.Ingestion.Extentions;
 
 namespace CommunAxiom.Commons.Ingestion.DataSource
 {
-    [DataSourceType(DataSourceType.FILE)]
     public class TextDataSourceReader : IDataSourceReader
     {
         private readonly IConfigValidatorLookup _configValidatorLookup;
@@ -17,12 +15,12 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
         {
             get
             {
-                if (_configurations == null && _configurations["content-type"] == null)
+                if (_configurations == null && _configurations["ContentType"] == null)
                 {
                     throw new NullReferenceException("Configurations is NULL!");
                 }
 
-                return _configurations["content-type"].Value.ToEnum<IngestorType>();
+                return _configurations["ContentType"].Value.ToEnum<IngestorType>();
             }
         }
 
@@ -68,10 +66,10 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
         {
             var configurations = new Dictionary<string, DataSourceConfiguration>();
 
-            configurations.Add("content-type", new DataSourceConfiguration
+            configurations.Add("ContentType", new DataSourceConfiguration
             {
+                Name = "ContentType",
                 DisplayName = "Content Type",
-                Name = "content-type",
                 FieldType = ConfigurationFieldType.Lookup,
                 Value = "json",
                 Parameter = "['json', 'csv']",
@@ -81,8 +79,8 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 
             configurations.Add("SampleFile", new DataSourceConfiguration
             {
-                DisplayName = "Sample File",
                 Name = "SampleFile",
+                DisplayName = "Sample File",
                 FieldType = ConfigurationFieldType.File,
                 IsReadonly = true,
                 Validators = _configValidatorLookup.Get(ConfigurationFieldType.File, "required")

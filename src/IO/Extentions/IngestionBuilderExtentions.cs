@@ -24,18 +24,29 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
             {
                 switch (key)
                 {
-                    case DataSourceType.FILE:
+                    case DataSourceType.File:
                         return provider.GetService<TextDataSourceReader>();
-                    case DataSourceType.API:
-                        return null;
                 }
 
                 return null;
             });
 
             // ingestors
-            services.AddTransient<IIngestor, JsonIngestor>();
-            services.AddTransient<JsonIngestor>();
+            services.AddScoped<JsonIngestor>();
+            services.AddScoped<CsvIngestor>();
+            
+            services.AddTransient<Func<IngestorType, IIngestor>>(provider => key =>
+            {
+                switch (key)
+                {
+                    case IngestorType.JSON:
+                        return provider.GetService<JsonIngestor>();
+                    case IngestorType.CSV:
+                        return provider.GetService<CsvIngestor>();
+                }
+
+                return null;
+            });
 
             // factories
             services.AddTransient<IDataSourceFactory, DataSourceFactory>();
@@ -61,6 +72,8 @@ namespace CommunAxiom.Commons.Ingestion.Extentions
                 options.Add("required", new RequiredConfigValidator());
                 // options.Add(ConfigurationFieldType.Date, new RequireConfigValidator());
             });
+            
+            services.AddSingleton<Importer, Importer>();
         }
 
     }

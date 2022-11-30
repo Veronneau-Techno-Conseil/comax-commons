@@ -1,37 +1,27 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
-using CommunAxiom.Commons.Ingestion.Attributes;
-using System.Reflection;
 
 namespace CommunAxiom.Commons.Ingestion.Ingestor
 {
     public class IngestorFactory : IIngestorFactory
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly Func<IngestorType, IIngestor> _serviceResolver;
 
-        public IngestorFactory(IServiceProvider serviceProvider)
+        public IngestorFactory(Func<IngestorType, IIngestor> serviceResolver)
         {
-            _serviceProvider = serviceProvider;
+            _serviceResolver = serviceResolver;
         }
 
         public IIngestor Create(IngestorType ingestorType)
         {
-            var type = Assembly.GetAssembly(typeof(IngestorFactory)).GetTypes()
-                .FirstOrDefault(type => Attribute.IsDefined(type, typeof(IngestionTypeAttribute)) &&
-                                type.GetCustomAttribute<IngestionTypeAttribute>().IngestorType == ingestorType);
 
-            if (type == null)
+            var ingestor = _serviceResolver(ingestorType);
+
+            if (ingestor == null)
             {
-                throw new ArgumentException($"No IngestionType with name {ingestorType} could be found");
+                throw new NullReferenceException("No Ingestor resolved!");
             }
-
-            var dataSourceReader = _serviceProvider.GetService(type) as IIngestor;
-
-            if (dataSourceReader == null)
-            {
-                throw new NullReferenceException($"No IngestionType resolved with type { type.FullName }");
-            }
-
-            return dataSourceReader;
+            
+            return ingestor;
         }
     }
 }
