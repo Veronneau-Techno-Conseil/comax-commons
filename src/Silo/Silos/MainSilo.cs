@@ -33,6 +33,8 @@ using CommunAxiom.Commons.Ingestion;
 using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Extentions;
 using CommunAxiom.Commons.Ingestion.Ingestor;
+using CommunAxiom.Commons.Client.Contracts.Grains.Agent;
+using Comax.Commons.Shared.OIDC;
 
 namespace CommunAxiom.Commons.Client.Silo
 {
@@ -79,9 +81,11 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<IDispatch, Dispatch>();       
                     services.AddSingleton<IBroadcast, Grains.BroadcastGrain.Broadcast>();
 
-                    services.AddSingleton<ISettingsProvider, SiloSettingsProvider>();
+                    //services.AddSingleton<ISettingsProvider, SiloSettingsProvider>();
                     services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
                     services.AddSingleton<IIncomingGrainCallFilter, AccessControlFilter>();
+                    services.AddSingleton<ITokenProvider, SiloTokenProvider>();
+                    services.AddSingleton<IOutgoingGrainCallFilter, SecureTokenOutgoingFilter>();
 
                     services.AddSingleton<Importer, Importer>();
 
@@ -119,7 +123,14 @@ namespace CommunAxiom.Commons.Client.Silo
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Grains.BroadcastGrain.Broadcast).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Dispatch).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Scheduler).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(StorageGrain).Assembly).WithReferences());
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(StorageGrain).Assembly).WithReferences()).ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(StorageGrain).Assembly).WithReferences())
+                .AddStartupTask(async (sp, cancellation) =>
+                {
+                    // Use the service provider to get the grain factory.
+                    var grainFactory = sp.GetRequiredService<IGrainFactory>();
+                    var agt = grainFactory.GetGrain<IAgent>(Guid.Empty);
+                    await agt.IAmAlive();
+                });
             
             var silo = builder.Build();
             await silo.StartAsync();

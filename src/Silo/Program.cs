@@ -21,8 +21,6 @@ namespace CommunAxiom.Commons.Client.Silo
                 .ConfigureServices((host, sc) =>
                 {
                     sc.AddLogging(x => x.AddConsole());
-                    sc.AddSingleton<ITokenProvider, SiloTokenProvider>();
-                    sc.AddSingleton<SecureTokenOutgoingFilter>();
 
                     sc.SetServerServices();
                     sc.SetupOrleansClient();

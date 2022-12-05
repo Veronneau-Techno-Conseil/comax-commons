@@ -11,6 +11,6 @@ namespace CommunAxiom.Commons.Client.SiloShared.System
         Silos CurrentSilo { get; }
         Task Heartbeat();
         Task SetSilo(Silos requiredSilo);
-        Task<bool> IsServiceAuthSet();
+        //Task<bool> IsServiceAuthSet();
     }
 }

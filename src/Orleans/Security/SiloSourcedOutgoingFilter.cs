@@ -9,16 +9,22 @@ namespace CommunAxiom.Commons.Orleans.Security
 {
     public class SiloSourcedOutgoingFilter : IOutgoingGrainCallFilter
     {
-        private readonly IGrainRuntime _grainRuntime;
+        protected readonly IGrainRuntime _grainRuntime;
         public SiloSourcedOutgoingFilter(IGrainRuntime grainRuntime)
         {
             _grainRuntime = grainRuntime;
         }
 
-        public Task Invoke(IOutgoingGrainCallContext context)
+        public virtual Task SetSecurityContext()
         {
             RequestContext.Set("__si", _grainRuntime.SiloIdentity);
-            return context.Invoke();
+            return Task.CompletedTask;
+        }
+
+        public async Task Invoke(IOutgoingGrainCallContext context)
+        {
+            await this.SetSecurityContext();
+            await context.Invoke();
         }
     }
 }

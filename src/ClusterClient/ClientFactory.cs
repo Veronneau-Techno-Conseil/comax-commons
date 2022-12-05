@@ -39,7 +39,7 @@ namespace ClusterClient
                         parts.AddFromApplicationBaseDirectory();
                     }).UseLocalhostClustering(30000)
                     .AddOutgoingGrainCallFilter(serviceProvider.GetService<SecureTokenOutgoingFilter>())
-                    .AddSimpleMessageStreamProvider(Constants.DefaultStream);
+                    .AddSimpleMessageStreamProvider(CommunAxiom.Commons.Orleans.Constants.DefaultStream);
             return b;
         }
 
@@ -47,7 +47,7 @@ namespace ClusterClient
         {
             try
             {
-                Counter c = new Counter() { Value = 4 };
+                Counter c = new Counter() { Value = 1 };
                 var builder = GetBuilder();
                 using (var client = builder.Build())
                 {
@@ -116,12 +116,12 @@ namespace ClusterClient
                     exception,
                     "Exception while attempting to connect to Orleans cluster"
                 );
-                if (c.Value == 5)
+                if (c.Value <= 0)
                 {
                     return false;
                 }
                 await Task.Delay(TimeSpan.FromSeconds(2));
-                c.Value++;
+                c.Value--;
                 return true;
             };
         }

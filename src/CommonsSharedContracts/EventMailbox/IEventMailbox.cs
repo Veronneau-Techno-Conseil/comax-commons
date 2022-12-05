@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CommunAxiom.Commons.Shared.RuleEngine;
 using Orleans;
 
 namespace CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox
@@ -7,11 +8,11 @@ namespace CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox
     public interface IEventMailbox:IGrainWithGuidKey
     {
         Task<bool> HasMail();
-        Task<Guid> GetStreamId();
         Task MarkRead(Guid id);
         Task DeleteMail(Guid id);
-        Task StartStream();
+        Task Subscribe(IMailboxObserver mailboxObserver);
+        Task Unsubscribe(IMailboxObserver mailboxObserver);
+        Task<Message> GetMessage(Guid msgId);
         Task SendMail(MailMessage mail);
-
     }
 }
