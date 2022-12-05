@@ -12,9 +12,11 @@ namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
     {
         private readonly Business _business;
 
-        public Datasources([PersistentState("DataSource")] IPersistentState<SourceState> state)
+        public Datasources(
+            [PersistentState("DataSource")] IPersistentState<SourceState> state,
+            [PersistentState("FileHash")] IPersistentState<byte[]> hashState)
         {
-            _business = new Business(new Repo(state));
+            _business = new Business(new Repo(state, hashState));
         }
 
         public Task<SourceState> GetConfig()
@@ -42,5 +44,16 @@ namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
         {
             await _business.DeleteConfig();
         }
+
+        public async Task SetFileHash(byte[] hash)
+        {
+            await _business.SetFileHash(hash);
+        }
+
+        public Task<byte[]> GetFileHash()
+        {
+            return _business.GetFileHash();
+        }
+        
     }
 }

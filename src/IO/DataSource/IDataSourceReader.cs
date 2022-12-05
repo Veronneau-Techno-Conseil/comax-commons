@@ -14,6 +14,7 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
 
         Stream ReadData();
 
+        byte[] CalculateHash();
     }
 
 }

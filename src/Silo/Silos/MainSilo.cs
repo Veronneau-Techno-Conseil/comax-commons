@@ -1,5 +1,4 @@
-﻿using System;
-using CommunAxiom.Commons.Client.Contracts.Account;
+﻿using CommunAxiom.Commons.Client.Contracts.Account;
 using CommunAxiom.Commons.Client.Contracts.Auth;
 using CommunAxiom.Commons.Client.Contracts.Dataset;
 using CommunAxiom.Commons.Client.Contracts.Datasource;
@@ -25,14 +24,14 @@ using ReplicationGrain;
 using SchedulerGrain;
 using System.Threading.Tasks;
 using CommunAxiom.Commons.Client.Contracts.Broadcast;
+using CommunAxiom.Commons.Client.Contracts.Grains.DataStateMonitor;
+using CommunAxiom.Commons.Client.Contracts.Grains.DateStateMonitorSupervisor;
 using CommunAxiom.Commons.Client.Contracts.Grains.Dispatch;
-using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Grains.DataStateMonitorGrain;
+using CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain;
 using CommunAxiom.Commons.Client.Grains.DispatchGrain;
 using CommunAxiom.Commons.Client.Grains.StorageGrain;
-using CommunAxiom.Commons.Ingestion;
-using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Extentions;
-using CommunAxiom.Commons.Ingestion.Ingestor;
 
 namespace CommunAxiom.Commons.Client.Silo
 {
@@ -78,7 +77,9 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<SchedulerRepo, SchedulerRepo>();
                     services.AddSingleton<IDispatch, Dispatch>();       
                     services.AddSingleton<IBroadcast, Grains.BroadcastGrain.Broadcast>();
-
+                    services.AddSingleton<IDataStateMonitor, DataStateMonitor>();
+                    services.AddSingleton<IDateStateMonitorSupervisor, DateStateMonitorSupervisor>();
+                    
                     services.AddSingleton<ISettingsProvider, SiloSettingsProvider>();
                     services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
                     services.AddSingleton<IIncomingGrainCallFilter, AccessControlFilter>();
@@ -96,7 +97,9 @@ namespace CommunAxiom.Commons.Client.Silo
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Grains.BroadcastGrain.Broadcast).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Dispatch).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Scheduler).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(StorageGrain).Assembly).WithReferences());
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(StorageGrain).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DataStateMonitor).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DateStateMonitorSupervisor).Assembly).WithReferences());
             
             var silo = builder.Build();
             await silo.StartAsync();
