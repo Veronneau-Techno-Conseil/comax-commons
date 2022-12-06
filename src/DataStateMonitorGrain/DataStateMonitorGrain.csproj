@@ -15,8 +15,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Contracts\Contracts.csproj" />
-      <ProjectReference Include="..\..\IO\CommunAxiom.Commons.Ingestion.csproj" />
+      <ProjectReference Include="..\IO\CommunAxiom.Commons.Ingestion.csproj" />
+      <ProjectReference Include="..\Orleans\Orleans.csproj" />
     </ItemGroup>
     
 </Project>

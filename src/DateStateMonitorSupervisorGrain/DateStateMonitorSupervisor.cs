@@ -13,7 +13,10 @@ namespace CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain
     public class DateStateMonitorSupervisor : Grain, IDateStateMonitorSupervisor, IDisposable
     {
         private IDisposable _dataStateTimer = null!;
+        
+        // HACK: make sure this property serilize properly.
         private readonly IPersistentState<List<string>> _keys;
+        
         private Business _business;
         private bool _disposedValue;
 
@@ -32,7 +35,7 @@ namespace CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain
                 true,
                 TimeSpan.FromSeconds(0),
                 TimeSpan.FromSeconds(1)
-            ); //Repeat each second to make sure cover every cron job
+            ); // remark: 1 minute for PROD - 1 seconds for TEST - This setting will be configured from adminstration page
 
             return Task.FromResult(base.OnActivateAsync());
         }
