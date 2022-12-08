@@ -27,5 +27,32 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
             
             return Ok();
         }
+
+
+        [HttpGet("TestDataState")]
+        public async Task<IActionResult> TestDataState()
+        {
+            await _clusterClient.WithClusterClient(async cc =>
+            {
+                await cc
+                    .GetDateStateMonitorSupervisor()
+                    .RegisterAsync("0a3905f7-0e1b-423e-ac4a-a84d2784adfb");
+            });
+            
+            return Ok();
+        }
+        
+        [HttpGet("TestDataState1")]
+        public async Task<IActionResult> TestDataState1()
+        {
+            await _clusterClient.WithClusterClient(async cc =>
+            {
+                await cc
+                    .GetDateStateMonitorSupervisor()
+                    .UnregisterAsync("0a3905f7-0e1b-423e-ac4a-a84d2784adfb");
+            });
+            
+            return Ok();
+        }
     }
 }

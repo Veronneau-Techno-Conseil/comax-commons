@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans.Runtime;
 
@@ -6,9 +5,9 @@ namespace CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain
 {
     public class Repo
     {
-        private readonly IPersistentState<List<string>> _keysState;
+        private readonly IPersistentState<DateSateMonitorItem> _keysState;
 
-        public Repo(IPersistentState<List<string>> keysState)
+        public Repo(IPersistentState<DateSateMonitorItem> keysState)
         {
             _keysState = keysState;
         }
@@ -17,9 +16,11 @@ namespace CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain
         {
             await _keysState.ReadStateAsync();
 
-            _keysState.State ??= new List<string>();
+            _keysState.State ??= new DateSateMonitorItem();
 
-            _keysState.State.Add(grainKey);
+            _keysState.State.Keys.Add(grainKey);
+            
+            await _keysState.WriteStateAsync();
         }
 
         public async Task RemoveAsync(string grainKey)
@@ -28,11 +29,12 @@ namespace CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain
 
             if (_keysState.State != null)
             {
-                _keysState.State.Remove(grainKey);
+                _keysState.State.Keys.Remove(grainKey);
+                await _keysState.WriteStateAsync();
             }
         }
 
-        public async Task<List<string>> GetAsync()
+        public async Task<DateSateMonitorItem> GetAsync()
         {
             await _keysState.ReadStateAsync();
             return _keysState.State;

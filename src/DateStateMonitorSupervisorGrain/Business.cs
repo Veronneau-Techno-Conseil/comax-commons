@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using CommunAxiom.Commons.Client.Contracts.Grains.DataStateMonitor;
 using CommunAxiom.Commons.Orleans;
@@ -16,7 +15,7 @@ namespace CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain
             _grainFactory = grainFactory;
         }
 
-        public void Init(IPersistentState<List<string>> keyState)
+        public void Init(IPersistentState<DateSateMonitorItem> keyState)
         {
             _repo = new Repo(keyState);
         }
@@ -35,9 +34,9 @@ namespace CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain
 
         public async Task EnsureActiveAsync()
         {
-            var keys = await _repo.GetAsync();
+            var items = await _repo.GetAsync();
 
-            foreach (var grainKey in keys)
+            foreach (var grainKey in items.Keys)
             {
                 var dataStateMonitor = _grainFactory.GetGrain<IDataStateMonitor>(grainKey);
                 await dataStateMonitor.EnsureActive();

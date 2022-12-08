@@ -14,7 +14,7 @@ namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
 
         public Datasources(
             [PersistentState("DataSource")] IPersistentState<SourceState> state,
-            [PersistentState("FileHash")] IPersistentState<byte[]> hashState)
+            [PersistentState("FileHash")] IPersistentState<FileHash> hashState)
         {
             _business = new Business(new Repo(state, hashState));
         }

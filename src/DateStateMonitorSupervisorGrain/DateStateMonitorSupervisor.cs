@@ -15,12 +15,12 @@ namespace CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain
         private IDisposable _dataStateTimer = null!;
         
         // HACK: make sure this property serilize properly.
-        private readonly IPersistentState<List<string>> _keys;
+        private readonly IPersistentState<DateSateMonitorItem> _keys;
         
         private Business _business;
         private bool _disposedValue;
 
-        public DateStateMonitorSupervisor([PersistentState("DateStateMonitorKeys")] IPersistentState<List<string>> keys)
+        public DateStateMonitorSupervisor([PersistentState("DateStateMonitorKeys")] IPersistentState<DateSateMonitorItem> keys)
         {
             _keys = keys;
         }

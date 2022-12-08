@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommunAxiom.Commons.Client.Contracts.Grains.DateStateMonitorSupervisor;
 
 namespace ClusterClient
 {
@@ -25,6 +26,8 @@ namespace ClusterClient
     {
         private bool _disposed = false;
         private readonly IClusterClient _clusterClient;
+        private ICommonsClusterClient _commonsClusterClientImplementation;
+
         public Client(IClusterClient clusterClient)
         {
             _clusterClient = clusterClient;
@@ -33,6 +36,11 @@ namespace ClusterClient
         ~Client()
         {
             if (!_disposed) { Dispose(); }
+        }
+
+        public IDateStateMonitorSupervisor GetDateStateMonitorSupervisor()
+        {
+            return _clusterClient.GetGrain<IDateStateMonitorSupervisor>(Guid.Empty);
         }
 
         public IAccount GetAccount()

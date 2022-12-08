@@ -61,10 +61,6 @@
     <_ContentIncludedByDefault Remove="DispatchGrain\obj\DispatchGrain.csproj.nuget.dgspec.json" />
     <_ContentIncludedByDefault Remove="DispatchGrain\obj\project.assets.json" />
     <_ContentIncludedByDefault Remove="DispatchGrain\obj\project.packagespec.json" />
-    <_ContentIncludedByDefault Remove="DateStateMonitorSupervisorGrain\bin\Debug\netstandard2.1\CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain.deps.json" />
-    <_ContentIncludedByDefault Remove="DateStateMonitorSupervisorGrain\obj\DateStateMonitorSupervisorGrain.csproj.nuget.dgspec.json" />
-    <_ContentIncludedByDefault Remove="DateStateMonitorSupervisorGrain\obj\project.assets.json" />
-    <_ContentIncludedByDefault Remove="DateStateMonitorSupervisorGrain\obj\project.packagespec.json" />
     <_ContentIncludedByDefault Remove="DataStateMonitorGrain\obj\DataStateMonitorGrain.csproj.nuget.dgspec.json" />
     <_ContentIncludedByDefault Remove="DataStateMonitorGrain\obj\project.assets.json" />
   </ItemGroup>
