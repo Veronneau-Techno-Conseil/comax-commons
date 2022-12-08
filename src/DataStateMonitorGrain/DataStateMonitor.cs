@@ -45,6 +45,7 @@ namespace CommunAxiom.Commons.Client.Grains.DataStateMonitorGrain
         public Task UnregisterAsync()
         {
             Dispose(true);
+            DeactivateOnIdle();
             return Task.CompletedTask;
         }
 
@@ -61,6 +62,7 @@ namespace CommunAxiom.Commons.Client.Grains.DataStateMonitorGrain
             if (disposing)
             {
                 _dataStateTimer.Dispose();
+               
             }
 
             _disposedValue = true;

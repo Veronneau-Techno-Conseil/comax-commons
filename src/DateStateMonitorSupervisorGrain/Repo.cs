@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Orleans.Runtime;
+using System.Linq;
 
 namespace CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain
 {
@@ -15,12 +16,13 @@ namespace CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain
         public async Task AddAsync(string grainKey)
         {
             await _keysState.ReadStateAsync();
-
             _keysState.State ??= new DateSateMonitorItem();
-
-            _keysState.State.Keys.Add(grainKey);
             
-            await _keysState.WriteStateAsync();
+            if (_keysState.State.Keys.All(x => x != grainKey))
+            {
+                _keysState.State.Keys.Add(grainKey);
+                await _keysState.WriteStateAsync();
+            }
         }
 
         public async Task RemoveAsync(string grainKey)
