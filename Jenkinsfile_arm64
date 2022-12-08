@@ -31,7 +31,7 @@ pipeline {
             steps {
                 
                 script {
-                    def orch = docker.build("registry.vtck3s.lan/comax-orchestrator:latest-arm64", "-f ./orchestrator.Dockerfile .")
+                    def orch = docker.build("registry.vtck3s.lan/comax-orchestrator:latest-arm64", "-f ./orchestrator.arm.Dockerfile .")
                     orch.push()
                     orch.push(patch)
                 }
