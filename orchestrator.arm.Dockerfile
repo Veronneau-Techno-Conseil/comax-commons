@@ -6,7 +6,7 @@ WORKDIR /src
 
 # Copy csproj and restore as distinct layers
 COPY ./src ./
-RUN dotnet restore
+RUN dotnet restore -v diag
 
 # Copy everything else and build
 WORKDIR /src/Node
