@@ -17,7 +17,7 @@ namespace CommunAxiom.Commons.Client.DevSilo.System
     {
         private readonly IServiceProvider serviceProvider;
         private readonly ILogger logger; 
-        private SystemListener systemListener;
+        //private SystemListener systemListener;
         private readonly IConfiguration configuration;
         public ClusterManagement(IServiceProvider serviceProvider, ILogger<ClusterManagement> logger, IConfiguration configuration)
         {
@@ -32,8 +32,8 @@ namespace CommunAxiom.Commons.Client.DevSilo.System
         {
             if(CurrentSilo == SiloShared.System.Silos.Unspecified)
             {
-                systemListener = new SystemListener(this, serviceProvider.GetRequiredService<ICommonsClientFactory>(), serviceProvider.GetRequiredService<IConfiguration>());
-                await systemListener.Listen();
+                //systemListener = new SystemListener(this, serviceProvider.GetRequiredService<ICommonsClientFactory>(), serviceProvider.GetRequiredService<IConfiguration>());
+                //await systemListener.Listen();
                 _ = SetSilo(SiloShared.System.Silos.Main);
             }
         }

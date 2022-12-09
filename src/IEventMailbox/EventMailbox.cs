@@ -11,19 +11,22 @@ using CommunAxiom.Commons.Shared.RuleEngine;
 using Orleans.Concurrency;
 using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
 using CommunAxiom.Commons.CommonsShared.Contracts.Mail;
+using Microsoft.Extensions.Logging;
 
 namespace CommunAxiom.Commons.CommonsShared.EventMailboxGrain
 {
     [Reentrant]
     [ImplicitStreamSubscription(EventMailboxConstants.MAILBOX_STREAM_INBOUND_NS)]
     [AuthorizeClaim(ClaimType = "https://orchestrator.communaxiom.org/mailbox")]
-    public class EventMailbox: Grain, IEventMailbox
+    public class EventMailbox : Grain, IEventMailbox
     {
         private readonly IPersistentState<MailboxState> _storageState;
         public EventMailboxBusiness _eventMailboxBusiness;
-        public EventMailbox([PersistentState("mailGrain")] IPersistentState<MailboxState> storageState)
+        private readonly ILogger _logger;
+        public EventMailbox([PersistentState("mailGrain")] IPersistentState<MailboxState> storageState, ILogger<EventMailbox> logger)
         {
             _storageState = storageState;
+            _logger = logger;
 
         }
 
@@ -36,18 +39,6 @@ namespace CommunAxiom.Commons.CommonsShared.EventMailboxGrain
             return await _eventMailboxBusiness.HasMail();
         }
 
-        public async Task<Guid> GetStreamId()
-        {
-            return await _eventMailboxBusiness.GetStreamId();
-        }
-
-        public async Task StartStream()
-        {
-            //read storage and push to stream
-            await _eventMailboxBusiness.ResumeMessageStream();
-
-        }
-
         public async Task SendMail(MailMessage mail)
         {
             await _eventMailboxBusiness.DropMail(mail);
@@ -58,12 +49,17 @@ namespace CommunAxiom.Commons.CommonsShared.EventMailboxGrain
             await _eventMailboxBusiness.DeleteMail(msgId);
         }
 
+        public async Task<Message> GetMessage(Guid msgId)
+        {
+            return await _eventMailboxBusiness.GetMessage(msgId);
+        }
+
         public override async Task OnActivateAsync()
         {
-            _eventMailboxBusiness = new EventMailboxBusiness(this.GetStreamProvider(Constants.DefaultStream), new CommunAxiom.Commons.Orleans.GrainFactory(GrainFactory));
+            _eventMailboxBusiness = new EventMailboxBusiness(this.GetStreamProvider(Orleans.Constants.DefaultStream), new CommunAxiom.Commons.Orleans.GrainFactory(GrainFactory), _logger);
             _eventMailboxBusiness.Init(_storageState);
 
-            var streamProvider = GetStreamProvider(Constants.ImplicitStream);
+            var streamProvider = GetStreamProvider(Orleans.Constants.ImplicitStream);
             var key = this.GetPrimaryKey();
             var stream = streamProvider.GetStream<Message>(
                     key, EventMailboxConstants.MAILBOX_STREAM_INBOUND_NS);
@@ -75,6 +71,7 @@ namespace CommunAxiom.Commons.CommonsShared.EventMailboxGrain
                 var mm = new MailMessage
                 {
                     From = msg.From,
+                    To = msg.To,
                     MsgId = msg.Id,
                     ReceivedDate = DateTime.UtcNow,
                     Subject = msg.Subject,
@@ -82,7 +79,17 @@ namespace CommunAxiom.Commons.CommonsShared.EventMailboxGrain
                 };
                 await _eventMailboxBusiness.DropMail(mm);
             });
-            
+
+        }
+
+        public async Task Subscribe(IMailboxObserver mailboxObserver)
+        {
+            await _eventMailboxBusiness.Subscribe(mailboxObserver);
+        }
+
+        public async Task Unsubscribe(IMailboxObserver mailboxObserver)
+        {
+            await _eventMailboxBusiness.Unsubscribe(mailboxObserver);
         }
     }
 }

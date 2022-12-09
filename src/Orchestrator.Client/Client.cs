@@ -16,6 +16,7 @@ using CommunAxiom.Commons.Shared;
 using CommunAxiom.Commons.CommonsShared.Contracts.UriRegistry;
 using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
 using Comax.Commons.Orchestrator.Contracts.PublicBoard;
+using Microsoft.Extensions.Logging;
 
 namespace Comax.Commons.Orchestrator.Client
 {
@@ -23,16 +24,30 @@ namespace Comax.Commons.Orchestrator.Client
     {
         private bool _disposed = false;
         private readonly IClusterClient _clusterClient;
+        private readonly ILogger<Client> _logger;
+        private readonly HandlerToDelegateRelay _onDisconnectRelay;
+        private bool _connected = true;
 
         private Guid? _userID = null;
-        public Client(IClusterClient clusterClient)
+        public Client(IClusterClient clusterClient, ILogger<Client> logger, HandlerToDelegateRelay onDisconnectRelay)
         {
             _clusterClient = clusterClient;
+            _logger = logger;
+            _onDisconnectRelay = onDisconnectRelay;
+            _onDisconnectRelay.Delegate = (o, args) => this._connected = false;
         }
 
         ~Client()
         {
             if (!_disposed) { Dispose(); }
+        }
+
+        public bool IsConnected
+        {
+            get
+            {
+                return this._connected;
+            }
         }
 
         public IClusterClient ClusterClient
@@ -54,36 +69,30 @@ namespace Comax.Commons.Orchestrator.Client
         public IUriRegistry GetUriRegistry(string id)
         {
             string actual = Constants.BLANK_ID;
-            if(!string.IsNullOrWhiteSpace(id))
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                if (!id.StartsWith("usr://") && !id.StartsWith("com://"))
+                {
+                    throw new ArgumentException("Id should be a uri");
+                }
                 actual = id;
+            }
             return _clusterClient.GetGrain<IUriRegistry>(actual);
         }
 
-        public async Task<IEventMailbox> GetEventMailbox(Guid? id = null)
+        public async Task<IEventMailboxClient> GetEventMailbox(Guid? id = null)
         {
             Guid? userID = id;
             if(userID == null)
                 userID = await this.LoadUserId();
-            return _clusterClient.GetGrain<IEventMailbox>(userID.Value);
+            var gr = _clusterClient.GetGrain<IEventMailbox>(userID.Value);
+            var cl = new EventMailboxClient(ClusterClient, gr, _logger);
+            return cl;
         }
 
         public ICentral GetCentral()
         {
             return _clusterClient.GetGrain<ICentral>(Guid.Empty);
-        }
-        public Task<StreamSubscriptionHandle<MailMessage>> SubscribeEventMailboxStream(Guid id, Func<MailMessage, StreamSequenceToken, Task> fn, Func<Exception, Task> funcError, Func<Task> onCompleted)
-        {
-            return _clusterClient.GetStreamProvider(Constants.DefaultStream)
-                    .GetStream<MailMessage>(id, Constants.DefaultNamespace).SubscribeAsync(fn,funcError,onCompleted);
-        }
-
-        public async Task<(StreamSubscriptionHandle<MailMessage>, AsyncEnumerableStream<MailMessage>)> EnumEventMailbox(Guid streamId)
-        {
-            var result = new AsyncEnumerableStream<MailMessage>();
-            var handle = await _clusterClient.GetStreamProvider(Constants.DefaultStream)
-                    .GetStream<MailMessage>(streamId, Constants.DefaultNamespace)
-                    .SubscribeAsync(result);
-            return (handle, result);
         }
 
         public void Dispose()
@@ -103,11 +112,6 @@ namespace Comax.Commons.Orchestrator.Client
         public Task Close()
         {
             return _clusterClient.Close();
-        }
-
-        public Task<Message> GetMail(Guid id)
-        {
-            throw new NotImplementedException();
         }
 
         public IPublicBoard GetPublicBoard()

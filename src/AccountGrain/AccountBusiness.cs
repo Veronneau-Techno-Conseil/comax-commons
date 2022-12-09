@@ -1,4 +1,5 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Account;
+using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared;
 using CommunAxiom.Commons.Shared.OIDC;
 using Microsoft.Extensions.Configuration;
@@ -78,6 +79,8 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             }
             else
             {
+                var principal = await tokenClient.RequestIntrospection(details.ClientID, details.ClientSecret, data.access_token);
+                details.ApplicationUri = principal.Item2.GetUri();
                 details.State = AccountState.CredentialsSet;
                 details.AccessToken = data.access_token;
                 details.RefreshToken = data.refresh_token;

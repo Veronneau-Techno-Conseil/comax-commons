@@ -10,7 +10,7 @@ namespace CommunAxiom.Commons.Client.SiloShared.System
     {
         Unspecified = 0,
         Bootstrap = 1,
-        Pilot = 2,
-        Main = 3,
+        //Pilot = 2,
+        Main = 2,
     }
 }
