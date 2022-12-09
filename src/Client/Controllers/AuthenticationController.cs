@@ -301,6 +301,16 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
             await clusterClient.Close();
             clusterClient.Dispose();
 
+            if(operationResult == null)
+            {
+                return this.Ok(new OperationResult<string>()
+                {
+                    Result = AuthSteps.CANCELLED,
+                    IsError = false,
+                    Detail = $"Operation incomplete"
+                });
+            }
+
             if (operationResult.IsError)
             {
                 return this.Ok(new OperationResult<string>()

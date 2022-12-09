@@ -9,14 +9,14 @@ using Orleans.Streams;
 
 namespace CommunAxiom.Commons.Client.Grains.DispatchGrain
 {
-    [ImplicitStreamSubscription(Constants.DefaultNamespace)]
+    [ImplicitStreamSubscription(CommunAxiom.Commons.Orleans.Constants.DefaultNamespace)]
     [AuthorizeClaim]
     [StatelessWorker(1)]
     public class Dispatch : Grain, IDispatch
     {
         public override async Task OnActivateAsync()
         {
-            var streamProvider = GetStreamProvider(Constants.ImplicitStream);
+            var streamProvider = GetStreamProvider(CommunAxiom.Commons.Orleans.Constants.ImplicitStream);
 
             var stream = streamProvider.GetEventStream();
 

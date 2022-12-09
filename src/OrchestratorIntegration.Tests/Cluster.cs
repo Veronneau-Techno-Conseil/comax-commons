@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Orleans;
 using Orleans.Hosting;
 using System;
 using System.Collections.Generic;
@@ -60,7 +61,7 @@ namespace OrchestratorIntegration.Tests
              * */
 
             sc.AddSingleton<IOrchestratorClientConfig, ClientConfig>();
-            sc.AddSingleton<SecureTokenOutgoingFilter>(sp =>
+            sc.AddSingleton<IOutgoingGrainCallFilter>(sp =>
             {
                 var logger = sp.GetService<ILogger<SecureTokenOutgoingFilter>>();
                 var oidc = new OIDCSettings();

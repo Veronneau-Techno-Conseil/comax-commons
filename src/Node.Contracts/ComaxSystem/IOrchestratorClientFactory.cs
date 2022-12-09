@@ -10,6 +10,7 @@ namespace Comax.Commons.Orchestrator.Contracts.ComaxSystem
         Task<bool> TestConnection();
         Task WithClusterClient(Func<IOrchestratorClient, Task> action);
         Task<TResult> WithClusterClient<TResult>(Func<IOrchestratorClient, Task<TResult>> action);
+        Task<IOrchestratorClient> GetUnmanagedClient();
         Task<IOrchestratorClient> WithUnmanagedClient(Func<IOrchestratorClient, Task> action);
         Task<(IOrchestratorClient, TResult)> WithUnmanagedClient<TResult>(Func<IOrchestratorClient, Task<TResult>> action);
     }

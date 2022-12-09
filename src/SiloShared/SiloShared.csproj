@@ -21,9 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AgentService\AgentService.csproj" />
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\IO\CommunAxiom.Commons.Ingestion.csproj" />
     <ProjectReference Include="..\LiteDbStorageProvider\LiteDbStorageProvider.csproj" />
+    <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
+    <ProjectReference Include="..\Orchestrator.Client\Orchestrator.Client.csproj" />
     <ProjectReference Include="..\Orleans\Orleans.csproj" />
   </ItemGroup>
 

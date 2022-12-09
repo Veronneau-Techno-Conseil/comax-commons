@@ -12,7 +12,7 @@ namespace OrchestratorIntegration.Tests
             var cf = new ClientFactory(Cluster.ServiceProvider, Cluster.Configuration);
             await cf.WithClusterClient(async c =>
             {
-                var ur = c.GetUriRegistry("Test uri");
+                var ur = c.GetUriRegistry("usr://"+Guid.NewGuid());
                 var testCall = await ur.GetOrCreate();
             });
         }

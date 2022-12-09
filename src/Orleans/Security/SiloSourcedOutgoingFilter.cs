@@ -1,4 +1,6 @@
-﻿using Orleans;
+﻿using Comax.Commons.Shared.OIDC;
+using Microsoft.Extensions.Logging;
+using Orleans;
 using Orleans.Runtime;
 using System;
 using System.Collections.Generic;
@@ -9,16 +11,23 @@ namespace CommunAxiom.Commons.Orleans.Security
 {
     public class SiloSourcedOutgoingFilter : IOutgoingGrainCallFilter
     {
-        private readonly IGrainRuntime _grainRuntime;
-        public SiloSourcedOutgoingFilter(IGrainRuntime grainRuntime)
+        protected readonly IGrainRuntime _grainRuntime;
+
+        public SiloSourcedOutgoingFilter(IGrainRuntime grainRuntime, ILogger<SecureTokenOutgoingFilter> logger, ITokenProvider tokenProvider)
         {
             _grainRuntime = grainRuntime;
         }
 
-        public Task Invoke(IOutgoingGrainCallContext context)
+        public virtual Task SetSecurityContext()
         {
             RequestContext.Set("__si", _grainRuntime.SiloIdentity);
-            return context.Invoke();
+            return Task.CompletedTask;
+        }
+
+        public async Task Invoke(IOutgoingGrainCallContext context)
+        {
+            await this.SetSecurityContext();
+            await context.Invoke();
         }
     }
 }

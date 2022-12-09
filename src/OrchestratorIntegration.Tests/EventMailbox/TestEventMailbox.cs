@@ -1,5 +1,6 @@
 ﻿using Comax.Commons.Orchestrator.Client;
 using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
+using FluentAssertions;
 using NUnit.Framework;
 using Orleans.Streams;
 
@@ -16,6 +17,7 @@ namespace OrchestratorIntegration.Tests.EventMailbox
             var mail = new MailMessage()
             {
                 From = "com://local",
+                To = "com://local",
                 MsgId = Guid.NewGuid(),
                 Type = "NEW_DATA_VERSION",
                 Subject = "test EventMailbox message"
@@ -24,30 +26,39 @@ namespace OrchestratorIntegration.Tests.EventMailbox
             await cf.WithClusterClient(async c =>
             {
                 var emb = await c.GetEventMailbox(Guid.NewGuid());
-                var streamId = emb.GetStreamId();
+                var obs = new MBObserver();
+                var streamId = emb.Subscribe(obs);
                 //var testCall = await emb.SendMail();
-                var subscriptionHandle = c.SubscribeEventMailboxStream(streamId.Result, OnMailMessage, OnEventMailboxStreamError, OnComplete);
                 await emb.SendMail(mail);
                 //unsubscribe from stream
+
                 
-            });
-            
+                int cnt = 0;
+                while (obs.MailMessages.Count < 1 && cnt < 10)
+                {
+                    await Task.Run(() => Thread.Sleep(10000));
+                    cnt++;
+                }
+
+                foreach (var item in obs.MailMessages)
+                {
+                    await emb.DeleteMail(item.MsgId);
+                }
+
+                obs.MailMessages.Should().NotBeNullOrEmpty();
+            });            
         }
 
-        public Task OnMailMessage(MailMessage mail,StreamSequenceToken token)
-        {
-            return Task.CompletedTask;
-        }
-        public Task OnEventMailboxStreamError(Exception e)
-        {
-            Console.Error.WriteLine(e.ToString());
-            Console.Error.WriteLine(e.StackTrace);
-            return Task.CompletedTask;
-        }
-        public Task OnComplete()
-        {
-            return Task.CompletedTask;
-        }
 
+    }
+
+    public class MBObserver: IMailboxObserver
+    {
+        public List<MailMessage> MailMessages { get; set; } = new List<MailMessage>();
+        public Task NewMail(MailMessage message)
+        {
+            this.MailMessages.Add(message);
+            return Task.CompletedTask;
+        }
     }
 }

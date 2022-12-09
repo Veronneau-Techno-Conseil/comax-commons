@@ -34,13 +34,13 @@ namespace CommunAxiom.Commons.CommonsShared.UriRegistryGrain
 
         public async Task<Guid> GetOrCreate()
         {
-            if (this.GetPrimaryKeyString()==Constants.BLANK_ID)
+            if (this.GetPrimaryKeyString()==Commons.Orleans.Constants.BLANK_ID)
             {
-                var user = this.GetUser();
-                var id = user.FindFirst(x => x.Type == "sub")?.Value;
-                if (!string.IsNullOrWhiteSpace(id))
+                var user = this.GetUser().GetUri();
+                
+                if (!string.IsNullOrWhiteSpace(user))
                 {
-                    var gr = this.GrainFactory.GetGrain<IUriRegistry>(id);
+                    var gr = this.GrainFactory.GetGrain<IUriRegistry>(user);
                     return await gr.GetOrCreate();
                 }
             }

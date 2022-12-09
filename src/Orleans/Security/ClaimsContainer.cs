@@ -19,6 +19,8 @@ namespace CommunAxiom.Commons.Orleans.Security
 
         public void SetPrincipal(ClaimsPrincipal claimsPrincipal)
         {
+            if (claimsPrincipal == null)
+                return;
             var ms = new MemoryStream();
             BinaryWriter binaryWriter = new BinaryWriter(ms);
             claimsPrincipal.WriteTo(binaryWriter);

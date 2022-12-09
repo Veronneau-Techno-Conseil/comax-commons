@@ -122,6 +122,8 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
         {
             foreach (var configuration in _configurations.Values)
             {
+                if (configuration == null || configuration.Validators == null)
+                    continue;
                 foreach (var validator in configuration.Validators)
                 {
                     yield return validator.Validate(configuration);

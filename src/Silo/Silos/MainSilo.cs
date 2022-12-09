@@ -32,6 +32,18 @@ using CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain;
 using CommunAxiom.Commons.Client.Grains.DispatchGrain;
 using CommunAxiom.Commons.Client.Grains.StorageGrain;
 using CommunAxiom.Commons.Ingestion.Extentions;
+using CommunAxiom.Commons.Ingestion.Ingestor;
+using CommunAxiom.Commons.Client.Contracts.Grains.Agent;
+using Comax.Commons.Shared.OIDC;
+using Comax.Commons.Orchestrator.Contracts.ComaxSystem;
+using Comax.Commons.Orchestrator.Client;
+using CommunAxiom.Commons.Client.AgentService.OrchClient;
+using CommunAxiom.Commons.Client.Grains.AgentGrain;
+using CommunAxiom.Commons.Client.AgentService.Conf;
+using System;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Ingestion.DataSource;
+using CommunAxiom.Commons.Ingestion;
 
 namespace CommunAxiom.Commons.Client.Silo
 {
@@ -82,8 +94,27 @@ namespace CommunAxiom.Commons.Client.Silo
                     
                     services.AddSingleton<ISettingsProvider, SiloSettingsProvider>();
                     services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
-                    services.AddSingleton<IIncomingGrainCallFilter, AccessControlFilter>();
+                    services.AddSingleton<IIncomingGrainCallFilter, AuthRequiredAccessControlFilter>();
+                    services.AddTransient<IOutgoingGrainCallFilter, SiloSourcedOutgoingFilter>();
+                    services.AddSingleton<ITokenProvider, SiloTokenProvider>();
+                    services.AddSingleton<AppIdProvider>();
 
+                    services.AddSingleton<Importer>();
+
+                    services.AddSingleton<IDataSourceFactory, DataSourceFactory>();
+                    services.AddSingleton<IIngestorFactory, IngestorFactory>();
+
+					//TODO: revise	
+                    services.AddSingleton<IOrchestratorClientConfig, ClientConfig>();
+                    services.AddSingleton<IOrchestratorClientFactory, Comax.Commons.Orchestrator.Client.ClientFactory>();
+                    services.AddSingleton<ClientManager>();
+                    services.AddSingleton<IOrchestratorClient>(sp =>
+                    {
+                        return sp.GetService<ClientManager>().Client;
+                    });
+					//END TODO
+
+                    
                 })
                 //configure application parts for each grain
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Accounts).Assembly).WithReferences())
@@ -99,9 +130,18 @@ namespace CommunAxiom.Commons.Client.Silo
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Scheduler).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(StorageGrain).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DataStateMonitor).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DateStateMonitorSupervisor).Assembly).WithReferences());
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DateStateMonitorSupervisor).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Agent).Assembly).WithReferences())
+                .AddStartupTask(async (sp, cancellation) =>
+                {
+                    // Use the service provider to get the grain factory.
+                    var grainFactory = sp.GetRequiredService<IGrainFactory>();
+                    var agt = grainFactory.GetGrain<IAgent>(Guid.Empty);
+                    await agt.IAmAlive();
+                });
             
             var silo = builder.Build();
+            silo.Services.GetService<ClientManager>();
             await silo.StartAsync();
             _silo = silo;
             IsSiloStarted = true;
@@ -110,7 +150,7 @@ namespace CommunAxiom.Commons.Client.Silo
         static void ConfigureIdentitty(IServiceCollection services)
         {
             
-            services.AddTransient(services => SiloShared.Conf.OIDCConfig.Config);
+            services.AddTransient(services => OIDCConfig.Config);
         }
 
         public static async Task StopSilo()

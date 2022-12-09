@@ -27,3 +27,4 @@ dependencies:
   - name: community-operator
     repository: https://mongodb.github.io/helm-charts
     version: 0.7.6
+

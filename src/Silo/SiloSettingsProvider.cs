@@ -27,6 +27,10 @@ namespace CommunAxiom.Commons.Client.Silo
             var acnt = _grainFactory.GetGrain<IAccount>(Guid.Empty);
 
             var details = await acnt.GetDetails();
+            if(details == null || string.IsNullOrWhiteSpace(details.AccessToken))
+            {
+                return null;
+            }
 
             var settings = new OIDCSettings();
 
@@ -34,7 +38,7 @@ namespace CommunAxiom.Commons.Client.Silo
 
             settings.ClientId = details.ClientID;
             settings.Secret = details.ClientSecret;
-            
+
             return settings;
         }
     }

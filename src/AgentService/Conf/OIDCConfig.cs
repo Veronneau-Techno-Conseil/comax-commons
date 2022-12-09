@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommunAxiom.Commons.Client.SiloShared.Conf
+namespace CommunAxiom.Commons.Client.AgentService.Conf
 {
     public class OIDCConfig
     {
@@ -55,6 +55,14 @@ namespace CommunAxiom.Commons.Client.SiloShared.Conf
             OIDCSettings authSettings = new OIDCSettings();
             configuration.Bind(Sections.OIDCSection, authSettings);
             Conf.OIDCConfig.Config = authSettings;
+        }
+    }
+
+    public class StaticSettingsProvider : ISettingsProvider
+    {
+        public Task<OIDCSettings> GetOIDCSettings()
+        {
+            return Task.FromResult(OIDCConfig.Config);
         }
     }
 }
