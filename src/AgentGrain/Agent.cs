@@ -1,4 +1,5 @@
 ﻿using Comax.Commons.Orchestrator.Contracts.ComaxSystem;
+using Comax.Commons.Shared.OIDC;
 using CommunAxiom.Commons.Client.ClusterEventStream.Extentions;
 using CommunAxiom.Commons.Client.Contracts.Grains.Agent;
 using CommunAxiom.Commons.Client.Contracts.Grains.Scheduler;
@@ -11,7 +12,7 @@ using Orleans.Runtime;
 using System;
 using System.Threading.Tasks;
 
-namespace AgentGrain
+namespace CommunAxiom.Commons.Client.Grains.AgentGrain
 {
     [AuthorizeClaim]
     [Reentrant]
@@ -19,14 +20,19 @@ namespace AgentGrain
     {
         private AgentBusiness _agentBusiness;
         private readonly AgentRepo _repo;
-        private IDisposable _iAmAliveTicker, _connectionMonitor;
+        private IDisposable _iAmAliveTicker, _connectionMonitor, _stateMonitor;
         private readonly IOrchestratorClientFactory _orchestratorClientFactory;
+        private readonly ITokenProvider _tokenProvider;
+        private readonly AppIdProvider _appIdProvider;
 
-        public Agent(IPersistentState<AgentState> agentState, IOrchestratorClientFactory orchestratorClientFactory)
+        public Agent([PersistentState("agentState")] IPersistentState<AgentState> agentState, IOrchestratorClientFactory orchestratorClientFactory, ITokenProvider tokenProvider, AppIdProvider appIdProvider)
         {
             _repo = new AgentRepo(agentState);
+            _tokenProvider = tokenProvider;
+            _orchestratorClientFactory= orchestratorClientFactory;
+            _appIdProvider = appIdProvider;
         }
-        
+
         public override Task OnActivateAsync()
         {
             var gf = new GrainFactory(this.GrainFactory);
@@ -37,11 +43,15 @@ namespace AgentGrain
                 return streamProvider.GetEventStream();
             };
 
-            _agentBusiness = new AgentBusiness(_repo, gf, _orchestratorClientFactory, fn);
+            _agentBusiness = new AgentBusiness(_repo, gf, _orchestratorClientFactory, fn, _tokenProvider, _appIdProvider);
             _iAmAliveTicker = RegisterTimer(x => _agentBusiness.IAmAlive(), true,
-                TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(5)); 
+                TimeSpan.FromSeconds(0), TimeSpan.FromMinutes(5));
+
             _connectionMonitor = RegisterTimer(x => _agentBusiness.CheckConnection(), true,
-                TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(30)); 
+                TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(30));
+
+            _stateMonitor = RegisterTimer(x => _agentBusiness.EnsureSaved(), true,
+                TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(30));
             return base.OnActivateAsync();
         }
 
@@ -70,13 +80,13 @@ namespace AgentGrain
             return _agentBusiness.IAmAlive();
         }
 
-
         public void Dispose()
         {
             try
             {
                 _iAmAliveTicker.Dispose();
                 _connectionMonitor.Dispose();
+                _stateMonitor.Dispose();
             }
             catch { }
         }

@@ -31,6 +31,7 @@ using CommunAxiom.Commons.Shared.OIDC;
 using CommunAxiom.Commons.Shared.Configuration;
 using CommunAxiom.Commons.Shared;
 using CommunAxiom.Commons.Orleans;
+using CommunAxiom.Commons.Orleans.Security;
 
 namespace CommunAxiom.Commons.Client.Grains.AccountGrain
 {
@@ -56,12 +57,14 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             _logger = logger;
         }
 
+        [AuthorizePassthrough]
         public Task Proceed()
         {
             _ = RunAuthentication(clientid, secret, redirect);
             return Task.CompletedTask;
         }
 
+        [AuthorizePassthrough]
         public async Task Complete()
         {
             _logger.LogInformation("cleaning up");
@@ -87,10 +90,11 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             _shouldSaveClientCredentials = false;
         }
 
+        [AuthorizePassthrough]
         public Task<OperationResult<AuthorizationInstructions>> LaunchServiceAuthentication(string clientId, string clientSecret, string redirectUri)
         {
             _operationId = Guid.NewGuid();
-            _asyncStream = this.GetStreamProvider(Constants.DefaultStream).GetStream<AuthorizationInstructions>(_operationId, Constants.DefaultNamespace);
+            _asyncStream = this.GetStreamProvider(Orleans.Constants.DefaultStream).GetStream<AuthorizationInstructions>(_operationId, Orleans.Constants.DefaultNamespace);
             clientid = clientId;
             secret = clientSecret;
             redirect = redirectUri;
@@ -106,6 +110,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             });
         }
 
+        [AuthorizePassthrough]
         public Task<SessionInfo> GetSessionInfo()
         {
             return Task.FromResult(_sessionInfo);
@@ -189,6 +194,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             }
         }
 
+        [AuthorizePassthrough]
         public async Task<BrowserResult> InvokeAsync(BrowserOptions options, CancellationToken cancellationToken = default)
         {
             _logger.LogInformation("Invoking browser");
@@ -213,10 +219,11 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             throw new InvalidOperationException("Operation was cancelled before completing");
         }
 
+        [AuthorizePassthrough]
         public async Task<OperationResult<AuthorizationInstructions>> LaunchAuthentication(string redirectUri)
         {
             _operationId = Guid.NewGuid();
-            _asyncStream = this.GetStreamProvider(Constants.DefaultStream).GetStream<AuthorizationInstructions>(_operationId, Constants.DefaultNamespace);
+            _asyncStream = this.GetStreamProvider(Orleans.Constants.DefaultStream).GetStream<AuthorizationInstructions>(_operationId, Orleans.Constants.DefaultNamespace);
             var account = this.GrainFactory.GetGrain<IAccount>(Guid.Empty);
             var details = await account.GetDetails();
             clientid = details.ClientID;
@@ -234,6 +241,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             };
         }
 
+        [AuthorizePassthrough]
         public async Task<OperationResult<SessionInfo>> RetrieveToken(string clientId, string clientSecret, string devideCode, int interval)
         {
             using var client = new HttpClient();
@@ -294,6 +302,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             while (true);
         }
 
+        [AuthorizePassthrough]
         public Task SetResult(Contracts.Remote.BrowserResult browserResult)
         {
             _browserResult = new BrowserResult
@@ -306,6 +315,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             return Task.CompletedTask;
         }
 
+        [AuthorizePassthrough]
         public byte[] Convert(ClaimsPrincipal claimsPrincipal)
         {
             var ms = new MemoryStream();

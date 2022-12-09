@@ -9,10 +9,10 @@ namespace Comax.Commons.Orchestrator.Client
 {
     public static class ClientExtensions
     {
-        public static void SetupOrleansClient(this IServiceCollection collection)
-        {
-            collection.AddSingleton<IOrchestratorClientFactory, ClientFactory>();            
-        }
+        //public static void SetupOrleansClient(this IServiceCollection collection)
+        //{
+        //    collection.AddSingleton<IOrchestratorClientFactory, ClientFactory>();            
+        //}
         
     }
 }

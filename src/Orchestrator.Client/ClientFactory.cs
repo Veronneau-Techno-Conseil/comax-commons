@@ -62,7 +62,7 @@ namespace Comax.Commons.Orchestrator.Client
                 });
             }
 
-            b.AddOutgoingGrainCallFilter(serviceProvider.GetService<SecureTokenOutgoingFilter>())
+            b.AddOutgoingGrainCallFilter(serviceProvider.GetService<IOutgoingGrainCallFilter>())
                 .AddSimpleMessageStreamProvider(CommunAxiom.Commons.Orleans.Constants.DefaultStream);
 
             return (b, onDisconnect);
@@ -155,9 +155,15 @@ namespace Comax.Commons.Orchestrator.Client
             };
         }
 
-        public Task<IOrchestratorClient> GetUnmanagedClient()
+        public async Task<IOrchestratorClient> GetUnmanagedClient()
         {
-            throw new NotImplementedException();
+            Counter c = new Counter();
+            var (builder, onDisconnect) = GetBuilder();
+            var client = builder.Build();
+            await client.Connect(GetRetryFilter(c));
+            var logger = serviceProvider.GetService<ILogger<Client>>();
+            var cl = new Client(client, logger, onDisconnect);
+            return cl;
         }
 
         private class Counter

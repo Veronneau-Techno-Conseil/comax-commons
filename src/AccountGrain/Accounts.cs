@@ -22,6 +22,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             _configuration = configuration;
         }
 
+        [AuthorizePassthrough]
         public async Task<AccountState> CheckState(bool forceRefresh, string clientIdRef = null)
         {
             return await this._accountBusiness.CheckState(forceRefresh, clientIdRef);
@@ -32,11 +33,13 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             throw new NotImplementedException();
         }
 
+        [AuthorizePassthrough]
         public async Task<AccountDetails> GetDetails()
         {
             return await this._accountBusiness.GetDetails();
         }
 
+        [AuthorizePassthrough]
         public async Task Initialize(AccountDetails accountDetails)
         {
             await this._accountBusiness.Initialize(accountDetails);

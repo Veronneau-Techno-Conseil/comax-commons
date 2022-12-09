@@ -1,17 +1,18 @@
-﻿using CommunAxiom.Commons.Client.Contracts;
+﻿using CommunAxiom.Commons.Client.AgentService.Conf;
+using CommunAxiom.Commons.Client.AgentService.OrchClient;
+using CommunAxiom.Commons.Client.Contracts;
 using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
-using CommunAxiom.Commons.Client.SiloShared;
-using CommunAxiom.Commons.Client.SiloShared.Conf;
 using CommunAxiom.Commons.Client.SiloShared.System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.Silo.System
 {
-    public class ClusterManagement: IClusterManagement
+    public class ClusterManagement : IClusterManagement
     {
         private readonly IServiceProvider serviceProvider;
         private readonly ILogger logger;
@@ -30,13 +31,16 @@ namespace CommunAxiom.Commons.Client.Silo.System
         {
             //if (await IsServiceAuthSet())
             //{
-                if(CurrentSilo != Silos.Main)
-                {
-                    var client = serviceProvider.GetService<ICommonsClientFactory>();
-                    await client.WithClusterClient(cc=>cc.SetCredentials(configuration));
-                    logger.LogInformation("Service auth already set, switching to main silo");
-                }
-                await SetSilo(Silos.Main);
+            if (CurrentSilo != Silos.Main)
+            {
+                var client = serviceProvider.GetService<ICommonsClientFactory>();
+                await client.WithClusterClient(cc => cc.SetCredentials(configuration));
+                var cm = serviceProvider.GetService<ClientManager>();
+                await cm.InitializeTask;
+
+                logger.LogInformation("Service auth already set, switching to main silo");
+            }
+            await SetSilo(Silos.Main);
             //}
             //else
             //{
@@ -69,7 +73,7 @@ namespace CommunAxiom.Commons.Client.Silo.System
                     await MainSilo.StopSilo();
                     break;
             }
-            
+
             switch (requiredSilo)
             {
                 case Silos.Unspecified:

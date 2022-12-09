@@ -9,18 +9,19 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AgentGrain
+namespace CommunAxiom.Commons.Client.Grains.AgentGrain
 {
     public class AgentRepo
     {
         private bool _loaded = false;
+        private bool _shouldSave = false;
         private IPersistentState<AgentState> _persistentState;
         private ThrottleDebounce.RateLimitedFunc<Task> _debouncedSave = null;
 
         public AgentRepo(IPersistentState<AgentState> persistentState)
         {
             _persistentState = persistentState;
-            _debouncedSave = ThrottleDebounce.Throttler.Throttle(ForceSaveState, TimeSpan.FromSeconds(30));
+            _debouncedSave = ThrottleDebounce.Throttler.Throttle(SetSave, TimeSpan.FromSeconds(30));
         }
         
         private async Task EnsureLoaded()
@@ -32,25 +33,13 @@ namespace AgentGrain
             }
         }
 
-        public async Task AddUserMessage(MailMessage mailMessage)
+        public async Task EnsureSaved()
         {
-            await EnsureLoaded();
-            var user = this._persistentState.State.UserAuthStates.Where(x => x.PrincipalId == mailMessage.To).FirstOrDefault();
-            user.MailMessages.Add(mailMessage);
-            await _debouncedSave.Invoke();
-        }
-
-        public async Task RemoveMessage(string userUri, Guid message)
-        {
-            await EnsureLoaded();
-            var user = this._persistentState.State.UserAuthStates.Where(x => x.PrincipalId == userUri).FirstOrDefault();
-            var msg = user.MailMessages.FirstOrDefault(x => x.MsgId == message);
-            if(msg != null)
+            if(_shouldSave && _loaded)
             {
-                user.MailMessages.Remove(msg);
+                await _persistentState.WriteStateAsync();
+                _shouldSave = false;
             }
-            await _debouncedSave.Invoke();
-
         }
 
         public async Task SetUserAuthState(UserAuthState userAuthState)
@@ -70,19 +59,14 @@ namespace AgentGrain
             this.SaveState();
         }
 
-        public async Task ConnectionState(bool isConnected)
-        {
-            await this.EnsureLoaded();
-            _persistentState.State.OrchestratorConnectionState.IsConnected = isConnected;
-            this.SaveState();
-        }
-
-        public async Task ForceSaveState()
+        
+        private Task SetSave()
         {
             if (_loaded)
             {
-                await _persistentState.WriteStateAsync();
+                _shouldSave = true;
             }
+            return Task.CompletedTask;
         }
 
         public void SaveState()
@@ -93,17 +77,34 @@ namespace AgentGrain
             _ = _debouncedSave.Invoke();
         }
 
-        public async Task<OrchestratorConnectionState> GetConnectionState()
-        {
-            await this.EnsureLoaded();
-            return _persistentState.State.OrchestratorConnectionState;
-        }
 
         public async Task<UserAuthState> GetUserAuthState(string v)
         {
             await this.EnsureLoaded();
             var user = _persistentState.State.UserAuthStates.FirstOrDefault(x => x.PrincipalId == v);
+            if(user == null)
+            {
+                user = new UserAuthState
+                {
+                    PrincipalId = v
+                };
+                _persistentState.State.UserAuthStates.Add(user);
+                _ = _debouncedSave.Invoke();
+            }
             return user.Clone();
+        }
+
+        public async Task ConnectionState(bool isConnected)
+        {
+            await EnsureLoaded();
+            _persistentState.State.OrchestratorConnectionState.IsConnected = isConnected;
+            _ = _debouncedSave.Invoke();
+        }
+
+        public async Task<OrchestratorConnectionState> GetConnectionState()
+        {
+            await EnsureLoaded();
+            return _persistentState.State.OrchestratorConnectionState;
         }
     }
 }

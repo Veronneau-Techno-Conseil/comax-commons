@@ -38,7 +38,7 @@ namespace ClusterClient
                     {
                         parts.AddFromApplicationBaseDirectory();
                     }).UseLocalhostClustering(30000)
-                    .AddOutgoingGrainCallFilter(serviceProvider.GetService<SecureTokenOutgoingFilter>())
+                    .AddOutgoingGrainCallFilter(serviceProvider.GetService<IOutgoingGrainCallFilter>())
                     .AddSimpleMessageStreamProvider(CommunAxiom.Commons.Orleans.Constants.DefaultStream);
             return b;
         }

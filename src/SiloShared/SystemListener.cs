@@ -1,6 +1,6 @@
 ﻿using CommunAxiom.Commons.Client.Contracts;
 using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
-using CommunAxiom.Commons.Client.SiloShared.Conf;
+//using CommunAxiom.Commons.Client.SiloShared.Conf;
 using CommunAxiom.Commons.Client.SiloShared.System;
 using Microsoft.Extensions.Configuration;
 using Orleans.Streams;

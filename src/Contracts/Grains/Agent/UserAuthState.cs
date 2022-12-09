@@ -10,6 +10,6 @@ namespace CommunAxiom.Commons.Client.Contracts.Grains.Agent
     {
         public string PrincipalId { get; set; }
         public bool IsAuthorised { get; set; }
-        public List<MailMessage> MailMessages { get; set; }
+        public Guid Subscription { get; set; }
     }
 }

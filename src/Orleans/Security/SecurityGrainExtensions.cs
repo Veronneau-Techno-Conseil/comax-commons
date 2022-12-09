@@ -33,5 +33,10 @@ namespace CommunAxiom.Commons.Orleans.Security
         {
             return cp.FindFirst(Constants.URI_CLAIM).Value;
         }
+
+        public static string GetPrincipalType(this ClaimsPrincipal cp)
+        {
+            return cp.FindFirst(Constants.PRINCIPAL_TYPE).Value;
+        }
     }
 }

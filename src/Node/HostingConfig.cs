@@ -93,6 +93,7 @@ namespace Comax.Commons.Orchestrator
             {
                 // TODO: use configuration to set the IP Address
                 siloHostBuilder.Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback);
+                siloHostBuilder.UseLocalhostClustering(int.Parse(configuration["siloPort"]), int.Parse(configuration["gatewayPort"]));
             }
             else
             {
@@ -100,7 +101,7 @@ namespace Comax.Commons.Orchestrator
                     options.AdvertisedIPAddress = IPAddress.Parse(configuration["advertisedIp"]);
                     options.SiloListeningEndpoint = IPEndPoint.Parse($"{configuration["listeningEndpoint"]}:{configuration["siloPort"]}");
                     options.GatewayListeningEndpoint = IPEndPoint.Parse($"{configuration["listeningEndpoint"]}:{configuration["gatewayPort"]}");
-                Console.WriteLine($"STARTUP: Advertizing: {configuration["advertisedIp"]}, SiloEndpoint: {configuration["listeningEndpoint"]}:{configuration["siloPort"]}, GatewayEndpoint: {configuration["listeningEndpoint"]}:{configuration["gatewayPort"]}");
+                    Console.WriteLine($"STARTUP: Advertizing: {configuration["advertisedIp"]}, SiloEndpoint: {configuration["listeningEndpoint"]}:{configuration["siloPort"]}, GatewayEndpoint: {configuration["listeningEndpoint"]}:{configuration["gatewayPort"]}");
                 });
             }
            

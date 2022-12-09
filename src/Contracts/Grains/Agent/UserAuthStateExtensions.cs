@@ -15,16 +15,7 @@ namespace CommunAxiom.Commons.Client.Contracts.Grains.Agent
             {
                 PrincipalId = userAuthState.PrincipalId,
                 IsAuthorised = userAuthState.IsAuthorised,
-                MailMessages = new List<MailMessage>(userAuthState.MailMessages.Select(x => new MailMessage
-                {
-                    From = x.From,
-                    To = x.To,
-                    MsgId = x.MsgId,
-                    ReadState = x.ReadState,
-                    ReceivedDate = x.ReceivedDate,
-                    Subject = x.Subject,
-                    Type = x.Type
-                }))
+                Subscription = userAuthState.Subscription
             };
         }
     }
