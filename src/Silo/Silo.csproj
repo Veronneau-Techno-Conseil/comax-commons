@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AccountGrain\AccountGrain.csproj" />
+    <ProjectReference Include="..\AgentGrain\AgentGrain.csproj" />
     <ProjectReference Include="..\ClusterClient\ClusterClient.csproj" />
     <ProjectReference Include="..\DatasetGrain\DatasetGrain.csproj" />
     <ProjectReference Include="..\DatasourceGrain\DatasourceGrain.csproj" />
@@ -37,6 +38,7 @@
     <ProjectReference Include="..\SchedulerGrain\SchedulerGrain.csproj" />
     <ProjectReference Include="..\SiloShared\SiloShared.csproj" />
     <ProjectReference Include="..\StorageGrain\StorageGrain.csproj" />
+	<ProjectReference Include="..\Orchestrator.Client\Orchestrator.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

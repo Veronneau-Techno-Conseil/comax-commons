@@ -60,6 +60,7 @@ namespace Comax.Commons.Orchestrator
                     services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
                     services.AddSingleton<IIncomingGrainCallFilter, AuthRequiredAccessControlFilter>();
                     services.AddSingleton<IOutgoingGrainCallFilter, SiloSourcedOutgoingFilter>();
+                    services.AddSingleton<AppIdProvider>();
 
                     services.AddSingleton<ITokenProvider, ClientTokenProvider>();
                     services.AddTransient<HttpClient>();

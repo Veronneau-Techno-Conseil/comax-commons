@@ -14,19 +14,34 @@ namespace CommunAxiom.Commons.Orleans.Security
     public class AuthRequiredAccessControlFilter : IIncomingGrainCallFilter, ITokenProvider
     {
         private readonly IClaimsPrincipalProvider _claimsPrincipalProvider;
-        public AuthRequiredAccessControlFilter(IClaimsPrincipalProvider claimsPrincipalProvider)
+        private readonly AppIdProvider _appIdProvider;
+        public AuthRequiredAccessControlFilter(IClaimsPrincipalProvider claimsPrincipalProvider, AppIdProvider appIdProvider)
         {
             _claimsPrincipalProvider = claimsPrincipalProvider;
+            _appIdProvider = appIdProvider;
         }
 
-        public Task<string?> FetchToken()
+        public async Task<string?> FetchToken()
         {
-            return Task.FromResult(RequestContext.Get(Config.SECURE_TOKEN_KEY)?.ToString());
+            var token = (RequestContext.Get(Config.SECURE_TOKEN_KEY))?.ToString();
+
+            if (string.IsNullOrWhiteSpace(token) && RequestContext.Get("__si") != null)
+            {
+                token = await _appIdProvider.GetAccessToken();
+            }
+
+            return token;
         }
 
         public async Task Invoke(IIncomingGrainCallContext context)
         {
             AccessControlValidationResult? validationResult = null;
+
+            if(AccessControl.PassthroughAuthorize(context))
+            {
+                await context.Invoke();
+                return;
+            }
 
             var cp = await _claimsPrincipalProvider.GetClaimsPrincipal(this);
 

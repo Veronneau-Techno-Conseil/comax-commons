@@ -16,6 +16,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.Models
     {
         public const string OK = "OK";
         public const string LOGIN = "Login";
+        public const string CANCELLED = "Cancelled";
         public const string Reset = "Reset";
         public const string ApiSecret = "ApiSecret";
         public const string AuthApi = "AuthApi";

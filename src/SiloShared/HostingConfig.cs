@@ -19,6 +19,7 @@ using Microsoft.Extensions.Hosting;
 using CommunAxiom.Commons.Client.SiloShared.System;
 using CommunAxiom.Commons.Ingestion.Extentions;
 using CommunAxiom.Commons.Orleans;
+using CommunAxiom.Commons.Client.AgentService.OrchClient;
 
 namespace CommunAxiom.Commons.Client.SiloShared
 {
@@ -27,6 +28,7 @@ namespace CommunAxiom.Commons.Client.SiloShared
         public static IServiceCollection SetServerServices(this IServiceCollection sc)
         {
             sc.AddHostedService<HeartbeatService>();
+            sc.AddHostedService<AgentSyncService>();
             sc.AddIngestion();
             return sc;
         }

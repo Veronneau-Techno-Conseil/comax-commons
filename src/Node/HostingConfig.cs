@@ -93,6 +93,7 @@ namespace Comax.Commons.Orchestrator
             {
                 // TODO: use configuration to set the IP Address
                 siloHostBuilder.Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback);
+                siloHostBuilder.UseLocalhostClustering(int.Parse(configuration["siloPort"]), int.Parse(configuration["gatewayPort"]));
             }
             else
             {
