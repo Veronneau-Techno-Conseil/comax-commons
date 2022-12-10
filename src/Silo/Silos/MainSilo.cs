@@ -1,5 +1,4 @@
-﻿using System;
-using CommunAxiom.Commons.Client.Contracts.Account;
+﻿using CommunAxiom.Commons.Client.Contracts.Account;
 using CommunAxiom.Commons.Client.Contracts.Auth;
 using CommunAxiom.Commons.Client.Contracts.Dataset;
 using CommunAxiom.Commons.Client.Contracts.Datasource;
@@ -25,12 +24,13 @@ using ReplicationGrain;
 using SchedulerGrain;
 using System.Threading.Tasks;
 using CommunAxiom.Commons.Client.Contracts.Broadcast;
+using CommunAxiom.Commons.Client.Contracts.Grains.DataStateMonitor;
+using CommunAxiom.Commons.Client.Contracts.Grains.DateStateMonitorSupervisor;
 using CommunAxiom.Commons.Client.Contracts.Grains.Dispatch;
-using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Client.Grains.DataStateMonitorGrain;
+using CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain;
 using CommunAxiom.Commons.Client.Grains.DispatchGrain;
 using CommunAxiom.Commons.Client.Grains.StorageGrain;
-using CommunAxiom.Commons.Ingestion;
-using CommunAxiom.Commons.Ingestion.DataSource;
 using CommunAxiom.Commons.Ingestion.Extentions;
 using CommunAxiom.Commons.Ingestion.Ingestor;
 using CommunAxiom.Commons.Client.Contracts.Grains.Agent;
@@ -40,6 +40,10 @@ using Comax.Commons.Orchestrator.Client;
 using CommunAxiom.Commons.Client.AgentService.OrchClient;
 using CommunAxiom.Commons.Client.Grains.AgentGrain;
 using CommunAxiom.Commons.Client.AgentService.Conf;
+using System;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+using CommunAxiom.Commons.Ingestion.DataSource;
+using CommunAxiom.Commons.Ingestion;
 
 namespace CommunAxiom.Commons.Client.Silo
 {
@@ -85,7 +89,9 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<SchedulerRepo, SchedulerRepo>();
                     services.AddSingleton<IDispatch, Dispatch>();       
                     services.AddSingleton<IBroadcast, Grains.BroadcastGrain.Broadcast>();
-
+                    services.AddSingleton<IDataStateMonitor, DataStateMonitor>();
+                    services.AddSingleton<IDateStateMonitorSupervisor, DateStateMonitorSupervisor>();
+                    
                     services.AddSingleton<ISettingsProvider, SiloSettingsProvider>();
                     services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
                     services.AddSingleton<IIncomingGrainCallFilter, AuthRequiredAccessControlFilter>();
@@ -93,7 +99,7 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<ITokenProvider, SiloTokenProvider>();
                     services.AddSingleton<AppIdProvider>();
 
-                    services.AddSingleton<Importer, Importer>();
+                    services.AddSingleton<Importer>();
 
                     services.AddSingleton<IDataSourceFactory, DataSourceFactory>();
                     services.AddSingleton<IIngestorFactory, IngestorFactory>();
@@ -108,22 +114,6 @@ namespace CommunAxiom.Commons.Client.Silo
                     });
 					//END TODO
 
-                    // data sources
-
-                    services.AddScoped<TextDataSourceReader>();
-            
-                    services.AddTransient<Func<DataSourceType, IDataSourceReader>>(provider => key =>
-                    {
-                        switch (key)
-                        {
-                            case DataSourceType.FILE:
-                                return provider.GetService<TextDataSourceReader>();
-                            case DataSourceType.API:
-                                return null;
-                        }
-
-                        return null;
-                    });
                     
                 })
                 //configure application parts for each grain
@@ -139,6 +129,8 @@ namespace CommunAxiom.Commons.Client.Silo
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Dispatch).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Scheduler).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(StorageGrain).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DataStateMonitor).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DateStateMonitorSupervisor).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Agent).Assembly).WithReferences())
                 .AddStartupTask(async (sp, cancellation) =>
                 {

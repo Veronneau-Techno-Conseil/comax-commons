@@ -27,7 +27,9 @@
     <ProjectReference Include="..\ClusterClient\ClusterClient.csproj" />
     <ProjectReference Include="..\DatasetGrain\DatasetGrain.csproj" />
     <ProjectReference Include="..\DatasourceGrain\DatasourceGrain.csproj" />
+    <ProjectReference Include="..\DataStateMonitorGrain\DataStateMonitorGrain.csproj" />
     <ProjectReference Include="..\DataTransferGrain\DataTransferGrain.csproj" />
+    <ProjectReference Include="..\DateStateMonitorSupervisorGrain\DateStateMonitorSupervisorGrain.csproj" />
     <ProjectReference Include="..\DispatchGrain\DispatchGrain.csproj" />   
     <ProjectReference Include="..\BroadcastGrain\BroadcastGrain.csproj" />
     <ProjectReference Include="..\IngestionGrain\IngestionGrain.csproj" />

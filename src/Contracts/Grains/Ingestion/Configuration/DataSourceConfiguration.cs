@@ -13,7 +13,7 @@ namespace CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration
 
         public ConfigurationFieldType FieldType { get; set; }
 
-        public IList<IConfigValidator> Validators { get; set; }
+        public IList<IConfigValidator> Validators { get; set; } = new List<IConfigValidator>();
 
         public string Parameter { get; set; }
 

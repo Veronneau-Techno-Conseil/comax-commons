@@ -13,5 +13,8 @@ namespace CommunAxiom.Commons.Client.Contracts.Datasource
         Task SetFieldMetaData(List<FieldMetaData> fieldMetaDatas);
         Task<SourceState> GetSourceState();
         Task DeleteConfig();
+
+        public Task SetFileHash(byte[] hash);
+        public Task<byte[]> GetFileHash();
     }
 }

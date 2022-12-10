@@ -14,11 +14,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using CommunAxiom.Commons.Client.Contracts.Grains.DateStateMonitorSupervisor;
 
 namespace CommunAxiom.Commons.Client.Contracts.ComaxSystem
 {
     public interface ICommonsClusterClient: IDisposable
     {
+        IDateStateMonitorSupervisor GetDateStateMonitorSupervisor();
         IAccount GetAccount();
         IAuthentication GetAuthentication();
         IDatasource GetDatasource(string datasourceId);
