@@ -28,7 +28,7 @@ namespace Comax.Commons.Orchestrator.MembershipProvider
                 Credential = MongoCredential.CreateCredential(mmc.authDb, mmc.username, mmc.password),
                 AllowInsecureTls = mmc.allowInsecureTls,
                 DirectConnection = mmc.directConnection,
-                Server = new MongoServerAddress(mmc.hosts[0], mmc.port),
+                Server = new MongoServerAddress(mmc.host, mmc.port),
                 UseTls = mmc.useTls,
                 //ReadPreference = ReadPreference.SecondaryPreferred,
                 //ReadConcern = ReadConcern.Local,

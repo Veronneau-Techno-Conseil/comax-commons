@@ -31,6 +31,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.Extensions
             ILookup<Guid, PortfolioModel> collectionHash,
             Guid parentId)
         {
+            
             return collectionHash[parentId].Select(collectionItem =>
             {
                 Enum.TryParse(collectionItem.Type, out PortfolioType selectedType);

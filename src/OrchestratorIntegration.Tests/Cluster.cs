@@ -1,7 +1,7 @@
 ﻿using Comax.Commons.Orchestrator;
+using Comax.Commons.Orchestrator.ApiMembershipProvider;
 using Comax.Commons.Orchestrator.Client;
 using Comax.Commons.Orchestrator.Contracts.ComaxSystem;
-using Comax.Commons.Orchestrator.MembershipProvider;
 using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.OIDC;
 using FluentAssertions.Common;
@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Orleans;
 using Orleans.Hosting;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace OrchestratorIntegration.Tests
     [SetUpFixture]
     public class Cluster
     {
+        public static bool NoAuth { get; set; }
         public static IConfiguration Configuration { get; set; }
         public static IServiceProvider ServiceProvider { get; set; }
 
@@ -31,36 +33,35 @@ namespace OrchestratorIntegration.Tests
         public async Task RunBeforeAnyTests()
         {
             SetupTests();
-            await MainSilo.StartSilo();
+            if (Configuration["client_mode"] == "local")
+                await MainSilo.StartSilo();
         }
 
         [OneTimeTearDown]
         public async Task RunAfterAnyTests()
         {
-            await MainSilo.StopSilo();
+            if (Configuration["client_mode"] == "local")
+                await MainSilo.StopSilo();
         }
 
         public static void SetupTests()
         {
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddJsonFile("./config.json");
+            configurationBuilder.AddEnvironmentVariables();
             Configuration = configurationBuilder.Build();
 
             ServiceCollection sc = new ServiceCollection();
             sc.AddSingleton<IConfiguration>(Configuration);
             sc.AddLogging(lb => lb.AddConsole());
 
-            sc.AddSingleton<IMongoClientFactory>(sp =>
-            {
-                return new MongoClientFactory(Configuration);
-            });
 
             /*
              * Client specific
              * */
 
             sc.AddSingleton<IOrchestratorClientConfig, ClientConfig>();
-            sc.AddSingleton<SecureTokenOutgoingFilter>(sp =>
+            sc.AddSingleton<IOutgoingGrainCallFilter>(sp =>
             {
                 var logger = sp.GetService<ILogger<SecureTokenOutgoingFilter>>();
                 var oidc = new OIDCSettings();
@@ -90,10 +91,9 @@ namespace OrchestratorIntegration.Tests
                     return new SecureTokenOutgoingFilter(logger, new TestTokenProvider(oidc, Configuration));
                 });
 
-                sc.AddSingleton<IMongoClientFactory>(sp =>
-                {
-                    return new MongoClientFactory(Configuration);
-                });
+                sc.AddSingleton<ISettingsProvider>(x=> new ConfigSettingsProvider("ClientOIDC", Configuration));
+                sc.AddSingleton<ISvcClientFactory, SvcClientFactory>();
+                sc.AddApiProvider(c => Configuration.GetSection("membership").Bind(c));
             }
         }
     }

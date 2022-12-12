@@ -1,0 +1,42 @@
+# spinnaker-role-and-rolebinding-target.yml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bldagnt
+  namespace: cluster-mgmt
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bldagnt-token
+  namespace: cluster-mgmt
+  annotations:
+    kubernetes.io/service-account.name: "bldagnt"
+type: kubernetes.io/service-account-token
+data: {}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bldagnt-role
+  namespace: comax-commons # Should be namespace you are granting access to
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bldagnt-rolebinding
+  namespace: comax-commons # Should be namespace you are granting access to
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: bldagnt-role # Should match name of Role
+subjects:
+- namespace: cluster-mgmt # Should match namespace where SA lives
+  kind: ServiceAccount
+  name: bldagnt # Should match service account name, above

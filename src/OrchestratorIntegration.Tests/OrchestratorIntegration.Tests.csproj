@@ -18,6 +18,7 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     <PackageReference Include="FluentAssertions" Version="6.7.0" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0-rc.1.22426.10" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.0" />
@@ -27,10 +28,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommonsSharedContracts\CommonsSharedContracts.csproj" />
-    <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
+    
     <ProjectReference Include="..\Node\Orchestrator.csproj" />
     <ProjectReference Include="..\Orchestrator.Client\Orchestrator.Client.csproj" />
     <ProjectReference Include="..\Shared.Tests\Shared.Tests.csproj" />
+    <ProjectReference Include="..\SOIGrain\SOIGrain.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="config.json">

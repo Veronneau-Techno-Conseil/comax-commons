@@ -20,6 +20,7 @@ using System.Text;
 using CommunAxiom.Commons.ClientUI.Server.Hubs;
 using CommunAxiom.Commons.Ingestion.Extentions;
 using Comax.Commons.Shared.OIDC;
+using Orleans;
 //                TODO: webBuilder.UseElectron(args);
 
 var builder = WebApplication.CreateBuilder(args);
@@ -67,7 +68,7 @@ builder.Services.AddSingleton<CommunAxiom.Commons.ClientUI.Server.Helper.ITempDa
 // Orleans client
 builder.Services.AddLogging(x => x.AddConsole());
 builder.Services.AddTransient<ITokenProvider, ClientTokenProvider>();
-builder.Services.AddSingleton<SecureTokenOutgoingFilter>();
+builder.Services.AddSingleton<IOutgoingGrainCallFilter, SecureTokenOutgoingFilter>();
 builder.Services.SetupOrleansClient();
 
 builder.Services.AddControllers();

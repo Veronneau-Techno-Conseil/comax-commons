@@ -14,5 +14,10 @@
   "PubSubStore": {
     "Name": "PubSubStore",
     "FileName": "./PubSubStore.db"
+  },
+  "client_mode": "local",
+  "membership": {
+    "host": "https://referee.communaxiom.org",
+    "cacheDuration": "00:05:00"
   }
 }

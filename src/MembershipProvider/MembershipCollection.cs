@@ -258,17 +258,17 @@ namespace Comax.Commons.Orchestrator.MembershipProvider
             this.logger = logger;
             this.options = options.Value;
             this.clusterId = clusterOptions.Value.ClusterId;
+            membershipCollection = new SingleMembershipCollection(
+                        mongoClient,
+                        this.options.DatabaseName,
+                        this.options.CollectionPrefix,
+                        this.options.CreateShardKeyForCosmos,
+                        this.options.CollectionConfigurator);
         }
 
         /// <inheritdoc />
         public Task InitializeMembershipTable(bool tryInitTableVersion)
-        {
-            membershipCollection = new SingleMembershipCollection(
-                        mongoClient,
-                        options.DatabaseName,
-                        options.CollectionPrefix, 
-                        options.CreateShardKeyForCosmos, 
-                        options.CollectionConfigurator);
+        {   
             return Task.CompletedTask;
         }
 

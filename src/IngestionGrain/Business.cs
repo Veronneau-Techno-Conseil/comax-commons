@@ -44,107 +44,103 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
             {
                 return await Task.FromResult(IngestionState.InProcess);
             }
+            
+            var broadcast = _grainFactory.GetGrain<IBroadcast>(_grainKey);
 
-            return await Task.Run(async () =>
+            try
             {
-                try
+                _ingestionState = IngestionState.Started;
+
+                await broadcast.Notify(new Shared.RuleEngine.Message
                 {
-                    _ingestionState = IngestionState.Started;
+                    From = "com://local/data/{dsid}",
+                    FromOwner = "ust://{usrid}",
+                    To = "local",
+                    Type = "INGESTION_STARTED",
+                    Scope = "PARTNERS",
+                    Payload = null!
+                });
+                
+                var dataSource = _grainFactory.GetGrain<IDatasource>(_grainKey);
 
-                    var broadcast = _grainFactory.GetGrain<IBroadcast>(_grainKey);
-                    await broadcast.Notify(new Shared.RuleEngine.Message
-                    {
-                        From = "com://local/data/{dsid}",
-                        FromOwner = "ust://{usrid}",
-                        To = "local",
-                        Type = "INGESTION_STARTED",
-                        Scope = "local",
-                        Payload = null
-                    });
+                var state = await dataSource.GetConfig();
 
-                    var dataSource = _grainFactory.GetGrain<IDatasource>(_grainKey);
-                    var state = await dataSource.GetConfig();
-
-                    var sourfceConfig = new SourceConfig
-                    {
-                        Configurations = state.Configurations,
-                        DataSourceType = state.DataSourceType
-                    };
-
-                    var result = await _importer.Import(sourfceConfig, state.Fields);
-
-                    var index = new DataIndex();
-
-
-                    // save rows
-                    for (int i = 0; i < result.Rows.Count; i++)
-                    {
-                        var identifier = $"{_grainKey}-data-{i}";
-                        index.Index.Add(new DataIndexItem { Id = identifier });
-                        var rowStorage = _grainFactory.GetGrain<IStorageGrain>(identifier);
-                        await rowStorage.SaveData(result.Rows[i]);
-                    }
-
-                    var storage = _grainFactory.GetGrain<IStorageGrain>($"{_grainKey}-index");
-
-                    // save errors
-                    for (int i = 0; i < result.Errors.Count; i++)
-                    {
-                        var identifier = $"{_grainKey}-err-{i}";
-                        index.Index.Add(new DataIndexItem { Id = identifier });
-                        var rowStorage = _grainFactory.GetGrain<IStorageGrain>(identifier);
-                        await rowStorage.SaveData(result.Errors[i].Item1);
-                    }
-
-                    var temp = JObject.FromObject(index);
-                    await storage.SaveData(temp);
-
-                    await _repo.AddHistory(new()
-                    {
-                        CreateDateTime = DateTime.UtcNow,
-                        IsSuccessful = true
-                    });
-
-                    await broadcast.Notify(new Shared.RuleEngine.Message
-                    {
-                        From = "com://local/data/{dsid}",
-                        FromOwner = "ust://{usrid}",
-                        To = "com://*",
-                        Type = "NEW_DATA_VERSION",
-                        Scope = "local",
-                        Payload = null
-                    });
-                }
-                catch (Exception ex)
+                var sourfceConfig = new SourceConfig
                 {
-                    await _repo.AddHistory(new()
-                    {
-                        CreateDateTime = DateTime.UtcNow,
-                        IsSuccessful = false,
-                        Exception = ex
-                    });
+                    Configurations = state.Configurations,
+                    DataSourceType = state.DataSourceType
+                };
 
-                    // TODO: added a notification when error happen
-                }
-                finally
+                var result = await _importer.Import(sourfceConfig, state.Fields);
+
+                var index = new DataIndex();
+
+                // save rows
+                for (int i = 0; i < result.Rows.Count; i++)
                 {
-                    _ingestionState = IngestionState.Completed;
-
-                    var broadcast = _grainFactory.GetGrain<IBroadcast>(_grainKey);
-                    await broadcast.Notify(new Shared.RuleEngine.Message
-                    {
-                        From = "com://local/data/{dsid}",
-                        FromOwner = "ust://{usrid}",
-                        To = "local",
-                        Type = "INGESTION_END",
-                        Scope = "local",
-                        Payload = null
-                    });
+                    var identifier = $"{_grainKey}-data-{i}";
+                    index.Index.Add(new DataIndexItem { Id = identifier });
+                    var rowStorage = _grainFactory.GetGrain<IStorageGrain>(identifier);
+                    await rowStorage.SaveData(result.Rows[i]);
                 }
 
-                return _ingestionState;
-            });
+                var storage = _grainFactory.GetGrain<IStorageGrain>($"{_grainKey}-index");
 
+                // save errors
+                for (int i = 0; i < result.Errors.Count; i++)
+                {
+                    var identifier = $"{_grainKey}-err-{i}";
+                    index.Index.Add(new DataIndexItem { Id = identifier });
+                    var rowStorage = _grainFactory.GetGrain<IStorageGrain>(identifier);
+                    await rowStorage.SaveData(result.Errors[i].Item1);
+                }
+
+                var temp = JObject.FromObject(index);
+                await storage.SaveData(temp);
+
+                await _repo.AddHistory(new()
+                {
+                    CreateDateTime = DateTime.UtcNow,
+                    IsSuccessful = true
+                });
+
+                await broadcast.Notify(new Shared.RuleEngine.Message
+                {
+                    From = "com://local/data/{dsid}",
+                    FromOwner = "ust://{usrid}",
+                    To = "com://*",
+                    Type = "NEW_DATA_VERSION",
+                    Scope = "PARTNERS",
+                    Payload = null!
+                });
+            }
+            catch (Exception ex)
+            {
+                await _repo.AddHistory(new()
+                {
+                    CreateDateTime = DateTime.UtcNow,
+                    IsSuccessful = false,
+                    Exception = ex
+                });
+
+                // TODO: added a notification when error happen
+            }
+            finally
+            {
+                _ingestionState = IngestionState.Completed;
+                
+                await broadcast.Notify(new Shared.RuleEngine.Message
+                {
+                    From = "com://local/data/{dsid}",
+                    FromOwner = "ust://{usrid}",
+                    To = "local",
+                    Type = "INGESTION_END",
+                    Scope = "PARTNERS",
+                    Payload = null!
+                });
+            }
+
+            return _ingestionState;
         }
     }
 }

@@ -70,9 +70,21 @@ spec:
           - name: gatewayPort
             value: "30001"
           - name: advertisedIp
+            {{- if not .Values.advertisedIp }}
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
+            {{- else }}
+            value: {{ .Values.advertisedIp }}
+            {{- end }}
+          - name: listeningEndpoint
+            {{- if not .Values.listeningEndpoint }}
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+            {{- else }}
+            value: {{ .Values.listeningEndpoint }}
+            {{- end }}
           # livenessProbe:
           #   httpGet:
           #     path: /

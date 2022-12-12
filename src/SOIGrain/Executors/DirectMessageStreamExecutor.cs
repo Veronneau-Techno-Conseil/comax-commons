@@ -24,7 +24,7 @@ namespace Comax.Commons.Orchestrator.SOIGrain.Executors
         public async Task Execute(Message param)
         {
             
-            var grain = _comaxGrainFactory.GetGrain<IUriRegistry>(MessageHelper.GetUserId(param.To));
+            var grain = _comaxGrainFactory.GetGrain<IUriRegistry>(param.To);
             var g = await grain.GetOrCreate();
             var strm = _streamProvider.GetStream<Message>(g, EventMailboxConstants.MAILBOX_STREAM_INBOUND_NS);
             await strm.OnNextAsync(param);

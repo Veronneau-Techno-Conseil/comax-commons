@@ -42,7 +42,7 @@ namespace CommunAxiom.Commons.Ingestion.Tests.Validators
             var actual = _fileConfigValidator.Validate(dataSourceConfiguration);
 
             actual.FieldName.Should().Be("file1");
-            actual.ErrorCode.Should().Be("The file type is required to set file name and file path");
+            actual.ErrorCode.Should().Be("File is not exists or file length is zero.");
         }
 
         [Test]

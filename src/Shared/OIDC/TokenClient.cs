@@ -48,6 +48,33 @@ namespace CommunAxiom.Commons.Shared.OIDC
             }
         }
 
+        public async Task<(bool, TokenData?)> RefreshToken(string refreshToken)
+        {
+            await this.Configure();
+
+            var res = await _httpClient.RequestRefreshTokenAsync(new RefreshTokenRequest
+            {
+                Address = TokenMetadata.TokenEndpoint,
+                RefreshToken = refreshToken,
+                ClientId = _settings.ClientId,
+                ClientSecret = _settings.Secret
+            });
+
+            if (res.HttpResponse.IsSuccessStatusCode)
+            {
+                return (true, new TokenData { access_token = res.AccessToken, expires_in = res.ExpiresIn, refresh_token = res.RefreshToken, token_type = res.TokenType });
+            }
+            else if (res.HttpResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return (false, null);
+            }
+            else
+            {
+                throw new Exception($"Unexpected result calling token endpoint: {res.HttpStatusCode}=> {res.HttpErrorReason}, {await res.HttpResponse.Content.ReadAsStringAsync()}");
+            }
+
+        }
+
         public async Task<(bool, TokenData?)> AuthenticateClient(string clientId, string secret, string scope)
         {
             await this.Configure();

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "comax-referee.fullname" . }}
+  labels:
+    {{- include "comax-referee.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 7287
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "comax-referee.selectorLabels" . | nindent 4 }}
+  {{- if .Values.service.loadBalancerClass }}
+  loadBalancerClass: {{.Values.service.loadBalancerClass}}
+  {{- end }}

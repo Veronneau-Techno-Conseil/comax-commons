@@ -1,12 +1,9 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
-using CommunAxiom.Commons.Ingestion.Attributes;
 using CommunAxiom.Commons.Ingestion.Extentions;
-using Newtonsoft.Json;
 
 namespace CommunAxiom.Commons.Ingestion.DataSource
 {
-    [DataSourceType(DataSourceType.FILE)]
     public class TextDataSourceReader : IDataSourceReader
     {
         private readonly IConfigValidatorLookup _configValidatorLookup;
@@ -18,12 +15,12 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
         {
             get
             {
-                if (_configurations == null && _configurations["content-type"] == null)
+                if (_configurations == null && _configurations["ContentType"] == null)
                 {
                     throw new NullReferenceException("Configurations is NULL!");
                 }
 
-                return _configurations["content-type"].Value.ToEnum<IngestorType>();
+                return _configurations["ContentType"].Value.ToEnum<IngestorType>();
             }
         }
 
@@ -39,44 +36,63 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
                 throw new NullReferenceException("There is no data source configuration!");
             }
 
-            var dataSourceConfiguration = _configurations.FirstOrDefault(x => x.Key == "SampleFile").Value;
+            var dataSourceConfiguration = _configurations.FirstOrDefault(x => x.Key == "FilePath").Value;
 
-            var file = JsonConvert.DeserializeObject<FileModel>(dataSourceConfiguration.Value);
-
-            if (file == null)
-            {
-                throw new NullReferenceException("File wasn't able to deserialized!");
-            }
-
-            return new FileStream(Path.Combine(file.Path, file.Name), FileMode.Open, FileAccess.Read);
-
+            return new FileStream(dataSourceConfiguration.Value, FileMode.Open, FileAccess.Read);
         }
+
+        /*
+         *
+        public Stream ReadSampleFile()
+        {
+            if (_configurations == null)
+            {
+                throw new NullReferenceException("There is no data source configuration!");
+            }
+        
+            var dataSourceConfiguration = _configurations.FirstOrDefault(x => x.Key == "SampleFile").Value;
+            
+            if (dataSourceConfiguration.Value == null)
+            {
+                throw new NullReferenceException("DataSource configuration file cannot be null.");
+            }
+        
+            return new MemoryStream(Encoding.UTF8.GetBytes(dataSourceConfiguration.Value));
+        }
+        *
+        */
 
         public void Setup(SourceConfig? sourceConfig = null)
         {
-            Dictionary<string, DataSourceConfiguration> configurations = new Dictionary<string, DataSourceConfiguration>();
+            var configurations = new Dictionary<string, DataSourceConfiguration>();
 
-            configurations.Add("content-type", new DataSourceConfiguration
+            configurations.Add("ContentType", new DataSourceConfiguration
             {
+                Name = "ContentType",
                 DisplayName = "Content Type",
-                Name = "content-type",
                 FieldType = ConfigurationFieldType.Lookup,
                 Value = "json",
-                Parameter = "['json', 'csv']"
+                Parameter = "['json', 'csv']",
+                IsReadonly = true,
+                Validators = _configValidatorLookup.Get(ConfigurationFieldType.Lookup)
             });
 
-            configurations.Add("SampleFile",
-                new DataSourceConfiguration { 
-                    DisplayName = "Sample File",
-                    Name = "SampleFile",
-                    FieldType = ConfigurationFieldType.File 
-                });
+            configurations.Add("SampleFile", new DataSourceConfiguration
+            {
+                Name = "SampleFile",
+                DisplayName = "Sample File",
+                FieldType = ConfigurationFieldType.File,
+                IsReadonly = true,
+                Validators = _configValidatorLookup.Get(ConfigurationFieldType.File, "required")
+            });
 
             configurations.Add("FilePath", new DataSourceConfiguration
             {
                 Name = "FilePath",
                 DisplayName = "File Path",
-                FieldType = ConfigurationFieldType.Text
+                FieldType = ConfigurationFieldType.Text,
+                IsReadonly = false,
+                Validators = _configValidatorLookup.Get(ConfigurationFieldType.Text, "required")
             });
 
 
@@ -84,9 +100,10 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
             {
                 foreach (var item in configurations.Keys)
                 {
-                    if (sourceConfig.Configurations.ContainsKey(item))
+                    if (sourceConfig.Configurations != null && sourceConfig.Configurations.ContainsKey(item))
                     {
-                        configurations[item] = sourceConfig.Configurations[item];
+                        configurations[item].Value = sourceConfig.Configurations[item].Value;
+                        configurations[item].DisplayValue = sourceConfig.Configurations[item].DisplayValue;
                     }
                 }
             }
@@ -98,11 +115,12 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
         {
             foreach (var configuration in _configurations.Values)
             {
-                foreach (var validator in _configValidatorLookup.ConfigValidators)
+                foreach (var validator in configuration.Validators)
                 {
                     yield return validator.Validate(configuration);
                 }
             }
         }
+        
     }
 }

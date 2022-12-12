@@ -28,6 +28,9 @@ namespace OrchestratorIntegration.Tests
 
         public async Task<string> FetchToken()
         {
+            if (Cluster.NoAuth)
+                return "";
+
             if(_tokens.ContainsKey(_userContract.username))
                 return _tokens[_userContract.username];
             var (res,token) = await _tokenClient.AuthenticatePassword(_userContract.username, _userContract.password);

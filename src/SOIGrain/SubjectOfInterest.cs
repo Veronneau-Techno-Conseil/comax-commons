@@ -20,7 +20,7 @@ namespace Comax.Commons.Orchestrator.SOIGrain
         {
             //TODO: Validate message from against authenticated user
             var comaxGrainFactory = new CommunAxiom.Commons.Orleans.GrainFactory(GrainFactory);
-            SOIBroadcastRulesEngine broadcastRulesEngine = new SOIBroadcastRulesEngine(this.GetUser(), this.GetStreamProvider(Constants.ImplicitStream), comaxGrainFactory);
+            SOIBroadcastRulesEngine broadcastRulesEngine = new SOIBroadcastRulesEngine(this.GetUser(), this.GetStreamProvider(CommunAxiom.Commons.Orleans.Constants.ImplicitStream), comaxGrainFactory);
             var r = broadcastRulesEngine.Validate(message);
             if (r.IsError)
                 return r;
