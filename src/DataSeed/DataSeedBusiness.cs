@@ -55,8 +55,8 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
                 var rowStorage = result.Rows[i];
             }
             //save indexes into DataSeedGrain
-            var temp;            
-            await _dataSeedRepo.Save(temp);
+            //var temp;            
+            //await _dataSeedRepo.Save(temp);
             //upload the rows into DataChunkGrain
         }
 

@@ -106,24 +106,7 @@ namespace CommunAxiom.Commons.Client.Silo
                     {
                         return sp.GetService<ClientManager>().Client;
                     });
-					//END TODO
-
-                    // data sources
-
-                    services.AddScoped<TextDataSourceReader>();
-            
-                    services.AddTransient<Func<DataSourceType, IDataSourceReader>>(provider => key =>
-                    {
-                        switch (key)
-                        {
-                            case DataSourceType.FILE:
-                                return provider.GetService<TextDataSourceReader>();
-                            case DataSourceType.API:
-                                return null;
-                        }
-
-                        return null;
-                    });
+					//END TODO                    
                     
                 })
                 //configure application parts for each grain

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CommunAxiom.Commons.CommonsShared.Contracts.DataSeed
+namespace CommunAxiom.Commons.CommonsShared.Contracts.DataChunk
 {
     public class DataChunk
     {

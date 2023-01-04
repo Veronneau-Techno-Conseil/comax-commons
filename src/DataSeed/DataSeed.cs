@@ -1,5 +1,4 @@
 ﻿using CommunAxiom.Commons.CommonsShared.Contracts.DataSeed;
-using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
 using Orleans;
 using Orleans.Runtime;
 using System;
@@ -9,10 +8,10 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
 {
     public class DataSeed : Grain, IDataSeed
     {
-        private readonly IPersistentState<DataSeedState> _storageState;
-        public DataSeed([PersistentState("dataSeedGrain")] IPersistentState<DataSeedState> storageState)
+        private readonly IPersistentState<DataSeedState> _dataSeedState;
+        public DataSeed([PersistentState("dataSeedGrain")] IPersistentState<DataSeedState> dataSeedState)
         {
-            _storageState = storageState;
+            _dataSeedState = dataSeedState;
         }
         public DataSeedBusiness _dataSeedBusiness;
 
