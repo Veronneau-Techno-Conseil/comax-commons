@@ -9,6 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+using Comax.Commons.Orchestrator.DataChunkGrain;
+using CommunAxiom.Commons.CommonsShared.Contracts.DataChunk;
+using Orleans;
 
 namespace Comax.Commons.Orchestrator.DataSeedGrain
 {
@@ -24,7 +28,7 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
             _grainKey = grainKey;
         }
 
-        public void Init(IPersistentState<DataSeedState> dsState)
+        public void Init(IPersistentState<DataSeedObject> dsState)
         {
             _dataSeedRepo = new DataSeedRepo(dsState);
         }
@@ -41,29 +45,43 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
             var storageGuid = FetchGuid(dsUri).ToString();
             var grain = _comaxGrainFactory.GetGrain<IStorageGrain>(storageGuid);
             var data = await grain.GetData();
-            DataSeedResult result = new DataSeedResult(data);
+            DataSeedResult result = new DataSeedResult(new DataSeedObject(Guid.Parse(storageGuid), data));
             return result;
         }
 
-        public async Task BuildIndexesAndRows(DataSeedResult result)
+        public async Task<List<DataSeedObject>> BuildIndexes(DataSeedResult dsResult)
         {
             var index = new DataIndex();
-            for(int i=0; i < result.Rows.Count; i++)
+            var dsDataList = new List<DataSeedObject>();
+            // upload indexes into DataSeedGrain
+            for(int i=0; i < dsResult.DS.Count; i++)
             {
-                var identifier = $"{_grainKey}-data-{i}";
-                index.Index.Add(new DataIndexItem { Id= identifier });
-                var rowStorage = result.Rows[i];
+                var dsData = new DataSeedObject();
+                var identifier = $"{_grainKey}-index";
+                var indexStorage = _comaxGrainFactory.GetGrain<IDataSeed>(Guid.Parse(identifier));
+                dsData.Id = indexStorage.GetPrimaryKey();
+                dsData.Index = JObject.FromObject(dsResult.DS[i]);
+                dsDataList.Add(dsData);
             }
-            //save indexes into DataSeedGrain
-            //var temp;            
-            //await _dataSeedRepo.Save(temp);
-            //upload the rows into DataChunkGrain
+            return dsDataList;
         }
-
-
-        //read and deserialize indexes
-        //build DataIndex object, save to state
-        //send index to DataSeed, send row to DataChunk
-
+        public async Task<List<DataChunkObject>> BuildRows(DataChunkResult dcResult)
+        {
+            //upload the rows into DataChunkGrain
+            var dcDataList = new List<DataChunkObject>();
+            for (int i = 0; i < dcResult.DC.Count; i++)
+            {
+                var dcData = new DataChunkObject();
+                var identifier = $"{_grainKey}-data-{i}";
+                var dataStorage = _comaxGrainFactory.GetGrain<IDataChunk>(identifier);
+                dcData.Id = dataStorage.GetPrimaryKey();
+                identifier = $"{_grainKey}-index";
+                var indexStorage = _comaxGrainFactory.GetGrain<IDataSeed>(Guid.Parse(identifier));
+                dcData.IdDataSeed = indexStorage.GetPrimaryKey();
+                dcData.Data = JObject.FromObject(dcResult.DC[i]);
+                dcDataList.Add(dcData);
+            }
+            return dcDataList;
+        }
     }
 }

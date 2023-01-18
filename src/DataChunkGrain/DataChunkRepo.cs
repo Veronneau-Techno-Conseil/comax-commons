@@ -10,18 +10,18 @@ namespace Comax.Commons.Orchestrator.DataChunkGrain
 {
     public class DataChunkRepo
     {
-        private readonly IPersistentState<DataChunkState> _state;
-        public DataChunkRepo(IPersistentState<DataChunkState> state)
+        private readonly IPersistentState<DataChunkObject> _state;
+        public DataChunkRepo(IPersistentState<DataChunkObject> state)
         {
             _state = state;
         }
-        public async Task<DataChunkState> Fetch()
+        public async Task<DataChunkObject> Fetch()
         {
             await _state.ReadStateAsync();
             return _state.State;
         }
 
-        public async Task Save(DataChunkState value)
+        public async Task Save(DataChunkObject value)
         {
             _state.State = value;
             await _state.WriteStateAsync();

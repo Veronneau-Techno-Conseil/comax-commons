@@ -6,6 +6,6 @@ namespace CommunAxiom.Commons.CommonsShared.Contracts.DataChunk
 {
     public class DataChunkState
     {
-        public List<DataChunk> DataChunks { get; set; } = new List<DataChunk>();
+        public List<DataChunkObject> DataChunks { get; set; } = new List<DataChunkObject>();
     }
 }

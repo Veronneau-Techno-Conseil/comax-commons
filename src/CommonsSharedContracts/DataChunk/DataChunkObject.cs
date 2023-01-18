@@ -5,10 +5,10 @@ using System.Text;
 
 namespace CommunAxiom.Commons.CommonsShared.Contracts.DataChunk
 {
-    public class DataChunk
+    public class DataChunkObject
     {
-        public int Index { get; set; }
+        public Guid Id { get; set; }
         public JObject Data { get; set; }
-        public Guid DataSeedId { get; set; }
+        public Guid IdDataSeed { get; set; }
     }
 }

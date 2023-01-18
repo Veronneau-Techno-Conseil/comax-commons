@@ -9,7 +9,7 @@ namespace CommunAxiom.Commons.CommonsShared.Contracts.DataChunk
 {
     public interface IDataChunk : IGrainWithStringKey
     {
-        Task SaveData(DataChunkState value);
-        Task<DataChunkState> GetData();
+        Task SaveData(DataChunkObject value);
+        Task<DataChunkObject> GetData();
     }
 }
