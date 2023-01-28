@@ -28,7 +28,7 @@ using CommunAxiom.Commons.Client.Contracts.Grains.DataStateMonitor;
 using CommunAxiom.Commons.Client.Contracts.Grains.DateStateMonitorSupervisor;
 using CommunAxiom.Commons.Client.Contracts.Grains.Dispatch;
 using CommunAxiom.Commons.Client.Grains.DataStateMonitorGrain;
-using CommunAxiom.Commons.Client.Grains.DateStateMonitorSupervisorGrain;
+
 using CommunAxiom.Commons.Client.Grains.DispatchGrain;
 using CommunAxiom.Commons.Client.Grains.StorageGrain;
 using CommunAxiom.Commons.Ingestion.Extentions;
@@ -52,6 +52,7 @@ using CommunAxiom.Commons.Client.AgentService;
 using Comax.Commons.Orchestrator.MailGrain;
 using ExplorerGrain;
 using CommunAxiom.Commons.Client.Grains.BroadcastGrain;
+using CommunAxiom.Commons.Client.Grains.DataStateMonitorSupervisorGrain;
 
 namespace CommunAxiom.Commons.Client.Silo
 {
@@ -118,7 +119,7 @@ namespace CommunAxiom.Commons.Client.Silo
                     services.AddSingleton<IDispatch, Dispatch>();
                     services.AddSingleton<IBroadcast, Grains.BroadcastGrain.Broadcast>();
                     services.AddSingleton<IDataStateMonitor, DataStateMonitor>();
-                    services.AddSingleton<IDateStateMonitorSupervisor, DateStateMonitorSupervisor>();
+                    services.AddSingleton<IDataStateMonitorSupervisor, DataStateMonitorSupervisor>();
                     services.AddSingleton<IAgentIntegration, AgentIntegrationAccessor>();
                     services.AddSingleton<ISettingsProvider, ConfigSettingsProvider>(sp =>
                     {
@@ -153,7 +154,7 @@ namespace CommunAxiom.Commons.Client.Silo
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Scheduler).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(StorageGrain).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DataStateMonitor).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DateStateMonitorSupervisor).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DataStateMonitorSupervisor).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Agent).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(EventMailbox).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Mail).Assembly).WithReferences())

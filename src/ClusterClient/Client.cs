@@ -45,9 +45,9 @@ namespace CommunAxiom.Commons.Client.ClusterClient
             if (!_disposed) { Dispose(); }
         }
 
-        public IDateStateMonitorSupervisor GetDateStateMonitorSupervisor()
+        public IDataStateMonitorSupervisor GetDateStateMonitorSupervisor()
         {
-            return _clusterClient.GetGrain<IDateStateMonitorSupervisor>(Guid.Empty);
+            return _clusterClient.GetGrain<IDataStateMonitorSupervisor>(Guid.Empty);
         }
 
         public IAccount GetAccount()

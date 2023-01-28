@@ -28,9 +28,9 @@ namespace CommunAxiom.Commons.Client.AgentClusterRuntime
 {
     public static class Client 
     {
-        public static IDateStateMonitorSupervisor GetDateStateMonitorSupervisor(this IComaxGrainFactory grainFactory)
+        public static IDataStateMonitorSupervisor GetDateStateMonitorSupervisor(this IComaxGrainFactory grainFactory)
         {
-            return grainFactory.GetGrain<IDateStateMonitorSupervisor>(Guid.Empty);
+            return grainFactory.GetGrain<IDataStateMonitorSupervisor>(Guid.Empty);
         }
 
         public static IAccount GetAccount(this IComaxGrainFactory grainFactory)

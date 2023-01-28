@@ -67,8 +67,10 @@ namespace Shared.Tests.FlowControl
                 var afc = ExecutionContext.SuppressFlow();
                 var res = Task.Run(() =>
                 {
-                    if (_contract.Value == null)
-                        return null;
+                    _contract.Value = new Contract
+                    {
+                        Value = "Some other value"
+                    };
                     return _contract.Value.Value;
                 }).ConfigureAwait(true).GetAwaiter().GetResult();
                 afc.Undo();

@@ -22,7 +22,7 @@ namespace CommunAxiom.Commons.Client.Contracts.ComaxSystem
 {
     public interface ICommonsClusterClient: IDisposable
     {
-        IDateStateMonitorSupervisor GetDateStateMonitorSupervisor();
+        IDataStateMonitorSupervisor GetDateStateMonitorSupervisor();
         IAccount GetAccount();
         IAgent GetAgent();
         IAuthentication GetAuthentication();

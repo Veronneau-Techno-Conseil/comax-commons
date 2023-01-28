@@ -9,7 +9,7 @@ using Orleans.Runtime;
 namespace CommunAxiom.Commons.Client.Grains.DataStateMonitorSupervisorGrain
 {
     [Reentrant]
-    public class DataStateMonitorSupervisor : Grain, IDateStateMonitorSupervisor, IDisposable
+    public class DataStateMonitorSupervisor : Grain, IDataStateMonitorSupervisor, IDisposable
     {
         private IDisposable _dataStateTimer = null!;
         
