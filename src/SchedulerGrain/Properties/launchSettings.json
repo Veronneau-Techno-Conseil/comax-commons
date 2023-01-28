@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "SchedulerGrain": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:8035;http://localhost:8036"
+    }
+  }
+}

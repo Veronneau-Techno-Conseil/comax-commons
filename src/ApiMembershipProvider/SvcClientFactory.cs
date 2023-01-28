@@ -5,18 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using CommunAxiom.Commons.Shared.OIDC;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
-namespace Comax.Commons.Orchestrator.ApiMembershipProvider
+namespace Comax.Commons.CommonsShared.ApiMembershipProvider
 {
     public class SvcClientFactory : ISvcClientFactory
     {
         private readonly ISettingsProvider _settingsProvider;
-        private readonly IConfiguration _configuration;
+        private readonly ApiMembershipConfig _configuration;
 
-        public SvcClientFactory(ISettingsProvider settingsProvider, IConfiguration configuration)
+        public SvcClientFactory(IOptions<ApiMembershipConfig> apiMembershipConfig, ISettingsProvider settingsProvider)
         {
             _settingsProvider = settingsProvider;
-            _configuration = configuration;
+            _configuration = apiMembershipConfig.Value;
         }
 
         private TokenData tokenData = null;
@@ -36,7 +37,7 @@ namespace Comax.Commons.Orchestrator.ApiMembershipProvider
             }
             var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenData?.access_token);
-            ApiRef.RefereeSvc refereeSvc = new ApiRef.RefereeSvc(_configuration["membership:host"], client);
+            ApiRef.RefereeSvc refereeSvc = new ApiRef.RefereeSvc(_configuration.Host, client);
             return refereeSvc;
         }
     }

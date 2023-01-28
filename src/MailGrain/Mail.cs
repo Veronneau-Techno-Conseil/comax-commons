@@ -12,15 +12,18 @@ namespace Comax.Commons.Orchestrator.MailGrain
     public class Mail : Grain, IMail
     {
         private IPersistentState<Message> _storageState;
-        public Mail([PersistentState("mailGrain")] IPersistentState<Message> storageState)
+        public Mail([PersistentState("Message")] IPersistentState<Message> storageState)
         {
             _storageState = storageState;
         }
 
         public async Task Delete()
         {
-            await _storageState.ReadStateAsync();
-            await _storageState.ClearStateAsync();
+            if (_storageState.RecordExists)
+            {
+                await _storageState.ReadStateAsync();
+                await _storageState.ClearStateAsync();
+            }
         }
 
         public async Task<bool> Exists()

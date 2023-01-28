@@ -12,5 +12,6 @@ namespace CommunAxiom.Commons.Client.Contracts.ComaxSystem
         Task<TResult> WithClusterClient<TResult>(Func<ICommonsClusterClient, Task<TResult>> action);
         Task<ICommonsClusterClient> WithUnmanagedClient(Func<ICommonsClusterClient, Task> action);
         Task<(ICommonsClusterClient, TResult)> WithUnmanagedClient<TResult>(Func<ICommonsClusterClient, Task<TResult>> action);
+        Task<ICommonsClusterClient> GetUnmanagedClient();
     }
 }

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "CentralGrain": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:8045;http://localhost:8046"
+    }
+  }
+}

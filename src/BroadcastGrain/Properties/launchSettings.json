@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "BroadcastGrain": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:8037;http://localhost:8038"
+    }
+  }
+}

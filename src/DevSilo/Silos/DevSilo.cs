@@ -23,17 +23,18 @@ using ReplicationGrain;
 using System.Threading.Tasks;
 using CommunAxiom.Commons.Client.Contracts.Grains.Dispatch;
 using CommunAxiom.Commons.Client.Grains.DispatchGrain;
+using System;
 
 namespace CommunAxiom.Commons.Client.DevSilo.Silos
 {
-    internal class DevSilo
+    internal class DevSilo: IDisposable
     {
-        static ISiloHost _silo;
+        ISiloHost _silo;
 
-        public static ISiloHost Host { get { return _silo; } }
-        public static bool IsSiloStarted { get; private set; }
+        public ISiloHost Host { get { return _silo; } }
+        public bool IsSiloStarted { get; private set; }
 
-        public static async Task StartSilo()
+        public async Task StartSilo()
         {
             if (IsSiloStarted)
             {
@@ -41,7 +42,7 @@ namespace CommunAxiom.Commons.Client.DevSilo.Silos
             }
             // define the cluster configuration
             var builder = new SiloHostBuilder()
-                .SetDefaults(out var conf)
+                .SetDefaults(out var conf, "./config.json")
                 .UseDashboard()
                 .ConfigureServices(services =>
                 {
@@ -56,7 +57,7 @@ namespace CommunAxiom.Commons.Client.DevSilo.Silos
                     services.AddSingleton<IDatasource, Datasources>();
                     services.AddSingleton<IDataTransfer, DataTransfer>();
                     services.AddSingleton<IIngestion, Ingestions>();
-                    services.AddSingleton<IPortfolio, Portfolios>();
+                    services.AddSingleton<IPortfolio, PortfolioGrain.Portfolio>();
                     services.AddSingleton<IProject, Projects>();
                     services.AddSingleton<IReplication, Replications>();
                     services.AddSingleton<IDispatch, Dispatch>();
@@ -68,7 +69,7 @@ namespace CommunAxiom.Commons.Client.DevSilo.Silos
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Datasources).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DataTransfer).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Ingestions).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Portfolios).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(PortfolioGrain.Portfolio).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Projects).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Replications).Assembly).WithReferences());
 
@@ -83,7 +84,7 @@ namespace CommunAxiom.Commons.Client.DevSilo.Silos
             
         }
 
-        public static async Task StopSilo()
+        public async Task StopSilo()
         {
             if (IsSiloStarted)
             {
@@ -91,6 +92,11 @@ namespace CommunAxiom.Commons.Client.DevSilo.Silos
                 _silo.Dispose();
                 _silo = null;
             }
+        }
+
+        public void Dispose()
+        {
+            _silo.Dispose();
         }
     }
 }

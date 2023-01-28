@@ -1,7 +1,7 @@
 using Blazorise;
 using Blazorise.Bulma;
 using Blazorise.Icons.FontAwesome;
-using ClusterClient;
+using CommunAxiom.Commons.Client.ClusterClient;
 using CommunAxiom.Commons.ClientUI.Server.Helper;
 using CommunAxiom.Commons.ClientUI.Server.Models;
 using CommunAxiom.Commons.ClientUI.Server.SEO;
@@ -19,9 +19,9 @@ using Microsoft.AspNetCore.ResponseCompression;
 using System.Text;
 using CommunAxiom.Commons.ClientUI.Server.Hubs;
 using CommunAxiom.Commons.Ingestion.Extentions;
-using Comax.Commons.Shared.OIDC;
+using CommunAxiom.Commons.Shared.OIDC;
 using Orleans;
-//                TODO: webBuilder.UseElectron(args);
+//  TODO: webBuilder.UseElectron(args);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,19 +57,16 @@ builder.Services.AddSingleton<IHostEnvironment>(
 var applicationSettingsSection = builder.Configuration;
 builder.Services.Configure<ApplicationSettings>(options => { applicationSettingsSection.Bind(options); });
 
-
-
 // SEO Services
 builder.Services.AddScoped<MetadataTransferService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<CommunAxiom.Commons.ClientUI.Server.Helper.ITempData, CommunAxiom.Commons.ClientUI.Server.Helper.TempStorage>();
 
-
 // Orleans client
 builder.Services.AddLogging(x => x.AddConsole());
 builder.Services.AddTransient<ITokenProvider, ClientTokenProvider>();
 builder.Services.AddSingleton<IOutgoingGrainCallFilter, SecureTokenOutgoingFilter>();
-builder.Services.SetupOrleansClient();
+builder.Services.SetupOrleansClient("./appsettings.json");
 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(c =>
@@ -116,13 +113,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BlazingChat.WebAPI v1"));
-
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseCors();
-
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

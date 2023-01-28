@@ -11,7 +11,7 @@ namespace CommunAxiom.Commons.Client.Grains.StorageGrain
     {
         private readonly IPersistentState<JObject> _storageState;
         private readonly Repo _repo;
-        public StorageGrain([PersistentState("storageGrain", Constants.Storage.JObjectStore)] IPersistentState<JObject> storageState)
+        public StorageGrain([PersistentState("storageGrain", OrleansConstants.Storage.JObjectStore)] IPersistentState<JObject> storageState)
         {
             _storageState = storageState;
             _repo = new Repo(storageState);

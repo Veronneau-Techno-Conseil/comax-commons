@@ -55,6 +55,7 @@ namespace Comax.Commons.StorageProvider
             {
                 collection.Delete(grain);
             }
+            grainState.RecordExists = false;
         }
 
         public Task ReadStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
@@ -70,6 +71,7 @@ namespace Comax.Commons.StorageProvider
                     return;
                 }
 
+                grainState.RecordExists = true;
                 dynamic obj = BsonMapper.Global.Deserialize(typeof(GrainStorageModel<>).MakeGenericType(grainState.Type), grain);
 
                 grainState.State = obj.Contents;
@@ -99,6 +101,7 @@ namespace Comax.Commons.StorageProvider
 
                 var doc = BsonMapper.Global.Serialize(typeof(GrainStorageModel<>).MakeGenericType(grainState.Type), obj);
                 collection.Upsert(doc.AsDocument);
+                grainState.RecordExists = true;
             });
         }
 

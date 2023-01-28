@@ -10,8 +10,7 @@ namespace CommunAxiom.Commons.Client.Contracts.Grains.Agent
     public interface IAgent: IGrainWithGuidKey
     {
         Task IAmAlive();
-
-        Task<OrchestratorConnectionState> GetOrchestratorConnectionState();
+        Task EnsureStarted();
         Task<UserAuthState> GetCommonsAuthState();
         Task<UserAuthState> GetCurrentUserAuthState();
     }

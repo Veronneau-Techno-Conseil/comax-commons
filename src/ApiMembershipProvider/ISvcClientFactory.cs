@@ -1,6 +1,6 @@
-﻿using Comax.Commons.Orchestrator.ApiMembershipProvider.ApiRef;
+﻿using Comax.Commons.CommonsShared.ApiMembershipProvider.ApiRef;
 
-namespace Comax.Commons.Orchestrator.ApiMembershipProvider
+namespace Comax.Commons.CommonsShared.ApiMembershipProvider
 {
     public interface ISvcClientFactory
     {

@@ -26,7 +26,7 @@ namespace SchedulerGrain
 
         public override Task OnActivateAsync()
         {
-            _schedulerBusiness = new SchedulerBusiness(new GrainFactory(this.GrainFactory));
+            _schedulerBusiness = new SchedulerBusiness(new GrainFactory(this.GrainFactory, this.GetStreamProvider));
             _schedulerBusiness.Init(_scheduler, _schedulersList);
             _delayDeActivation = RegisterTimer(x => DelayGrainDeactivation(), true,
                 TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(5)); //Consider changing the timer frequency if needed

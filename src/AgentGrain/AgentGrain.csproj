@@ -18,10 +18,10 @@
 	  <PackageReference Include="ThrottleDebounce" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AgentService\AgentService.csproj" />
-    <ProjectReference Include="..\ClusterEventStream\ClusterEvent.csproj" />
+    <ProjectReference Include="..\AgentClusterRuntime\AgentClusterRuntime.csproj" />
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
+    <ProjectReference Include="..\Orleans\Orleans.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Orleans_CodeGenInputs Remove="AgentBusiness.cs" />

@@ -1,9 +1,11 @@
 using Blazored.Toast.Services;
 using Blazorise;
+using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.ClientUI.Shared.Extensions;
 using CommunAxiom.Commons.ClientUI.Shared.Helper;
 using CommunAxiom.Commons.ClientUI.Shared.Models;
+using CommunAxiom.Commons.ClientUI.Shared.ViewModels;
 using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces;
 using CommunAxiom.Commons.Ingestion;
 using CommunAxiom.Commons.Ingestion.DataSource;
@@ -42,7 +44,7 @@ namespace ClientUI.Components.Portfolio
 
         private void OnChangeType(string type)
         {
-            ModalViewModel.Type = type;
+            ModalViewModel.Type = (PortfolioType)Enum.Parse(typeof(PortfolioType), type);
         }
 
         private void OnSelectedTab(string tabName)
@@ -148,7 +150,7 @@ namespace ClientUI.Components.Portfolio
                 Id = newPortfolio.ID,
                 Text = newPortfolio.Name,
                 ParentId = newPortfolio.ParentId,
-                Type = Enum.Parse<PortfolioType>(newPortfolio.Type)
+                Type = newPortfolio.Type
             });
 
             ClearModel();
@@ -168,7 +170,7 @@ namespace ClientUI.Components.Portfolio
             ModalViewModel.ID = Guid.Empty;
             ModalViewModel.ParentId = Guid.Empty;
             ModalViewModel.Name = string.Empty;
-            ModalViewModel.Type = _types[0];
+            ModalViewModel.Type = CommunAxiom.Commons.Client.Contracts.Grains.Portfolio.PortfolioType.Folder;
         }
 
         [Inject] public IDataSourceFactory DataSourceFactory { get; set; }
@@ -181,7 +183,7 @@ namespace ClientUI.Components.Portfolio
         protected override async Task OnInitializedAsync()
         {
             _types = PortfolioViewModel.GetPortfolioTypes();
-            ModalViewModel.Type = _types[0];
+            ModalViewModel.Type = PortfolioType.Folder;
 
             SelectedDataSource = DataSourceType.File;
 

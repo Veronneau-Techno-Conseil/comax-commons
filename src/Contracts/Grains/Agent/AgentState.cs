@@ -11,6 +11,5 @@ namespace CommunAxiom.Commons.Client.Contracts.Grains.Agent
         }
 
         public List<UserAuthState> UserAuthStates { get; set; } = new List<UserAuthState>();
-        public OrchestratorConnectionState OrchestratorConnectionState { get; set; } = new OrchestratorConnectionState();
     }
 }

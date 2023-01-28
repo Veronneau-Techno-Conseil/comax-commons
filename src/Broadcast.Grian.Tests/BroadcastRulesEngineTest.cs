@@ -4,6 +4,7 @@ using NUnit.Framework;
 using FluentAssertions;
 using IStreamProvider = Orleans.Streams.IStreamProvider;
 using CommunAxiom.Commons.Shared.RuleEngine;
+using CommunAxiom.Commons.Shared.RulesEngine;
 
 namespace Broadcast.Grian.Tests
 {
@@ -38,8 +39,8 @@ namespace Broadcast.Grian.Tests
                 From = "com://local",
                 FromOwner = "ust://{usrid}",
                 To = "com://*",
-                Type = "NEW_DATA_VERSION",
-                Scope = "PARTNERS"
+                Type = MessageTypes.CommonsAgentEvents.MSG_TYPE_NEW_DATA,
+                Scope = MessageScopes.MSG_SCOPE_PARTNERS
             };
 
             var result = _broadcastRulesEngine.ExtractValues(message);
@@ -49,8 +50,8 @@ namespace Broadcast.Grian.Tests
             result[0].Should().Be("com://local");
             result[1].Should().Be("ust://{usrid}");
             result[2].Should().Be("com://*");
-            result[3].Should().Be("NEW_DATA_VERSION");
-            result[4].Should().Be("PARTNERS");
+            result[3].Should().Be(MessageTypes.CommonsAgentEvents.MSG_TYPE_NEW_DATA);
+            result[4].Should().Be(MessageScopes.MSG_SCOPE_PARTNERS);
         }
 
         [Test]
@@ -97,8 +98,8 @@ namespace Broadcast.Grian.Tests
                 From = "com://local",
                 FromOwner = "ust://{usrid}",
                 To = "com://*",
-                Type = "NEW_DATA_VERSION",
-                Scope = "PARTNERS"
+                Type = MessageTypes.CommonsAgentEvents.MSG_TYPE_NEW_DATA,
+                Scope = MessageScopes.MSG_SCOPE_PARTNERS
             };
 
             var result = _broadcastRulesEngine.Validate(message);

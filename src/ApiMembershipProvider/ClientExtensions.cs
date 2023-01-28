@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Comax.Commons.Orchestrator.ApiMembershipProvider
+namespace Comax.Commons.CommonsShared.ApiMembershipProvider
 {
     public static class MongoDBClientExtensions
     {
@@ -16,37 +16,27 @@ namespace Comax.Commons.Orchestrator.ApiMembershipProvider
         /// <summary>
         /// Configure client to use MongoGatewayListProvider
         /// </summary>
-        public static IClientBuilder UseApiClustering(this IClientBuilder builder,
-            Action<ApiMembershipClientConfig> configurator = null)
+        public static IClientBuilder UseApiClustering(this IClientBuilder builder, Action<ApiMembershipConfig> configurator = null)
         {
-            return builder.ConfigureServices(services => services.AddApiProvider(configurator));
+            return builder.ConfigureServices(services => services.AddApiProvider<SvcClientFactory>(configurator));
         }
 
-        /// <summary>
-        /// Configure client to use MongoGatewayListProvider
-        /// </summary>
-        public static IClientBuilder UseMongoDBClustering(this IClientBuilder builder,
-            IConfiguration configuration)
+        public static IClientBuilder UseApiClustering<TSvcClientFactory>(this IClientBuilder builder, Action<ApiMembershipConfig> configurator = null) 
+            where TSvcClientFactory : class, ISvcClientFactory
         {
-            return builder.ConfigureServices(services => services.AddApiProvider(configuration));
+            return builder.ConfigureServices(services => services.AddApiProvider<TSvcClientFactory>(configurator));
         }
 
-        public static IServiceCollection AddApiProvider(this IServiceCollection services,
-            Action<ApiMembershipClientConfig> configurator = null)
+
+        internal static IServiceCollection AddApiProvider<TSvcClientFactory>(this IServiceCollection services,
+            Action<ApiMembershipConfig> configurator = null) where TSvcClientFactory : class, ISvcClientFactory
         {
             services.Configure(configurator ?? (x => { }));
             services.AddSingleton<IGatewayListProvider, ApiGatewayListProvider>();
+            services.AddSingleton<ISvcClientFactory, TSvcClientFactory>();
 
             return services;
         }
 
-        public static IServiceCollection AddApiProvider(this IServiceCollection services,
-            IConfiguration configuration)
-        {
-            services.Configure<ApiMembershipClientConfig>(configuration);
-            services.AddSingleton<IGatewayListProvider, ApiGatewayListProvider>();
-
-            return services;
-        }
     }
 }

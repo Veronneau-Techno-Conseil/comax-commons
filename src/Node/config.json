@@ -23,7 +23,12 @@
   "advertisedIp": "127.0.0.1",
   "listeningEndpoint": "0.0.0.0",
 
-  "membership": {
-    "host": "https://referee.communaxiom.org"
+  "Membership": {
+    "Host": "https://referee.communaxiom.org",
+    "cacheDuration": "00:05:00"
+  },
+  "ClusterSettings": {
+    "PortfolioSyncInterval": "30000",
+    "PortfolioSyncReminderInterval": "5000"
   }
 }

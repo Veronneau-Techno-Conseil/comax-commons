@@ -1,4 +1,4 @@
-﻿using Comax.Commons.Shared.OIDC;
+﻿using CommunAxiom.Commons.Shared.OIDC;
 
 namespace CommunAxiom.Commons.ClientUI.Server.Helper
 {

@@ -17,6 +17,8 @@ using CommunAxiom.Commons.CommonsShared.Contracts.UriRegistry;
 using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
 using Comax.Commons.Orchestrator.Contracts.PublicBoard;
 using Microsoft.Extensions.Logging;
+using Comax.Commons.Orchestrator.Contracts.CommonsActor;
+using Comax.Commons.Orchestrator.Contracts.Portfolio;
 
 namespace Comax.Commons.Orchestrator.Client
 {
@@ -28,7 +30,7 @@ namespace Comax.Commons.Orchestrator.Client
         private readonly HandlerToDelegateRelay _onDisconnectRelay;
         private bool _connected = true;
 
-        private Guid? _userID = null;
+        private UserTuple? _currentUser = null;
         public Client(IClusterClient clusterClient, ILogger<Client> logger, HandlerToDelegateRelay onDisconnectRelay)
         {
             _clusterClient = clusterClient;
@@ -59,16 +61,16 @@ namespace Comax.Commons.Orchestrator.Client
         }
 
 
-        private async Task<Guid> LoadUserId()
+        private async Task<UserTuple> LoadUser()
         {
-            if (_userID == null)
-                _userID = await this.GetUriRegistry("").GetOrCreate();
-            return _userID.Value;
+            if (_currentUser == null)
+                _currentUser = await this.GetUriRegistry("").GetCurrentUser();
+            return _currentUser;
         }
 
         public IUriRegistry GetUriRegistry(string id)
         {
-            string actual = Constants.BLANK_ID;
+            string actual = OrleansConstants.BLANK_ID;
             if (!string.IsNullOrWhiteSpace(id))
             {
                 if (!id.StartsWith("usr://") && !id.StartsWith("com://"))
@@ -84,15 +86,27 @@ namespace Comax.Commons.Orchestrator.Client
         {
             Guid? userID = id;
             if(userID == null)
-                userID = await this.LoadUserId();
+                userID = (await this.LoadUser()).InternalId;
             var gr = _clusterClient.GetGrain<IEventMailbox>(userID.Value);
             var cl = new EventMailboxClient(ClusterClient, gr, _logger);
             return cl;
         }
 
+        public async Task<ICommonsActor> GetActor(string uri = null)
+        {
+            var uriValue = uri ?? (await this.LoadUser()).Uri;
+            var gr = _clusterClient.GetGrain<ICommonsActor>(uriValue);
+            return gr;
+        }
+
         public ICentral GetCentral()
         {
             return _clusterClient.GetGrain<ICentral>(Guid.Empty);
+        }
+
+        public IPortfolioRegistry GetPortfolioRegistry()
+        {
+            return _clusterClient.GetGrain<IPortfolioRegistry>(Guid.Empty);
         }
 
         public void Dispose()
@@ -121,8 +135,8 @@ namespace Comax.Commons.Orchestrator.Client
 
         public async Task<ISubjectOfInterest> GetSubjectOfInterest()
         {
-            Guid? userID = await this.LoadUserId();
-            return _clusterClient.GetGrain<ISubjectOfInterest>(userID.Value);
+            Guid userID = (await this.LoadUser()).InternalId;
+            return _clusterClient.GetGrain<ISubjectOfInterest>(userID);
         }
     }
 }

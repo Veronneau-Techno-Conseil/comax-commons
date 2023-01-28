@@ -1,4 +1,5 @@
-﻿using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+﻿using System.Security.Cryptography;
+using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Validators;
 using CommunAxiom.Commons.Ingestion.Extentions;
 
@@ -39,6 +40,12 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
             var dataSourceConfiguration = _configurations.FirstOrDefault(x => x.Key == "FilePath").Value;
 
             return new FileStream(dataSourceConfiguration.Value, FileMode.Open, FileAccess.Read);
+        }
+
+        public byte[] CalculateHash()
+        {
+            using var md5 = MD5.Create();
+            return md5.ComputeHash(ReadData());
         }
 
         /*
@@ -115,6 +122,8 @@ namespace CommunAxiom.Commons.Ingestion.DataSource
         {
             foreach (var configuration in _configurations.Values)
             {
+                if (configuration == null || configuration.Validators == null)
+                    continue;
                 foreach (var validator in configuration.Validators)
                 {
                     yield return validator.Validate(configuration);

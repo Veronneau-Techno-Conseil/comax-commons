@@ -11,6 +11,8 @@ using CommunAxiom.Commons.Shared;
 using CommunAxiom.Commons.CommonsShared.Contracts.UriRegistry;
 using Comax.Commons.Orchestrator.Contracts.PublicBoard;
 using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
+using Comax.Commons.Orchestrator.Contracts.CommonsActor;
+using Comax.Commons.Orchestrator.Contracts.Portfolio;
 
 namespace Comax.Commons.Orchestrator.Contracts.ComaxSystem
 {
@@ -20,9 +22,12 @@ namespace Comax.Commons.Orchestrator.Contracts.ComaxSystem
         IPublicBoard GetPublicBoard();
         Task<IEventMailboxClient> GetEventMailbox(Guid? id = null);
         
+        Task<ICommonsActor> GetActor(string? uri = null);
+
         ICentral GetCentral();
         Task<ISubjectOfInterest> GetSubjectOfInterest();
         IClusterClient ClusterClient { get; }
+        IPortfolioRegistry GetPortfolioRegistry();
 
         Task Close();
     }

@@ -1,4 +1,4 @@
-﻿using Comax.Commons.Shared.OIDC;
+﻿using CommunAxiom.Commons.Shared.OIDC;
 using CommunAxiom.Commons.Shared;
 using CommunAxiom.Commons.Shared.OIDC;
 using FluentAssertions;
@@ -13,6 +13,7 @@ namespace OrchestratorIntegration.Tests
 {
     public class TestTokenProvider : ITokenProvider
     {
+        private readonly OIDCSettings _oIDCSettings;
         private readonly TokenClient _tokenClient;
         private readonly IConfiguration _configuration;
         private readonly TestUserContract _userContract;
@@ -24,6 +25,7 @@ namespace OrchestratorIntegration.Tests
             _configuration = configuration;
             _userContract = new TestUserContract();
             _configuration.Bind("TestUser", _userContract);
+            _oIDCSettings = oIDCSettings;
         }
 
         public async Task<string> FetchToken()
@@ -31,17 +33,36 @@ namespace OrchestratorIntegration.Tests
             if (Cluster.NoAuth)
                 return "";
 
-            if(_tokens.ContainsKey(_userContract.username))
-                return _tokens[_userContract.username];
-            var (res,token) = await _tokenClient.AuthenticatePassword(_userContract.username, _userContract.password);
-            token.Should().NotBeNull();
-            if (token == null)
-                return "";
-            if (res)
+            TokenData? tokenData = null;
+            bool result = false;
+            if (Cluster.AsCommonsAgent)
             {
-                _tokens[_userContract.username] = token.access_token.ToString();
+                if (_tokens.ContainsKey(_oIDCSettings.ClientId))
+                    return _tokens[_oIDCSettings.ClientId];
+                var (res, token) = await _tokenClient.AuthenticateClient(_oIDCSettings.ClientId, _oIDCSettings.Secret, _oIDCSettings.Scopes);
+                tokenData = token;
+                result = res;
             }
-            return token.access_token;
+            else
+            {
+                if (_tokens.ContainsKey(_userContract.username))
+                    return _tokens[_userContract.username];
+                var (res, token) = await _tokenClient.AuthenticatePassword(_userContract.username, _userContract.password);
+                tokenData = token;
+                result = res;
+            }
+
+            tokenData.Should().NotBeNull();
+            if (tokenData == null)
+                return "";
+            if (result)
+            {
+                if (Cluster.AsCommonsAgent)
+                    _tokens[_oIDCSettings.ClientId] = tokenData.access_token.ToString();
+                else
+                    _tokens[_userContract.username] = tokenData.access_token.ToString();
+            }
+            return tokenData.access_token;
         }
 
         private class TestUserContract

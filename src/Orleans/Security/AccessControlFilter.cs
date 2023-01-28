@@ -1,5 +1,4 @@
-﻿using Comax.Commons.Shared.OIDC;
-using CommunAxiom.Commons.Shared.OIDC;
+﻿using CommunAxiom.Commons.Shared.OIDC;
 using Orleans;
 using Orleans.Runtime;
 using O = Orleans;

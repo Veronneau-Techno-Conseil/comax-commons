@@ -7,9 +7,7 @@ namespace CommunAxiom.Commons.Client.Contracts.Account
     public class AccountDetails
     {
         public string ApplicationUri { get; set; }
-        public string DisplayName { get; set; }
         public string ClientID { get; set; }
-        public string ClientSecret { get; set; }
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
         public DateTime? NextRefresh { get; set; }

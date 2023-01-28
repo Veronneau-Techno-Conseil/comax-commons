@@ -1,4 +1,4 @@
-﻿using Comax.Commons.Shared.OIDC;
+﻿
 using CommunAxiom.Commons.Shared.OIDC;
 using Orleans;
 using Orleans.Runtime;
@@ -53,17 +53,20 @@ namespace CommunAxiom.Commons.Orleans.Security
                     IsAuthenticated = false
                 };
             }
-            
+
+            ClaimsContainer claimsContainer = new ClaimsContainer();
+            claimsContainer.SetPrincipal(cp);
+
+            RequestContext.Set("cp", claimsContainer);
+
             if (!AccessControl.ShouldAuthorize(context))
             {
                 await context.Invoke();
                 return;
             }
 
-            ClaimsContainer claimsContainer = new ClaimsContainer();
-            claimsContainer.SetPrincipal(cp);
-
-            RequestContext.Set("cp", claimsContainer);
+            if(RequestContext.Get("__si") == null)
+                await this.UserSet();
             try
             {
                 validationResult = AccessControl.IsAuthorized(context, cp);
@@ -85,6 +88,11 @@ namespace CommunAxiom.Commons.Orleans.Security
             {
                 RequestContext.Remove("cp");
             }
+        }
+
+        protected virtual Task UserSet()
+        {
+            return Task.CompletedTask;
         }
     }
 }

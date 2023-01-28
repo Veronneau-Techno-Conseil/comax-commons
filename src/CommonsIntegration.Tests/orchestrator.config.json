@@ -1,0 +1,49 @@
+{
+  "OIDC": {
+    "Authority": "https://accounts.communaxiom.org/",
+    "Scopes": "openid offline_access roles profile email",
+    "ClientId": "tractavissent_expetendum_multoque_monstret",
+    "Secret": "a7b5dd54-cfc9-4423-bee2-04344a6d1f04"
+  },
+  "ClientOIDC": {
+    "Authority": "https://accounts.communaxiom.org/",
+    "Scopes": "openid offline_access roles profile email",
+    "ClientId": "odit_legantur_epicuro_ferentur",
+    "Secret": "66151b2b-3ad0-4a2b-b345-f840ef582bcf"
+  },
+  "LiteDbStorage": {
+    "Name": "LiteDbStorage",
+    "FileName": "./dbs/SiloStore.db"
+  },
+  "JObjectStore": {
+    "Name": "JObjectStore",
+    "FileName": "./dbs/SiloStore.db"
+  },
+  "PubSubStore": {
+    "Name": "PubSubStore",
+    "FileName": "./dbs/PubSubStore.db"
+  },
+  "TestUser": {
+    "username": "usera@vertechcon.net",
+    "password": "Tester123!"
+  },
+  "TestUserB": {
+    "username": "userb@vertechcon.net",
+    "password": "Tester123!"
+  },
+  "CentralApiUrl": "https://central.communaxiom.org",
+  "siloPort": 7718,
+  "gatewayPort": 30001,
+  "advertisedIp": "127.0.0.1",
+
+  "client_mode": "local",
+  "membership": {
+    "host": "https://referee.communaxiom.org",
+    "cacheDuration": "00:05:00"
+  },
+  "ClusterSettings": {
+    "AckFrequency": "15",
+    "PortfolioSyncInterval": "30",
+    "PortfolioSyncReminderInterval": "5"
+  }
+}

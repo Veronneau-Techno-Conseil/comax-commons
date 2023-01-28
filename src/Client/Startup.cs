@@ -1,24 +1,12 @@
-using System;
-using System.Threading.Tasks;
-using CommunAxiom.Commons.Client.Contracts.Account;
-using ElectronNET.API;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Orleans;
-using Orleans.Configuration;
-using Microsoft.Extensions.Logging;
-using System.Threading;
-using ElectronNET.API.Entities;
-using ClusterClient;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Blazorise;
 using Blazorise.Bulma;
+using CommunAxiom.Commons.Client.ClusterClient;
+using ElectronNET.API;
+using ElectronNET.API.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace CommunAxiom.Commons.ClientUI.Server
 {
@@ -68,7 +56,7 @@ namespace CommunAxiom.Commons.ClientUI.Server
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            services.SetupOrleansClient();
+            services.SetupOrleansClient("./appsettings.json");
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -104,7 +92,6 @@ namespace CommunAxiom.Commons.ClientUI.Server
             //To allow any API request from any origin
             //To allow for certain controllers or methods add theEnableCors attribute to specific controllers or methods
             //app.UseCors("CorsPolicy");
-
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

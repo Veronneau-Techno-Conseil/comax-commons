@@ -1,9 +1,8 @@
-﻿using Comax.Commons.Orchestrator.ApiMembershipProvider;
+﻿using Comax.Commons.CommonsShared.ApiMembershipProvider;
 using Comax.Commons.Orchestrator.Client;
-using Comax.Commons.Shared.OIDC;
+using CommunAxiom.Commons.Shared.OIDC;
 using CommunAxiom.Commons.Client.Silo;
 using CommunAxiom.Commons.Orleans.Security;
-using CommunAxiom.Commons.Shared.OIDC;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -31,13 +30,13 @@ namespace CommunAxiom.Commons.Client.AgentService.OrchClient
         {
             sc.AddSingleton(_configuration);
             sc.AddLogging(l => l.AddConsole());
-            sc.AddTransient<IOutgoingGrainCallFilter, CommonsAgentOutgoingFilter>();
-            sc.AddSingleton<ITokenProvider>(new TokenWrapper(_serviceProvider.GetService<ITokenProvider>().FetchToken().GetAwaiter().GetResult()));
+            sc.AddTransient<IOutgoingGrainCallFilter, AgentServiceOutgoingFilter>();
+            sc.AddTransient<ITokenProvider>(sp => _serviceProvider.GetService<ITokenProvider>());
             sc.AddSingleton(_serviceProvider.GetService<AppIdProvider>());
             
             sc.AddSingleton(_settingsProvider);
             sc.AddSingleton<ISvcClientFactory, SvcClientFactory>();
-            sc.AddApiProvider(c => _configuration.GetSection("membership").Bind(c));
+
         }
 
         public class TokenWrapper : ITokenProvider

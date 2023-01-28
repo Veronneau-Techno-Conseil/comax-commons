@@ -23,7 +23,7 @@ namespace LiteDbTests
             }
             // define the cluster configuration
             var builder = new SiloHostBuilder()
-                .SetDefaults(out var conf)
+                .SetDefaults(out var conf, "./config.json")
                 .ConfigureServices(services =>
                 {
                     services.SetStorage(conf);

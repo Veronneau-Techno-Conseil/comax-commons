@@ -22,25 +22,26 @@ namespace CommunAxiom.Commons.CommonsShared.UriRegistryGrain
             var user = this.GetUser();
             var id = user.FindFirst(x => x.Type == "sub")?.Value;
             var name = user.FindFirst("name").Value;
+            var uri = user.GetUri();
             Guid? internalId = null;
             if (!string.IsNullOrWhiteSpace(id))
             {
-                var gr = this.GrainFactory.GetGrain<IUriRegistry>(id);
+                var gr = this.GrainFactory.GetGrain<IUriRegistry>(uri);
                 internalId = await gr.GetOrCreate();
             }
 
-            return new UserTuple { Id = id, InternalId = internalId.GetValueOrDefault(), UserName = name };
+            return new UserTuple { Id = id, InternalId = internalId.GetValueOrDefault(), UserName = name, Uri = uri };
         }
 
         public async Task<Guid> GetOrCreate()
         {
-            if (this.GetPrimaryKeyString()==Commons.Orleans.Constants.BLANK_ID)
+            if (this.GetPrimaryKeyString()==Commons.Orleans.OrleansConstants.BLANK_ID)
             {
-                var user = this.GetUser().GetUri();
+                var uri = this.GetUser().GetUri();
                 
-                if (!string.IsNullOrWhiteSpace(user))
+                if (!string.IsNullOrWhiteSpace(uri))
                 {
-                    var gr = this.GrainFactory.GetGrain<IUriRegistry>(user);
+                    var gr = this.GrainFactory.GetGrain<IUriRegistry>(uri);
                     return await gr.GetOrCreate();
                 }
             }

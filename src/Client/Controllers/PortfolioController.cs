@@ -24,7 +24,7 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
             {
                 if (model != null)
                 {
-                    var portfolio = new Portfolio
+                    var portfolio = new PortfolioItem
                     {
                         ID = model.ID,
                         Name = model.Name,
@@ -33,7 +33,8 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
                     };
                     await _clusterClient.WithClusterClient(async cc =>
                     {
-                        await cc.GetPortfolio("Portfolios").AddAPortfolio(portfolio);
+                        var pf = cc.GetPortfolio();
+                        await pf.AddPortfolio(portfolio);
                     });
                     return Ok();
                 }
@@ -52,7 +53,7 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
         {
             var PortfoliosFinalList = await _clusterClient.WithClusterClient(async cc =>
             {
-                return await cc.GetPortfolio("Portfolios").GetPortfoliosList();
+                return await cc.GetPortfolio().GetPortfoliosList();
             });
             return PortfoliosFinalList?.Select(o => new PortfolioModel { ID =  o.ID, Name = o.Name, Type = o.Type, ParentId = o.ParentId });
         }
@@ -64,7 +65,7 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
             {
                 var result = await _clusterClient.WithClusterClient(async cc =>
                 {
-                    return await cc.GetPortfolio("Portfolios").CheckIfUnique(name);
+                    return await cc.GetPortfolio().CheckIfUnique(name);
                 });
                 return result;
             }

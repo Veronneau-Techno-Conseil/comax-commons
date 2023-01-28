@@ -26,4 +26,12 @@
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Orleans_CodeGenInputs Remove="Grains\Agent\IAgentIntegration.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Orleans_CodeGenInputs Remove="Grains\Portfolio\PortfolioItemType.cs" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "CommunAxiom.Commons.Ingestion": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:8009;http://localhost:8010"
+    }
+  }
+}

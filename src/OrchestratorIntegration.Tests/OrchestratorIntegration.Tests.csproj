@@ -28,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommonsSharedContracts\CommonsSharedContracts.csproj" />
+    <ProjectReference Include="..\GrainTests.Shared\GrainTests.Shared.csproj" />
     
     <ProjectReference Include="..\Node\Orchestrator.csproj" />
     <ProjectReference Include="..\Orchestrator.Client\Orchestrator.Client.csproj" />

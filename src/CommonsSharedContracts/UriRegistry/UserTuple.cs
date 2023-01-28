@@ -8,6 +8,7 @@ namespace CommunAxiom.Commons.CommonsShared.Contracts.UriRegistry
     {
         public string UserName { get; set; }
         public string Id { get; set; }
+        public string Uri { get; set; }
         public Guid InternalId { get; set; }
     }
 }

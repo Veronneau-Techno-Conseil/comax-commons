@@ -1,5 +1,5 @@
 ﻿using Comax.Commons.Orchestrator;
-using Comax.Commons.Orchestrator.ApiMembershipProvider;
+using Comax.Commons.CommonsShared.ApiMembershipProvider;
 using Comax.Commons.Orchestrator.Client;
 using Comax.Commons.Orchestrator.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Orleans.Security;
@@ -24,6 +24,9 @@ namespace OrchestratorIntegration.Tests
     public class Cluster
     {
         public static bool NoAuth { get; set; }
+
+        public static bool AsCommonsAgent { get; set; }
+
         public static IConfiguration Configuration { get; set; }
         public static IServiceProvider ServiceProvider { get; set; }
 
@@ -46,6 +49,16 @@ namespace OrchestratorIntegration.Tests
 
         public static void SetupTests()
         {
+            if (!Directory.Exists("./dbs"))
+            {
+                Directory.CreateDirectory("./dbs");
+            }
+            var files = System.IO.Directory.GetFiles("./dbs");
+            foreach (var file in files)
+            {
+                File.Delete(file);
+            }
+
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddJsonFile("./config.json");
             configurationBuilder.AddEnvironmentVariables();
@@ -93,7 +106,7 @@ namespace OrchestratorIntegration.Tests
 
                 sc.AddSingleton<ISettingsProvider>(x=> new ConfigSettingsProvider("ClientOIDC", Configuration));
                 sc.AddSingleton<ISvcClientFactory, SvcClientFactory>();
-                sc.AddApiProvider(c => Configuration.GetSection("membership").Bind(c));
+                //sc.AddApiProvider(c => Configuration.GetSection("membership").Bind(c));
             }
         }
     }

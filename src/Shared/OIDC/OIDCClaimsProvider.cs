@@ -1,4 +1,4 @@
-﻿using Comax.Commons.Shared.OIDC;
+﻿
 using System.Security.Claims;
 
 namespace CommunAxiom.Commons.Shared.OIDC

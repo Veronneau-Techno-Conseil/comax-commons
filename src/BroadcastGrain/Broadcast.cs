@@ -12,7 +12,7 @@ namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
 
         public override Task OnActivateAsync()
         {
-            _broadcastRulesEngine = new BroadcastRulesEngine(this.GetStreamProvider(Constants.ImplicitStream));
+            _broadcastRulesEngine = new BroadcastRulesEngine(this.GetStreamProvider(OrleansConstants.Streams.ImplicitStream));
 
             return base.OnActivateAsync();
         }

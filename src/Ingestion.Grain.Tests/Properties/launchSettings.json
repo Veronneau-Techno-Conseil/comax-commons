@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Ingestion.Grain.Tests": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:8029;http://localhost:8030"
+    }
+  }
+}

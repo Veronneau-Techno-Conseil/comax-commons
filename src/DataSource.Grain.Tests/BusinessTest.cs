@@ -15,7 +15,7 @@ namespace Ingestion.Grain.Tests
         {
             IPersistentState<SourceState> store = new PersistentStorageMock<SourceState>();
 
-            var business = new Business(new Repo(store));
+            var business = new Business(new Repo(store, null));
 
             await business.SetConfig(DataSourceType.File, new Dictionary<string, DataSourceConfiguration> { ["Name"] = new DataSourceConfiguration { Name = "Name" } });
 

@@ -1,7 +1,6 @@
-using ClusterClient;
+using CommunAxiom.Commons.Client.ClusterClient;
 using Comax.Commons.Orchestrator.Client;
 using Comax.Commons.Orchestrator.Contracts.ComaxSystem;
-using Comax.Commons.Shared.OIDC;
 using CommunAxiom.Commons.Client.AgentService.Conf;
 using CommunAxiom.Commons.Client.AgentService.OrchClient;
 using CommunAxiom.Commons.Client.Silo.System;
@@ -14,6 +13,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using System;
+using CommunAxiom.Commons.Client.Grains.AgentGrain;
+using System.Threading;
 
 namespace CommunAxiom.Commons.Client.Silo
 {
@@ -21,12 +22,14 @@ namespace CommunAxiom.Commons.Client.Silo
     {
         static void Main(string[] args)
         {
+            var cancellationTokenSource = new CancellationTokenSource();
             Console.WriteLine("Starting service...");
             var host = Host.CreateDefaultBuilder(args)
-                .SetConfiguration(out var cfg)
+                .SetConfiguration(out var cfg, "./config.json")
                 .ConfigureLogging(l=>l.AddConsole())
                 .ConfigureServices((host, sc) =>
                 {
+                    
                     sc.AddLogging(x => x.AddConsole());
                     sc.AddSingleton<ITokenProvider, AgentTokenProvider>();
                     sc.AddSingleton<IOutgoingGrainCallFilter,SecureTokenOutgoingFilter>();
@@ -34,15 +37,17 @@ namespace CommunAxiom.Commons.Client.Silo
                     sc.AddSingleton<IOrchestratorClientConfig, ClientConfig>();
                     sc.AddSingleton<ISettingsProvider, StaticSettingsProvider>();
                     sc.AddSingleton<IOrchestratorClientFactory, Comax.Commons.Orchestrator.Client.ClientFactory>();
-                    sc.AddSingleton<ClientManager>();
-                    sc.AddSingleton<IOrchestratorClient>(sp =>
-                    {
-                        return sp.GetService<ClientManager>().Client;
-                    });
+                    sc.AddSingleton<IClusterManagement, ClusterManagement>();
                     sc.SetServerServices();
-                    sc.SetupOrleansClient();
-                    sc.AddTransient<IClusterManagement, ClusterManagement>();
+                    sc.SetupOrleansClient("./config.json");
                 }).Build();
+
+            AgentIntegration.CancellationToken = cancellationTokenSource.Token;
+            host.WaitForShutdownAsync().ContinueWith(async x => {
+                cancellationTokenSource.Cancel();
+                await AgentIntegration.Clear(); 
+            });
+
             host.Run();
         }
     }

@@ -37,7 +37,7 @@ namespace LiteDbTests
                     {
                         parts.AddFromApplicationBaseDirectory();
                     }).UseLocalhostClustering(30000)
-                    .AddSimpleMessageStreamProvider(Constants.DefaultStream);
+                    .AddSimpleMessageStreamProvider(OrleansConstants.Streams.DefaultStream);
             return b;
         }
 

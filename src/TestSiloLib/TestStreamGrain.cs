@@ -15,7 +15,7 @@ namespace TestSiloLib
         public Task<Guid> InitStream()
         {
             _g = Guid.NewGuid();
-            _stream = this.GetStreamProvider(Constants.DefaultStream).GetStream<string>(_g.Value, Constants.DefaultNamespace);
+            _stream = this.GetStreamProvider(OrleansConstants.Streams.DefaultStream).GetStream<string>(_g.Value, OrleansConstants.StreamNamespaces.DefaultNamespace);
             return Task.FromResult(_g.Value);
         }
 

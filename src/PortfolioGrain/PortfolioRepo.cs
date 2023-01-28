@@ -10,73 +10,69 @@ namespace PortfolioGrain
 {
     public class PortfolioRepo
     {
-        private readonly IPersistentState<Portfolio> _portfolioDetails;
+        bool _read = false;
         private readonly IPersistentState<PortfoliosList> _portfolioList;
-        public PortfolioRepo(IPersistentState<Portfolio> portfolioDetails,
+        public PortfolioRepo(IPersistentState<PortfolioItem> portfolioDetails,
             IPersistentState<PortfoliosList> portfoliosList)
         {
-            _portfolioDetails = portfolioDetails;
             _portfolioList = portfoliosList;
         }
 
-        public async Task<bool> ListIsSet()
+        private async Task EnsureRead()
         {
-            var res = await GetListDetails();
-            return res != null;
-        }
-
-        public async Task<PortfoliosList> GetListDetails()
-        {
-            await _portfolioList.ReadStateAsync();
-            return _portfolioList.State;
-        }
-
-        public async Task AddAPortfolio(Portfolio portfolio)
-        {
-            var portfoliosList = await GetListDetails();
-            if (portfoliosList.Portfolios == null)
+            if (!_read)
             {
-                portfoliosList.Portfolios = new List<Portfolio>();
+                await _portfolioList.ReadStateAsync();
+                if(!_portfolioList.RecordExists)
+                    _portfolioList.State = new PortfoliosList();
+
+                if (_portfolioList.State.Portfolios == null)
+                    _portfolioList.State.Portfolios = new List<PortfolioItem>();
+
+                _read = true;
             }
-            portfoliosList.Portfolios = portfoliosList.Portfolios.Concat(new[] { portfolio });
+        }
+
+        public async Task AddPortfolio(PortfolioItem portfolio)
+        {
+            await EnsureRead();
+            _portfolioList.State.Portfolios.Add(portfolio);
             await _portfolioList.WriteStateAsync();
         }
 
-        public async Task<PortfoliosList> CreateList()
+        public async Task<PortfolioItem> GetDetails(Guid portfolioID)
         {
-            var portfoliosList = new PortfoliosList();
-            _portfolioList.State = portfoliosList;
-            await _portfolioList.WriteStateAsync();
-            var listDetails = await GetListDetails();
-            return listDetails;
+            await EnsureRead();
+            var portfolio = _portfolioList.State.Portfolios.Where(x => x.ID == portfolioID).FirstOrDefault();
+            return portfolio;
         }
 
-        public async Task<Portfolio> GetAPortfolioDetails(Guid portfolioID)
+        public async Task<IEnumerable<Guid>> GetIds()
         {
-            var PortfolioList = await GetListDetails();
-            var Portfolio = PortfolioList.Portfolios.AsQueryable().Where(x => x.ID == portfolioID).FirstOrDefault();
-            return (Portfolio);
+            await EnsureRead();
+            return _portfolioList.State.Portfolios.Select(x => x.ID).ToArray();
         }
 
-        public async Task<IEnumerable<Portfolio>> FilterPortfolios(string filter)
+        public async Task<IEnumerable<PortfolioItem>> GetList()
         {
-            var portfoliosList = await GetListDetails();
-            var filteredList = (portfoliosList.Portfolios.AsQueryable().Where(x => x.Name.Contains(filter)).ToList());
-            return (filteredList);
+            await EnsureRead();
+            return _portfolioList.State.Portfolios.ToArray();
+        }
+
+        public async Task<IEnumerable<PortfolioItem>> FilterPortfolios(string filter)
+        {
+            await EnsureRead();
+
+            var filteredList = _portfolioList.State.Portfolios.AsQueryable().Where(x => x.Name.Contains(filter)).ToList();
+            return filteredList;
         }
 
         public async Task<bool> CheckIfUnique(string name)
         {
-            var portfoliosList = await GetListDetails();
-            if (portfoliosList.Portfolios!=null)
-            {
-                var filteredPortfolios = portfoliosList.Portfolios.AsQueryable().Where(x => x.Name.Equals(name));
-                return !(filteredPortfolios != null && filteredPortfolios.Any());
-            }
-            else
-            {
-                return true;
-            }
+            await EnsureRead();
+            
+            var filteredPortfolios = _portfolioList.State.Portfolios.Where(x => x.Name.Equals(name));
+            return filteredPortfolios == null || filteredPortfolios.Any();
         }
     }
 }
