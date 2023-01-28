@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DataChunkGrain\DataChunkGrain.csproj" />
     <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
     <ProjectReference Include="..\StorageGrain\StorageGrain.csproj" />
   </ItemGroup>

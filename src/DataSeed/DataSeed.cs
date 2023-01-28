@@ -1,5 +1,6 @@
-﻿using CommunAxiom.Commons.CommonsShared.Contracts.DataSeed;
-using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
+﻿using CommunAxiom.Commons.CommonsShared.Contracts.DataChunk;
+using CommunAxiom.Commons.CommonsShared.Contracts.DataSeed;
+
 using Orleans;
 using Orleans.Runtime;
 using System;
@@ -9,26 +10,27 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
 {
     public class DataSeed : Grain, IDataSeed
     {
-        private readonly IPersistentState<DataSeedState> _storageState;
-        public DataSeed([PersistentState("dataSeedGrain")] IPersistentState<DataSeedState> storageState)
+        private readonly IPersistentState<DataSeedObject> _dataSeedState;
+        public DataSeed([PersistentState("dataSeedGrain")] IPersistentState<DataSeedObject> DataSeedObject)
         {
-            _storageState = storageState;
+            _dataSeedState = DataSeedObject;
         }
         public DataSeedBusiness _dataSeedBusiness;
 
         public async Task RetrieveData(Guid id)
         {
             var data =await _dataSeedBusiness.GetDataFromStorage("dsUri");
+            await SendIndex(data);
         }
 
-        public Task SendIndex()
+        public async Task SendIndex(DataSeedResult value)
         {
-            throw new NotImplementedException();
+            await _dataSeedBusiness.BuildIndexes(value);
         }
 
-        public Task UploadData(byte[] Data)
+        public async Task UploadData(DataChunkResult value)
         {
-            throw new NotImplementedException();
+            await _dataSeedBusiness.BuildRows(value);
         }
 
         public Task Validate()
