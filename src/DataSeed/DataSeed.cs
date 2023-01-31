@@ -1,6 +1,6 @@
 ﻿using CommunAxiom.Commons.CommonsShared.Contracts.DataChunk;
 using CommunAxiom.Commons.CommonsShared.Contracts.DataSeed;
-
+using CommunAxiom.Commons.Orleans;
 using Orleans;
 using Orleans.Runtime;
 using System;
@@ -34,6 +34,11 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
         }
 
         public Task Validate()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SetUploadStream(Guid id)
         {
             throw new NotImplementedException();
         }
