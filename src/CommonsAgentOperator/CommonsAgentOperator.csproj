@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+	  <LangVersion>10</LangVersion>
+	  <Nullable>enable</Nullable>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <AssemblyName>CommunAxiomCommonsAgentOperator</AssemblyName>
+	  <RootNamespace>CommunAxiom.Commons.Client.Hosting.Operator</RootNamespace>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="KubeOps" Version="6.1.0" />
+	</ItemGroup>
+
+</Project>

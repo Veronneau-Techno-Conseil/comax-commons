@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "DatasourceGrain": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:2275;http://localhost:2276"
+    }
+  }
+}
