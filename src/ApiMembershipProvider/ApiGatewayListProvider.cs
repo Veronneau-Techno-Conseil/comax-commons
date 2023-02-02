@@ -8,12 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Comax.Commons.Orchestrator.ApiMembershipProvider
+namespace Comax.Commons.CommonsShared.ApiMembershipProvider
 {
     public class ApiGatewayListProvider : IGatewayListProvider
     {
         private readonly ISvcClientFactory _refereeClientFact;
-        private readonly ApiMembershipClientConfig _apiMembershipClientConfig;
+        private readonly ApiMembershipConfig _apiMembershipClientConfig;
         private DateTime _lastFetch = DateTime.MinValue;
         private List<Uri> _uris = new List<Uri>();
         public TimeSpan MaxStaleness { get; private set; }
@@ -25,7 +25,7 @@ namespace Comax.Commons.Orchestrator.ApiMembershipProvider
 
         public bool IsUpdatable => true;
 
-        public ApiGatewayListProvider(IOptions<ApiMembershipClientConfig> configuration, ISvcClientFactory clientFactory)
+        public ApiGatewayListProvider(IOptions<ApiMembershipConfig> configuration, ISvcClientFactory clientFactory)
         {
             _refereeClientFact = clientFactory;
             _apiMembershipClientConfig = configuration.Value;

@@ -9,6 +9,9 @@ using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
 using CommunAxiom.Commons.CommonsShared.Contracts.Mail;
 using Microsoft.Extensions.Logging;
 using CommunAxiom.Commons.Shared.RuleEngine;
+using CommunAxiom.Commons.Orleans.Security;
+using CommunAxiom.Commons.Shared.RulesEngine;
+using System.Collections.Generic;
 
 namespace CommunAxiom.Commons.CommonsShared.EventMailboxGrain
 {
@@ -17,14 +20,14 @@ namespace CommunAxiom.Commons.CommonsShared.EventMailboxGrain
         private Guid? _streamId;
         private IAsyncStream<MailMessage>? _stream;
         private EventMailboxRepo? _eventMailboxRepo;
-        private IStreamProvider _streamProvider;
         private IComaxGrainFactory _comaxGrainFactory;
         private ObserverManager<IMailboxObserver> _mailboxObservers;
         private readonly ILogger _logger;
+        private List<Guid> _idsToRemove = new List<Guid>();
 
-        public EventMailboxBusiness(IStreamProvider streamProvider, IComaxGrainFactory comaxGrainFactory, ILogger logger)
+        public EventMailboxBusiness(IComaxGrainFactory comaxGrainFactory, ILogger logger)
         {
-            _streamProvider = streamProvider;
+            
             _comaxGrainFactory = comaxGrainFactory;
             _logger = logger;
             _mailboxObservers = new ObserverManager<IMailboxObserver>(TimeSpan.FromMinutes(5), logger, "EvtMBObs_");
@@ -49,7 +52,42 @@ namespace CommunAxiom.Commons.CommonsShared.EventMailboxGrain
                 if (ac.IsFaulted)
                     Console.Error.WriteLine(ac.Exception);
             });
+        }
 
+        public async Task StreamMails(StreamSpec streamSpec)
+        {
+            var sp = _comaxGrainFactory.GetStreamProvider(streamSpec.StreamProvider);
+            var stream = sp.GetStream<MailMessage>(streamSpec.Id, streamSpec.Namespace);
+            var mailMessages = await _eventMailboxRepo.Fetch();
+
+            _ = Task.Run(async () =>
+            {
+                var msg = mailMessages;
+                foreach (var mail in msg)
+                {
+                    await stream.OnNextAsync(mail);
+                    if(mail.Type == MessageTypes.OrchestratorInstructions.MSG_TYPE_ACK_ALIVE)
+                    {
+                        _idsToRemove.Add(mail.MsgId);
+                    }
+                }
+                await stream.OnCompletedAsync();
+            }).ContinueWith(ac =>
+            {
+                if (ac.IsFaulted)
+                    Console.Error.WriteLine(ac.Exception);
+            });
+        }
+
+        public async Task<int> Cleanup()
+        {
+            int res = 0;
+            foreach (var item in _idsToRemove)
+            {
+                await _eventMailboxRepo.Remove(item);
+                res++;
+            }
+            return res;
         }
 
         public Task Unsubscribe(IMailboxObserver mailboxObserver)

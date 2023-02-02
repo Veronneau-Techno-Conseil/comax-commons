@@ -24,11 +24,13 @@
   <ItemGroup>
       <ProjectReference Include="..\ApiMembershipProvider\ApiMembershipProvider.csproj" />
       <ProjectReference Include="..\CentralGrain\CentralGrain.csproj" />
+      <ProjectReference Include="..\CommonsActorGrain\CommonsActorGrain.csproj" />
       <ProjectReference Include="..\IEventMailbox\EventMailboxGrain.csproj" />
       <ProjectReference Include="..\LiteDbStorageProvider\LiteDbStorageProvider.csproj" />
       <ProjectReference Include="..\MailGrain\MailGrain.csproj" />
       <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
       <ProjectReference Include="..\PublicBoardGrain\PublicBoardGrain.csproj" />
+      <ProjectReference Include="..\SharedPortfolio\SharedPortfolio.csproj" />
       <ProjectReference Include="..\SOIGrain\SOIGrain.csproj" />
       <ProjectReference Include="..\UriRegistryGrain\UriRegistryGrain.csproj" />
   </ItemGroup>

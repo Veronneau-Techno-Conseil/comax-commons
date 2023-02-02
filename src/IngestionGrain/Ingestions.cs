@@ -33,7 +33,7 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
 
         public override Task OnActivateAsync()
         {
-            _business = new Business(_importer, new GrainFactory(this.GrainFactory), this.GrainReference.GrainIdentity.PrimaryKeyString);
+            _business = new Business(_importer, new GrainFactory(this.GrainFactory, this.GetStreamProvider), this.GrainReference.GrainIdentity.PrimaryKeyString);
             _business.Init(_history);
             return base.OnActivateAsync(); 
         }

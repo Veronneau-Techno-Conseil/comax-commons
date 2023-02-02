@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
+using System;
 
 namespace CommunAxiom.Commons.ClientUI.Shared.Models
 {

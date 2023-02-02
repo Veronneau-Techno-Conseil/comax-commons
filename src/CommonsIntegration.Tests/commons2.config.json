@@ -1,0 +1,48 @@
+{
+  "OIDC": {
+    "Authority": "https://accounts.communaxiom.org/",
+    "Scopes": "openid offline_access roles profile email",
+    "ClientId": "potione_ipsis_tanta_levius",
+    "Secret": "613b801b-6461-4efb-8ece-73f8c0bd89da"
+  },
+  "LiteDbStorage": {
+    "Name": "LiteDbStorage",
+    "FileName": "./dbs/CommonsSiloStore2.db"
+  },
+  "JObjectStore": {
+    "Name": "JObjectStore",
+    "FileName": "./dbs/CommonsSiloStore2.db"
+  },
+  "PubSubStore": {
+    "Name": "PubSubStore",
+    "FileName": "./dbs/CommonsPubSubStore2.db"
+  },
+  "client_mode": "local",
+  "membership": {
+    "host": "https://referee.communaxiom.org",
+    "cacheDuration": "00:05:00"
+  },
+  "ClusterId": "0.0.1-a1",
+  "ServiceId": "CommonsClientCluster",
+  "siloPort": "7716",
+  "gatewayPort": "30002",
+  "advertisedIp": "10.10.2.2",
+  "listeningEndpoint": "0.0.0.0",
+  "CommonsMembership": {
+    "Host": "https://localhost:5005",
+    "CacheDuration": "00:05:00"
+  },
+
+  "ListenPort": "5005",
+  "UseHttps": true,
+  "db": "litedb",
+  "LiteDb": {
+    "FileName": "./dbs/members2.db"
+  },
+  "AgentConfig": {
+    "LiveTickerPeriod": 15,
+    "ConnectionCheckPeriod": 5,
+    "SaveStatePeriod": 2,
+    "SubscriptionTimeout": 420
+  }
+}

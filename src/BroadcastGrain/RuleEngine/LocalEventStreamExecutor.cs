@@ -1,4 +1,4 @@
-﻿using CommunAxiom.Commons.Client.ClusterEventStream.Extentions;
+﻿using CommunAxiom.Commons.Client.AgentClusterRuntime.Extentions;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using Orleans.Streams;
 using System.Threading.Tasks;

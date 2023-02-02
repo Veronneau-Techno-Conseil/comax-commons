@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "AccountGrain": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:7993;http://localhost:7999"
+    }
+  }
+}

@@ -9,7 +9,7 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using System;
-using Comax.Commons.Orchestrator.ApiMembershipProvider;
+using Comax.Commons.CommonsShared.ApiMembershipProvider;
 using CommunAxiom.Commons.Shared;
 
 namespace Comax.Commons.Orchestrator.Client
@@ -52,7 +52,7 @@ namespace Comax.Commons.Orchestrator.Client
 
             if (configuration["client_mode"] == "local")
             {
-                b.UseLocalhostClustering(30001);
+                b.UseLocalhostClustering(int.TryParse(configuration["client_port"], out int port) ? port: 30001);
             }
             else
             {
@@ -63,7 +63,7 @@ namespace Comax.Commons.Orchestrator.Client
             }
 
             b.AddOutgoingGrainCallFilter(serviceProvider.GetService<IOutgoingGrainCallFilter>())
-                .AddSimpleMessageStreamProvider(CommunAxiom.Commons.Orleans.Constants.DefaultStream);
+                .AddSimpleMessageStreamProvider(CommunAxiom.Commons.Orleans.OrleansConstants.Streams.DefaultStream);
 
             return (b, onDisconnect);
         }

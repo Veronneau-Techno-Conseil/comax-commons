@@ -5,6 +5,7 @@ using CommunAxiom.Commons.Client.Contracts.Ingestion;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Ingestion;
 using CommunAxiom.Commons.Orleans;
+using CommunAxiom.Commons.Shared.RulesEngine;
 using Newtonsoft.Json.Linq;
 using Orleans.Runtime;
 using System;
@@ -56,8 +57,8 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
                     From = "com://local/data/{dsid}",
                     FromOwner = "ust://{usrid}",
                     To = "local",
-                    Type = "INGESTION_STARTED",
-                    Scope = "PARTNERS",
+                    Type = MessageTypes.CommonsAgentEvents.MSG_TYPE_INGESTION_START,
+                    Scope = MessageScopes.MSG_SCOPE_PARTNERS,
                     Payload = null!
                 });
                 
@@ -109,8 +110,8 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
                     From = "com://local/data/{dsid}",
                     FromOwner = "ust://{usrid}",
                     To = "com://*",
-                    Type = "NEW_DATA_VERSION",
-                    Scope = "PARTNERS",
+                    Type = MessageTypes.CommonsAgentEvents.MSG_TYPE_NEW_DATA,
+                    Scope = MessageScopes.MSG_SCOPE_PARTNERS,
                     Payload = null!
                 });
             }
@@ -134,8 +135,8 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
                     From = "com://local/data/{dsid}",
                     FromOwner = "ust://{usrid}",
                     To = "local",
-                    Type = "INGESTION_END",
-                    Scope = "PARTNERS",
+                    Type = MessageTypes.CommonsAgentEvents.MSG_TYPE_INGESTION_END,
+                    Scope = MessageScopes.MSG_SCOPE_PARTNERS,
                     Payload = null!
                 });
             }

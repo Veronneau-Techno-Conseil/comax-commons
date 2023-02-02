@@ -16,7 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MembershipApi\MembershipApi.csproj" />
     <ProjectReference Include="..\MembershipProvider\MembershipProvider.csproj" />
+    <ProjectReference Include="..\MongoDbMembershipStorage\MongoDbMembershipStorage.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +28,10 @@
     <None Update="key.pem">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

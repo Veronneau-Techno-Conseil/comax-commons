@@ -1,4 +1,4 @@
-﻿using Comax.Commons.Shared.OIDC;
+﻿using CommunAxiom.Commons.Shared.OIDC;
 using CommunAxiom.Commons.Orleans.Security;
 using Microsoft.Extensions.Logging;
 using Orleans;

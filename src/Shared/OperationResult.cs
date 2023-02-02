@@ -4,12 +4,22 @@ using System.Text;
 
 namespace CommunAxiom.Commons.Shared
 {
-    public class OperationResult<TResult>
+    public class OperationResult<TResult>: OperationResult
     {
-        public TResult Result { get; set; }
-        public bool IsError { get; set; }
-        public string Error { get; set; }
-        public string Detail { get; set; }
+        public TResult? Result { get; set; } = default;
+
+        public OperationResult()
+        {
+
+        }
+
+        public OperationResult(OperationResult other)
+        {
+            IsError = other.IsError;
+            Error = other.Error;
+            Detail = other.Detail;
+            Exception = other.Exception;
+        }
     }
 
     public class OperationResult
@@ -20,5 +30,6 @@ namespace CommunAxiom.Commons.Shared
         public bool IsError { get; set; }
         public string Error { get; set; }
         public string Detail { get; set; }
+        public Exception Exception { get; set; }
     }
 }

@@ -28,12 +28,14 @@
     <ProjectReference Include="..\DatasetGrain\DatasetGrain.csproj" />
     <ProjectReference Include="..\DatasourceGrain\DatasourceGrain.csproj" />
     <ProjectReference Include="..\DataStateMonitorGrain\DataStateMonitorGrain.csproj" />
+    <ProjectReference Include="..\DataStateMonitorSupervisorGrain\DataStateMonitorSupervisorGrain.csproj" />
     <ProjectReference Include="..\DataTransferGrain\DataTransferGrain.csproj" />
-    <ProjectReference Include="..\DateStateMonitorSupervisorGrain\DateStateMonitorSupervisorGrain.csproj" />
     <ProjectReference Include="..\DispatchGrain\DispatchGrain.csproj" />   
-    <ProjectReference Include="..\BroadcastGrain\BroadcastGrain.csproj" />
+    <ProjectReference Include="..\BroadcastGrain\BroadcastGrain.csproj" />   
+    <ProjectReference Include="..\ExplorerGrain\ExplorerGrain.csproj" />
     <ProjectReference Include="..\IngestionGrain\IngestionGrain.csproj" />
     <ProjectReference Include="..\LiteDbStorageProvider\LiteDbStorageProvider.csproj" />
+    <ProjectReference Include="..\MailGrain\MailGrain.csproj" />
     <ProjectReference Include="..\PortfolioGrain\PortfolioGrain.csproj" />
     <ProjectReference Include="..\ProjectGrain\ProjectGrain.csproj" />
     <ProjectReference Include="..\ReplicationGrain\ReplicationGrain.csproj" />
@@ -41,6 +43,7 @@
     <ProjectReference Include="..\SiloShared\SiloShared.csproj" />
     <ProjectReference Include="..\StorageGrain\StorageGrain.csproj" />
 	<ProjectReference Include="..\Orchestrator.Client\Orchestrator.Client.csproj" />
+	<ProjectReference Include="..\UriRegistryGrain\UriRegistryGrain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

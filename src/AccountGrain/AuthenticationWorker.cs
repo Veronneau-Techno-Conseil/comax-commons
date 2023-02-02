@@ -40,27 +40,26 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
     public class AuthenticationWorker : Grain, IAuthentication, IBrowser
     {
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthenticationWorker> _logger;
+        private readonly ISettingsProvider _settingsProvider;
 
         private Guid _operationId;
         private IAsyncStream<AuthorizationInstructions> _asyncStream;
         private BrowserResult _browserResult;
         private SessionInfo _sessionInfo;
-        private ILogger<AuthenticationWorker> _logger;
-        private string clientid;
-        private string secret;
         private string redirect;
-        private bool _shouldSaveClientCredentials;
 
-        public AuthenticationWorker(IConfiguration configuration, ILogger<AuthenticationWorker> logger)
+        public AuthenticationWorker(IConfiguration configuration, ILogger<AuthenticationWorker> logger, ISettingsProvider settingsProvider)
         {
             _configuration = configuration;
             _logger = logger;
+            _settingsProvider = settingsProvider;
         }
 
         [AuthorizePassthrough]
         public Task Proceed()
         {
-            _ = RunAuthentication(clientid, secret, redirect);
+            _ = RunAuthentication(redirect);
             return Task.CompletedTask;
         }
 
@@ -73,41 +72,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             _browserResult = null;
             _asyncStream = null;
             _sessionInfo = null;
-
-            if (_shouldSaveClientCredentials)
-            {
-                var account = this.GrainFactory.GetGrain<IAccount>(Guid.Empty);
-                await account.Initialize(new AccountDetails
-                {
-                    ClientID = clientid,
-                    ClientSecret = secret
-                });
-            }
-
-            clientid = null;
-            secret = null;
             redirect = null;
-            _shouldSaveClientCredentials = false;
-        }
-
-        [AuthorizePassthrough]
-        public Task<OperationResult<AuthorizationInstructions>> LaunchServiceAuthentication(string clientId, string clientSecret, string redirectUri)
-        {
-            _operationId = Guid.NewGuid();
-            _asyncStream = this.GetStreamProvider(Orleans.Constants.DefaultStream).GetStream<AuthorizationInstructions>(_operationId, Orleans.Constants.DefaultNamespace);
-            clientid = clientId;
-            secret = clientSecret;
-            redirect = redirectUri;
-            _shouldSaveClientCredentials = true;
-            return Task.FromResult(new OperationResult<AuthorizationInstructions>()
-            {
-                IsError = false,
-                Result = new AuthorizationInstructions()
-                {
-                    Step = Instruction.LaunchAuthStream,
-                    Payload = _operationId.ToString()
-                }
-            });
         }
 
         [AuthorizePassthrough]
@@ -116,19 +81,18 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             return Task.FromResult(_sessionInfo);
         }
 
-        private async Task RunAuthentication(string clientId, string clientSecret, string redirectUri)
+        private async Task RunAuthentication(string redirectUri)
         {
             try
             {
                 _logger.LogInformation("Launched running authentication process");
-                var settings = new OIDCSettings();
-                _configuration.Bind(Sections.OIDCSection, settings);
+                var settings = await _settingsProvider.GetOIDCSettings();
 
                 var options = new OidcClientOptions
                 {
                     Authority = settings.Authority,
-                    ClientId = clientId,
-                    ClientSecret = clientSecret,
+                    ClientId = settings.ClientId,
+                    ClientSecret = settings.Secret,
                     LoadProfile = false,
                     RedirectUri = redirectUri,
                     Scope = settings.Scopes,
@@ -220,17 +184,13 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
         }
 
         [AuthorizePassthrough]
-        public async Task<OperationResult<AuthorizationInstructions>> LaunchAuthentication(string redirectUri)
+        public Task<OperationResult<AuthorizationInstructions>> LaunchAuthentication(string redirectUri)
         {
             _operationId = Guid.NewGuid();
-            _asyncStream = this.GetStreamProvider(Orleans.Constants.DefaultStream).GetStream<AuthorizationInstructions>(_operationId, Orleans.Constants.DefaultNamespace);
-            var account = this.GrainFactory.GetGrain<IAccount>(Guid.Empty);
-            var details = await account.GetDetails();
-            clientid = details.ClientID;
-            secret = details.ClientSecret;
+            _asyncStream = this.GetStreamProvider(Orleans.OrleansConstants.Streams.DefaultStream).GetStream<AuthorizationInstructions>(_operationId, Orleans.OrleansConstants.StreamNamespaces.DefaultNamespace);
+            
             redirect = redirectUri;
-            _shouldSaveClientCredentials = false;
-            return new OperationResult<AuthorizationInstructions>()
+            return Task.FromResult(new OperationResult<AuthorizationInstructions>()
             {
                 IsError = false,
                 Result = new AuthorizationInstructions()
@@ -238,68 +198,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
                     Step = Instruction.LaunchAuthStream,
                     Payload = _operationId.ToString()
                 }
-            };
-        }
-
-        [AuthorizePassthrough]
-        public async Task<OperationResult<SessionInfo>> RetrieveToken(string clientId, string clientSecret, string devideCode, int interval)
-        {
-            using var client = new HttpClient();
-            var result = new OperationResult<SessionInfo>();
-
-            IdentityModel.Client.TokenResponse tokenResponse;
-            do
-            {
-                var discovery = await client.GetDiscoveryDocumentAsync(_configuration["oidcUrl"]);
-                if (discovery.IsError)
-                {
-                    result.IsError = true;
-                    result.Error = discovery.Error;
-                    return result;
-                }
-                tokenResponse = await client.RequestDeviceTokenAsync(new DeviceTokenRequest
-                {
-                    Address = discovery.TokenEndpoint,
-                    ClientId = clientId,
-                    ClientSecret = clientSecret,
-                    DeviceCode = devideCode
-                });
-
-                if (tokenResponse is { IsError: true, Error: Errors.AuthorizationPending })
-                {
-                    Console.WriteLine(" - authorization pending...");
-                    // Note: `deviceResponse.Interval` is the minimum number of seconds
-                    // the client should wait between polling requests.
-                    // In this sample the client will retry every 60 seconds at most.
-
-                    await Task.Delay(Math.Min(Math.Max(interval, 1), 60) * 1000);
-                }
-                else if (tokenResponse.IsError)
-                {
-                    result.IsError = true;
-                    result.Error = tokenResponse.Error;
-                    return result;
-                }
-                else
-                {
-                    var account = this.GrainFactory.GetGrain<IAccount>(Guid.Empty);
-                    await account.Initialize(new AccountDetails
-                    {
-                        ClientID = clientId,
-                        ClientSecret = clientSecret,
-                    });
-
-                    result.Result = new SessionInfo
-                    {
-                        AccessToken = tokenResponse.AccessToken,
-                        IdentityToken = tokenResponse.IdentityToken,
-                        RefreshToken = tokenResponse.RefreshToken
-                    };
-
-                    return result;
-                }
-            }
-            while (true);
+            });
         }
 
         [AuthorizePassthrough]

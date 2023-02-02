@@ -3,7 +3,7 @@ using Orleans;
 
 namespace CommunAxiom.Commons.Client.Contracts.Grains.DateStateMonitorSupervisor
 {
-    public interface IDateStateMonitorSupervisor : IGrainWithGuidKey
+    public interface IDataStateMonitorSupervisor : IGrainWithGuidKey
     {
         Task RegisterAsync(string grainKey);
         Task UnregisterAsync(string grainKey);

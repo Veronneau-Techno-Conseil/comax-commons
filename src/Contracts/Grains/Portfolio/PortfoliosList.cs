@@ -6,6 +6,7 @@ namespace CommunAxiom.Commons.Client.Contracts.Grains.Portfolio
 {
     public class PortfoliosList
     {
-        public IEnumerable<Portfolio> Portfolios { get; set; }
+        public string OwnerUri { get; set; }
+        public List<PortfolioItem> Portfolios { get; set; } = new List<PortfolioItem> { };
     }
 }

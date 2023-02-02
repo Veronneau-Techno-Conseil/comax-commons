@@ -9,16 +9,14 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Providers;
 using Orleans.Runtime;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using CommunAxiom.Commons.Client.SiloShared.System;
 using CommunAxiom.Commons.Ingestion.Extentions;
 using CommunAxiom.Commons.Orleans;
+using CommunAxiom.Commons.Client.Silo;
+using System;
+using System.Collections.Generic;
 using CommunAxiom.Commons.Client.AgentService.OrchClient;
 
 namespace CommunAxiom.Commons.Client.SiloShared
@@ -28,7 +26,6 @@ namespace CommunAxiom.Commons.Client.SiloShared
         public static IServiceCollection SetServerServices(this IServiceCollection sc)
         {
             sc.AddHostedService<HeartbeatService>();
-            sc.AddHostedService<AgentSyncService>();
             sc.AddIngestion();
             return sc;
         }
@@ -39,13 +36,13 @@ namespace CommunAxiom.Commons.Client.SiloShared
         /// <param name="siloHostBuilder"></param>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        public static ISiloHostBuilder SetDefaults(this ISiloHostBuilder siloHostBuilder, out IConfiguration configuration)
+        public static ISiloHostBuilder SetDefaults(this ISiloHostBuilder siloHostBuilder, out IConfiguration configuration, string configFile)
         {
-            siloHostBuilder.SetConfiguration(out configuration);
-            siloHostBuilder.SetClustering();
-            siloHostBuilder.SetEndPoints();
+            siloHostBuilder.SetConfiguration(out configuration, configFile);
+            siloHostBuilder.SetClustering(configuration);
+            siloHostBuilder.SetEndPoints(configuration);
             siloHostBuilder.SetStreamProviders();
-            siloHostBuilder.SetClusterOptions();
+            siloHostBuilder.SetClusterOptions(configuration);
             return siloHostBuilder;
         }
         /// <summary>
@@ -53,10 +50,13 @@ namespace CommunAxiom.Commons.Client.SiloShared
         /// </summary>
         /// <param name="siloHostBuilder"></param>
         /// <returns></returns>
-        public static ISiloHostBuilder SetClustering(this ISiloHostBuilder siloHostBuilder)
+        public static ISiloHostBuilder SetClustering(this ISiloHostBuilder siloHostBuilder, IConfiguration configuration)
         {
-            //TODO: Add support to multisilo cluster
-            return siloHostBuilder.UseLocalhostClustering();
+            if (configuration["advertisedIp"].StartsWith("127.0.0.1"))
+            {
+                return siloHostBuilder.UseLocalhostClustering();
+            }
+            return siloHostBuilder;
         }
 
         /// <summary>
@@ -64,12 +64,28 @@ namespace CommunAxiom.Commons.Client.SiloShared
         /// </summary>
         /// <param name="siloHostBuilder"></param>
         /// <returns></returns>
-        public static ISiloHostBuilder SetEndPoints(this ISiloHostBuilder siloHostBuilder)
+        public static ISiloHostBuilder SetEndPoints(this ISiloHostBuilder siloHostBuilder, IConfiguration configuration)
         {
             // the silo port was modified from the default because the option range for that port falls in an unauthorized range
-            siloHostBuilder.ConfigureEndpoints(siloPort: 7717, gatewayPort: 30000);
-            // TODO: use configuration to set the IP Address
-            siloHostBuilder.Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback);
+            siloHostBuilder.ConfigureEndpoints(siloPort: int.Parse(configuration["siloPort"].ToString()), gatewayPort: int.Parse(configuration["gatewayPort"].ToString()));
+
+            if (configuration["advertisedIp"].StartsWith("127.0.0.1"))
+            {
+                // TODO: use configuration to set the IP Address
+                siloHostBuilder.Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback);
+                siloHostBuilder.UseLocalhostClustering(int.Parse(configuration["siloPort"]), int.Parse(configuration["gatewayPort"]));
+            }
+            else
+            {
+                siloHostBuilder.Configure<EndpointOptions>(options =>
+                {
+                    options.AdvertisedIPAddress = IPAddress.Parse(configuration["advertisedIp"]);
+                    options.SiloListeningEndpoint = IPEndPoint.Parse($"{configuration["listeningEndpoint"]}:{configuration["siloPort"]}");
+                    options.GatewayListeningEndpoint = IPEndPoint.Parse($"{configuration["listeningEndpoint"]}:{configuration["gatewayPort"]}");
+                    Console.WriteLine($"STARTUP: Advertizing: {configuration["advertisedIp"]}, SiloEndpoint: {configuration["listeningEndpoint"]}:{configuration["siloPort"]}, GatewayEndpoint: {configuration["listeningEndpoint"]}:{configuration["gatewayPort"]}");
+                });
+            }
+
             return siloHostBuilder;
         }
 
@@ -80,20 +96,20 @@ namespace CommunAxiom.Commons.Client.SiloShared
         /// <returns></returns>
         public static ISiloHostBuilder SetStreamProviders(this ISiloHostBuilder siloHostBuilder)
         {
-            siloHostBuilder.AddSimpleMessageStreamProvider(Constants.DefaultStream);
-            siloHostBuilder.AddSimpleMessageStreamProvider(Constants.ImplicitStream, opts =>
+            siloHostBuilder.AddSimpleMessageStreamProvider(OrleansConstants.Streams.DefaultStream);
+            siloHostBuilder.AddSimpleMessageStreamProvider(OrleansConstants.Streams.ImplicitStream, opts =>
             {
                 opts.FireAndForgetDelivery = true;
             });
             return siloHostBuilder;
         }
 
-        public static ISiloHostBuilder SetClusterOptions(this ISiloHostBuilder siloHostBuilder)
+        public static ISiloHostBuilder SetClusterOptions(this ISiloHostBuilder siloHostBuilder, IConfiguration configuration)
         {
             siloHostBuilder.Configure<ClusterOptions>(options =>
              {
-                 options.ClusterId = "0.0.1-a1";
-                 options.ServiceId = "CommonsClientCluster";
+                 options.ClusterId = configuration["ClusterId"];
+                 options.ServiceId = configuration["ServiceId"];
              })
             .ConfigureLogging(logging => logging.AddConsole());
             return siloHostBuilder;
@@ -110,50 +126,77 @@ namespace CommunAxiom.Commons.Client.SiloShared
             services.AddOptions();
             services.SetJSONLiteDbSerializationProvider();
             services.Configure<LiteDbConfig>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, configuration.GetSection("LiteDbStorage"));
-            services.Configure<LiteDbConfig>(Constants.Storage.PubSubStore, configuration.GetSection(Constants.Storage.PubSubStore));
-            services.Configure<LiteDbConfig>(Constants.Storage.JObjectStore, configuration.GetSection(Constants.Storage.JObjectStore));
+            services.Configure<LiteDbConfig>(OrleansConstants.Storage.PubSubStore, configuration.GetSection(OrleansConstants.Storage.PubSubStore));
+            services.Configure<LiteDbConfig>(OrleansConstants.Storage.JObjectStore, configuration.GetSection(OrleansConstants.Storage.JObjectStore));
 
             services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, (svc, key) =>
             {
                 return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
             });
 
-            services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(Constants.Storage.PubSubStore, (svc, key) =>
+            services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(OrleansConstants.Storage.PubSubStore, (svc, key) =>
             {
                 return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
             });
 
             services.AddLiteDbGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
-            services.AddWrappedLiteDbGrainStorage(Constants.Storage.PubSubStore);
-            services.AddJObjectLiteDbGrainStorage(Constants.Storage.JObjectStore);
+            services.AddWrappedLiteDbGrainStorage(OrleansConstants.Storage.PubSubStore);
+            services.AddJObjectLiteDbGrainStorage(OrleansConstants.Storage.JObjectStore);
 
             return services;
         }
 
-        public static ISiloHostBuilder SetConfiguration(this ISiloHostBuilder siloHostBuilder, out IConfiguration configuration)
+        public static ISiloHostBuilder SetConfiguration(this ISiloHostBuilder siloHostBuilder, out IConfiguration configuration, string configFile)
         {
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-            configurationBuilder.AddJsonFile("./config.json");
+            configurationBuilder.AddInMemoryCollection(DefaultConfigs.Configs);
+            configurationBuilder.AddInMemoryCollection(new[]
+            {
+                new KeyValuePair<string,string>("ConfigPath", configFile ?? "./config.json"),
+                new KeyValuePair<string,string>("advertisedIp", "127.0.0.1")
+            });
+            configurationBuilder.AddJsonFile(configFile ?? "./config.json");
             configurationBuilder.AddEnvironmentVariables();
+            
             configuration = configurationBuilder.Build();
 
             return siloHostBuilder.ConfigureAppConfiguration(app =>
             {
-                app.AddJsonFile("./config.json");
+                app.AddInMemoryCollection(DefaultConfigs.Configs);
+                app.AddInMemoryCollection(new[]
+                {
+                    new KeyValuePair<string,string>("ConfigPath", configFile ?? "./config.json"),
+                    new KeyValuePair<string,string>("advertisedIp", "127.0.0.1")
+                });
+                app.AddJsonFile(configFile ?? "./config.json");
                 app.AddEnvironmentVariables();
+                
             });
         }
 
-        public static IHostBuilder SetConfiguration(this IHostBuilder siloHostBuilder, out IConfiguration configuration)
+        public static IHostBuilder SetConfiguration(this IHostBuilder siloHostBuilder, out IConfiguration configuration, string configFile)
         {
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-            configurationBuilder.AddJsonFile("./config.json");
+            configurationBuilder.AddInMemoryCollection(DefaultConfigs.Configs);
+            configurationBuilder.AddInMemoryCollection(new[]
+            {
+                new KeyValuePair<string,string>("ConfigPath", configFile ?? "./config.json"),
+                new KeyValuePair<string,string>("advertisedIp", "127.0.0.1")
+            });
+            configurationBuilder.AddJsonFile(configFile ?? "./config.json");
             configurationBuilder.AddEnvironmentVariables();
+            
             configuration = configurationBuilder.Build();
 
             return siloHostBuilder.ConfigureAppConfiguration(app =>
             {
-                app.AddJsonFile("./config.json");
+                app.AddInMemoryCollection(DefaultConfigs.Configs);
+                app.AddInMemoryCollection(new[]
+                {
+                    new KeyValuePair<string,string>("ConfigPath", configFile ?? "./config.json"),
+                    new KeyValuePair<string,string>("advertisedIp", "127.0.0.1")
+                });
+                app.AddJsonFile(configFile ?? "./config.json");
                 app.AddEnvironmentVariables();
             });
         }

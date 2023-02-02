@@ -94,17 +94,5 @@ namespace CommunAxiom.Commons.Client.Grains.AgentGrain
             return user.Clone();
         }
 
-        public async Task ConnectionState(bool isConnected)
-        {
-            await EnsureLoaded();
-            _persistentState.State.OrchestratorConnectionState.IsConnected = isConnected;
-            _ = _debouncedSave.Invoke();
-        }
-
-        public async Task<OrchestratorConnectionState> GetConnectionState()
-        {
-            await EnsureLoaded();
-            return _persistentState.State.OrchestratorConnectionState;
-        }
     }
 }

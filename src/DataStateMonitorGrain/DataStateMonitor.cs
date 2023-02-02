@@ -35,7 +35,7 @@ namespace CommunAxiom.Commons.Client.Grains.DataStateMonitorGrain
         public async Task Execute()
         {
             var dataStateBusiness = new Business(
-                new GrainFactory(this.GrainFactory),
+                new GrainFactory(this.GrainFactory, this.GetStreamProvider),
                 GrainReference.GrainIdentity.PrimaryKeyString, _dataSourceFactory
             );
 

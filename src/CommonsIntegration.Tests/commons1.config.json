@@ -1,0 +1,49 @@
+{
+  "OIDC": {
+    "Authority": "https://accounts.communaxiom.org/",
+    "Scopes": "openid offline_access roles profile email",
+    "ClientId": "malorum_maximeque_praetorem_exorsus",
+    "Secret": "26b62b3d-730e-4df4-98c5-9a487c97da1c"
+  },
+  "LiteDbStorage": {
+    "Name": "LiteDbStorage",
+    "FileName": "./dbs/CommonsSiloStore1.db"
+  },
+  "JObjectStore": {
+    "Name": "JObjectStore",
+    "FileName": "./dbs/CommonsSiloStore1.db"
+  },
+  "PubSubStore": {
+    "Name": "PubSubStore",
+    "FileName": "./dbs/CommonsPubSubStore1.db"
+  },
+  "client_mode": "local",
+  "membership": {
+    "host": "https://referee.communaxiom.org",
+    "cacheDuration": "00:05:00"
+  },
+  "ClusterId": "0.0.1-a1",
+  "ServiceId": "CommonsClientCluster",
+  "siloPort": "7717",
+  "gatewayPort": "30000",
+  "advertisedIp": "10.10.2.2",
+  "listeningEndpoint": "0.0.0.0",
+  "CommonsMembership": {
+    "Host": "https://localhost:5004",
+    "CacheDuration": "00:05:00"
+  },
+
+  "ListenPort": "5004",
+  "UseHttps": true,
+  "db": "litedb",
+  "LiteDb": {
+    "FileName": "./dbs/members1.db"
+  },
+  "AgentConfig": {
+    "LiveTickerPeriod": 15,
+    "ConnectionCheckPeriod": 5,
+    "SaveStatePeriod": 2,
+    "SubscriptionTimeout": 420
+  }
+
+}

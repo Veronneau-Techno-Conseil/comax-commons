@@ -1,67 +1,72 @@
-﻿using CommunAxiom.Commons.Shared.RuleEngine;
+﻿using CommunAxiom.Commons.Client.Contracts.Grains.Agent;
+using CommunAxiom.Commons.Shared.FlowControl;
+using CommunAxiom.Commons.Shared.RuleEngine;
+using Microsoft.Extensions.Configuration;
+using MongoDB.Driver.Core.Events;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.AgentService.OrchClient
 {
     public static class AgentIntegration
     {
-        public static bool IsConnected { get; internal set; }
+        public static CancellationToken CancellationToken { get; set; }
+
         private static object _lockObj = new object();
-        private static ConcurrentDictionary<Guid, AgentSyncState> workload = new ConcurrentDictionary<Guid, AgentSyncState>();
-        public static Guid Register(string token, TimeSpan frequency, TimeSpan subscriptionTimeout)
+        private static ConcurrentDictionary<Guid, ServiceHost> workload = new ConcurrentDictionary<Guid, ServiceHost>();
+        private static NoFlowTask<object> noFlow = new NoFlowTask<object>(() => Task.FromResult(new object()));
+        public static async Task Register(Guid id, string token, IConfiguration configuration)
         {
-            var newId = Guid.NewGuid();
-            var state = new AgentSyncState(newId, token, frequency, subscriptionTimeout);
-            lock (_lockObj)
+            await noFlow.Run((o) =>
             {
-                var contained = workload.Any(x => x.Value.Token == token);
-                if (contained)
-                    return workload.First(x => x.Value.Token == token).Key;
-                workload.AddOrUpdate(newId, state, (g, x) => state);
-            }
-            return newId;
+                workload.AddOrUpdate(id,
+                    i =>
+                    {
+                        var svc = new ServiceHost(i, configuration);
+                        svc.Token = token;
+                        _ = svc.StartAsync(CancellationToken);
+                        return svc;
+                    },
+                    (i, h) =>
+                    {
+                        h.Token = token;
+                        return h;
+                    });
+                return Task.FromResult(true);
+            });
         }
 
-        public static bool? IsAuthorized(Guid agentId)
+        public static IAgentSyncStatus? GetStatus(Guid agentId)
         {
             if (workload.TryGetValue(agentId, out var state))
             {
-                return state.IsAuthorized;
+                return state;
             }
-            else
-            {
-                return false;
-            }
+            return null;
         }
 
-        public static IEnumerable<Message> Read(Guid guid)
+        public static async Task Clear()
         {
-            if(workload.TryGetValue(guid, out var state))
+            foreach (var it in workload)
             {
-                while(state.Messages.TryDequeue(out var message))
-                    yield return message;
+                await it.Value.StopAsync();
+                it.Value.Dispose();
             }
+            workload.Clear();
         }
 
         internal static void Remove(Guid syncId)
         {
-            workload.TryRemove(syncId, out _);
-        }
-
-        public static IEnumerable<AgentSyncState> Jobs
-        {
-            get
+            if (workload.TryRemove(syncId, out ServiceHost value))
             {
-                lock (_lockObj)
-                {
-                    return workload.Values.ToList();
-                }
-            }
+                value.Dispose();
+            };
+
         }
     }
 }

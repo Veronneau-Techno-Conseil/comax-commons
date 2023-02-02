@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CommunAxiom.Commons.Orleans;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using Orleans;
 
@@ -14,5 +15,6 @@ namespace CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox
         Task Unsubscribe(IMailboxObserver mailboxObserver);
         Task<Message> GetMessage(Guid msgId);
         Task SendMail(MailMessage mail);
+        Task StreamMails(StreamSpec streamSpec);
     }
 }

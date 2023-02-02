@@ -23,18 +23,16 @@ namespace CommunAxiom.Commons.Orleans
         {
             _watcher = new WeakReference(watcher);
             _watcherReference = watcherReference;
-            _watcherTask = Task.Run(Watch);
             _subscribe = subscribe;
             _unsubscribe = unsubscribe;
             _logger = logger;
+            _watcherTask = Task.Run(Watch);
         }
 
         private async Task Watch()
         {
             var ticker = new Ticker(TimeSpan.FromSeconds(30));
-
             
-
             await _subscribe(_watcherReference);
             while (await ticker.NextTick(_cancellation.Token))
             {

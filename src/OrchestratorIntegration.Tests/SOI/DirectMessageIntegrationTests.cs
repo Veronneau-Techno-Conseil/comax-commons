@@ -37,9 +37,9 @@ namespace OrchestratorIntegration.Tests.SOI
                     CreatedDate = DateTime.UtcNow,
                     FromOwner = MessageHelper.UserUri(user.Id),
                     Payload = "Test message body",
-                    Scope = MessageHelper.MSG_SCOPE_PRIVATE,
+                    Scope = MessageScopes.MSG_SCOPE_PRIVATE,
                     Subject = "Test message subject",
-                    Type = MessageHelper.MSG_TYPE_DIRECT
+                    Type = MessageTypes.Communicate.MSG_TYPE_DIRECT
                 };
                 var soi = await client.GetSubjectOfInterest();
                 await soi.Broadcast(msg);

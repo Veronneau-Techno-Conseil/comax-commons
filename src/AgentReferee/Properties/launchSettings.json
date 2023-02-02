@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Referee": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:9005;http://localhost:9006"
+    }
+  }
+}

@@ -45,7 +45,6 @@
 		<ProjectReference Include="..\ClientUI.Components\ClientUI.Components.csproj" />
 		<ProjectReference Include="..\ClientUI.Shared\ClientUI.Shared.csproj" />
 		<ProjectReference Include="..\ClusterClient\ClusterClient.csproj" />
-		<ProjectReference Include="..\ClusterEventStream\ClusterEvent.csproj" />
 		<ProjectReference Include="..\Contracts\Contracts.csproj" />
 		<ProjectReference Include="..\IEventMailbox\EventMailboxGrain.csproj" />
 		<ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />

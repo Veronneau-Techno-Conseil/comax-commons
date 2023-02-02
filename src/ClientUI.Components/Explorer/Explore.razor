@@ -1,0 +1,36 @@
+﻿@page "/explore"
+
+@using Blazorise
+@using Blazorise.TreeView;
+@using CommunAxiom.Commons.Client.Contracts.Grains.Explorer;
+@using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
+@using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+
+<div class="container">
+    <div class="level content">
+        <h1 class="level-item is-4">@_localizer["Shared Portfolios"]</h1>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th><abbr>@_localizer["Owners"]</abbr></th>
+                <th><abbr>@_localizer["Uri"]</abbr></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in (Portfolios ?? new SharedPortfolio[] { }))
+            {
+                <tr>
+                    <td>@item.OwnerUsername</td>
+                    <td>@item.PortfolioUri</td>
+                    <td>
+                        <NavLink class="navbar-item" href="@{$"explore/portfolio/{Uri.EscapeDataString(item.PortfolioUri)}"}" Match="NavLinkMatch.All">
+                            <img class="icon-25" src="_content/ClientUI.Components/icons/Loupe.png" />
+                            @_localizer["Portfolio"]
+                        </NavLink>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>  
+</div>

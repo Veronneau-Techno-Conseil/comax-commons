@@ -1,6 +1,5 @@
-﻿using Comax.Commons.Shared.OIDC;
-using CommunAxiom.Commons.Orleans.Security;
-using CommunAxiom.Commons.Shared.OIDC;
+﻿using CommunAxiom.Commons.Shared.OIDC;
+
 using Orleans.Runtime;
 using System;
 using System.Collections.Generic;

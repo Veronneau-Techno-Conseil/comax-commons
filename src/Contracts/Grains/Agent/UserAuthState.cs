@@ -9,7 +9,8 @@ namespace CommunAxiom.Commons.Client.Contracts.Grains.Agent
     public class UserAuthState
     {
         public string PrincipalId { get; set; }
-        public bool IsAuthorised { get; set; }
+        public bool? IsAuthorised { get; set; }
+        public DateTime LastDate { get; set; }
         public Guid Subscription { get; set; }
     }
 }

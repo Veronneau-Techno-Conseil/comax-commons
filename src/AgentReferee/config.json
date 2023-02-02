@@ -1,0 +1,33 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "member_mongo": {
+    "authDb": "admin",
+    "username": "orchAdmin",
+    "password": "JTFkU054Mmt6Vwo=",
+    "host": "10.13.40.20",
+    "port": 27017,
+    "directConnection": true,
+    "useTls": false,
+    "allowInsecureTls": false
+  },
+  "OIDC": {
+    "Authority": "https://accounts.communaxiom.org/",
+    "Scopes": "offline_access roles profile email",
+    "ClientId": "falso_continent_teneam_discordiae",
+    "Secret": "d67f46f5-9151-4ecb-b1df-8e58ec901382"
+  },
+  "ClusterId": "0.0.1-a1",
+  "ServiceId": "CommonsClientCluster",
+  "ListenPort": "5004",
+  "UseHttps": true,
+  "db": "litedb",
+  "LiteDb": {
+    "FileName": "./members.db"
+  }
+}

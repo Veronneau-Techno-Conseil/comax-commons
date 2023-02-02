@@ -31,7 +31,17 @@ namespace CommunAxiom.Commons.Orleans.Security
 
         public static string GetUri(this ClaimsPrincipal cp)
         {
-            return cp.FindFirst(Constants.URI_CLAIM).Value;
+            return cp?.FindFirst(Constants.URI_CLAIM).Value;
+        }
+
+        public static string GetOwner(this ClaimsPrincipal cp)
+        {
+            return cp?.FindFirst(Constants.OWNER_CLAIM).Value;
+        }
+
+        public static string GetOwnerDisplayName(this ClaimsPrincipal cp)
+        {
+            return cp?.FindFirst(Constants.OWNERUN_CLAIM).Value;
         }
 
         public static string GetPrincipalType(this ClaimsPrincipal cp)

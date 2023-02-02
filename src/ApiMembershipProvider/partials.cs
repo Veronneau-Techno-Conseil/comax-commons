@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Comax.Commons.Orchestrator.ApiMembershipProvider.ApiRef
+namespace Comax.Commons.CommonsShared.ApiMembershipProvider.ApiRef
 {
     public partial class SiloAddress
     {

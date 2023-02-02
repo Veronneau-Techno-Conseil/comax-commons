@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+	  <AssemblyName>Comax.Commons.Orchestrator.OrchestratorRuntime</AssemblyName>
+	  <RootNamespace>Comax.Commons.Orchestrator.OrchestratorRuntime</RootNamespace>
+	  <LangVersion>10.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CommonsSharedContracts\CommonsSharedContracts.csproj" />
+    <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
+    <ProjectReference Include="..\Orleans\Orleans.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -13,29 +13,31 @@ using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.DevSilo.System
 {
-    public class ClusterManagement : IClusterManagement
+    public class ClusterManagement : IClusterManagement, IDisposable
     {
         private readonly IServiceProvider serviceProvider;
-        private readonly ILogger logger; 
-        //private SystemListener systemListener;
+        private readonly ILogger logger;
         private readonly IConfiguration configuration;
+        private readonly Silos.DevSilo devSilo;
         public ClusterManagement(IServiceProvider serviceProvider, ILogger<ClusterManagement> logger, IConfiguration configuration)
         {
             this.serviceProvider = serviceProvider;
             this.logger = logger;
             this.configuration = configuration;
+            this.devSilo = new Silos.DevSilo();
         }
 
-        public SiloShared.System.Silos CurrentSilo { get; set; } = SiloShared.System.Silos.Unspecified;
+        public bool SiloStarted { get; set; }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
 
         public async Task Heartbeat()
         {
-            if(CurrentSilo == SiloShared.System.Silos.Unspecified)
-            {
-                //systemListener = new SystemListener(this, serviceProvider.GetRequiredService<ICommonsClientFactory>(), serviceProvider.GetRequiredService<IConfiguration>());
-                //await systemListener.Listen();
-                _ = SetSilo(SiloShared.System.Silos.Main);
-            }
+            if (!SiloStarted)
+                _ = StartSilo();
         }
 
         public Task<bool> IsServiceAuthSet()
@@ -43,10 +45,10 @@ namespace CommunAxiom.Commons.Client.DevSilo.System
             return Task.FromResult(true);
         }
 
-        public async Task SetSilo(SiloShared.System.Silos requiredSilo)
+        public async Task StartSilo()
         {
-            CurrentSilo = requiredSilo;
-            await Silos.DevSilo.StartSilo();
+            await devSilo.StartSilo();
+            SiloStarted = true;
         }
     }
 }

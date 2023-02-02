@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace CommunAxiom.Commons.Client.Contracts.Grains.Portfolio
 {
-    public interface IPortfolio : IGrainWithStringKey
+    public interface IPortfolio : IGrainWithGuidKey
     {
-        Task AddAPortfolio(Portfolio portfolio);
-        Task<IEnumerable<Portfolio>> GetPortfoliosList();
-        Task<Portfolio> GetAPortfolioDetails(Guid portfolioID);
-        Task<IEnumerable<Portfolio>> FilterPortfolios(string filter);
+        Task AddPortfolio(PortfolioItem portfolio);
+        Task<IEnumerable<PortfolioItem>> GetPortfoliosList();
+        Task<PortfolioItem> GetAPortfolioDetails(Guid portfolioID);
+        Task<IEnumerable<PortfolioItem>> FilterPortfolios(string filter);
         Task<bool> CheckIfUnique(string name);
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Comax.Commons.Orchestrator.SOIGrain.Executors;
+using Comax.Commons.Orchestrator.SOIGrain.Executors.DM;
 using CommunAxiom.Commons.Orleans;
+using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using CommunAxiom.Commons.Shared.RulesEngine;
 using Orleans.Streams;
@@ -11,7 +13,7 @@ using System.Text;
 namespace Comax.Commons.Orchestrator.SOIGrain
 {
 
-    public class SOIBroadcastRulesEngine : RuleEngine<Message>
+    public class SOIBroadcastRulesEngine : RuleEngine<Message>, IUserContextAccessor
     {
         private readonly IStreamProvider _streamProvider;
         private readonly IComaxGrainFactory _comaxGrainFactory;
@@ -20,27 +22,10 @@ namespace Comax.Commons.Orchestrator.SOIGrain
         {
             _streamProvider = streamProvider;
             _comaxGrainFactory = comaxGrainFactory;
-            _claimsPrincipal = cp;
+            _claimsPrincipal = this.GetUser();
 
-            AddRule(new DirectMessageStreamExecutor(_streamProvider, _comaxGrainFactory),
-                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith($"usr://{cp.FindFirst("sub").Value}") },
-                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.StartsWith($"usr://{cp.FindFirst("sub").Value}") },
-                new RuleField<string>
-                {
-                    CheckAsync = async (v) =>
-                        {
-                            if (string.IsNullOrWhiteSpace(v) || !v.ToLower().StartsWith("usr://"))
-                                return false;
-                            var u = MessageHelper.GetUserId(v);
-                            if (string.IsNullOrWhiteSpace(u))
-                                return false;
-                            return await ValidationHelper.AuthorizeDirectUserMessage(_comaxGrainFactory, u);
-                        }
-                },
-                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals(MessageHelper.MSG_TYPE_DIRECT) },
-                new RuleField<string> { Check = (v) => !string.IsNullOrWhiteSpace(v) && v.ToUpper().Equals(MessageHelper.MSG_SCOPE_PRIVATE) }
-            );
-
+            this.AddDMRules(streamProvider, comaxGrainFactory, _claimsPrincipal);
+            this.AddOrchDMRules(streamProvider, comaxGrainFactory, _claimsPrincipal);
         }
 
         public override object[] ExtractValues(Message param)

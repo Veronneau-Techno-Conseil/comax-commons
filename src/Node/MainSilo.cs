@@ -1,7 +1,6 @@
 ﻿
-using Comax.Commons.Shared.OIDC;
-using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.OIDC;
+using CommunAxiom.Commons.Orleans.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -23,7 +22,10 @@ using CommunAxiom.Commons.CommonsShared.Contracts.UriRegistry;
 using CommunAxiom.Commons.CommonsShared.UriRegistryGrain;
 using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
 using CommunAxiom.Commons.CommonsShared.EventMailboxGrain;
-using Comax.Commons.Orchestrator.ApiMembershipProvider;
+using Comax.Commons.CommonsShared.ApiMembershipProvider;
+using Comax.Commons.Orchestrator.Contracts;
+using Comax.Commons.Orchestrator.CommonsActorGrain;
+using Comax.Commons.Orchestrator.SharedPortfolio.Registry;
 
 namespace Comax.Commons.Orchestrator
 {
@@ -34,7 +36,7 @@ namespace Comax.Commons.Orchestrator
         public static ISiloHost Host { get { return _silo; } }
         public static bool IsSiloStarted { get; private set; }
 
-        public static async Task StartSilo()
+        public static async Task StartSilo(string configurationFile = null)
         {
             if (IsSiloStarted)
             {
@@ -48,8 +50,8 @@ namespace Comax.Commons.Orchestrator
 
                     services.CentralGrainSetup();
 
-                    services.AddSingleton<ISvcClientFactory, SvcClientFactory>();
-                    services.AddSingleton<IMembershipTable, ApiMembershipProvider.ApiMembershipProvider>();
+                    services.UseApiMembership(conf.GetSection("Membership"));
+                    services.Configure<OrchestratorConfig>(conf.GetSection("ClusterSettings"));
 
                     //register singleton services for each grain/interface
                     //services.AddSingleton<ISubjectOfInterest, SubjectOfInterest>();
@@ -70,7 +72,7 @@ namespace Comax.Commons.Orchestrator
 
                     services.AddSingleton<IEventMailbox, EventMailbox>();
 
-                })
+                }, configurationFile)
                 .UseDashboard()
                 //configure application parts for each grain
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(PublicBoard).Assembly).WithReferences())
@@ -78,7 +80,9 @@ namespace Comax.Commons.Orchestrator
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(EventMailbox).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Mail).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(SubjectOfInterest).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Central).Assembly).WithReferences());
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Central).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts=> parts.AddApplicationPart(typeof(CommonsActor).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts=> parts.AddApplicationPart(typeof(PortfolioRegistry).Assembly).WithReferences());
 
             var silo = builder.Build();
             await silo.StartAsync();

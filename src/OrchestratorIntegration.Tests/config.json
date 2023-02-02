@@ -13,15 +13,15 @@
   },
   "LiteDbStorage": {
     "Name": "LiteDbStorage",
-    "FileName": "./SiloStore.db"
+    "FileName": "./dbs/SiloStore.db"
   },
   "JObjectStore": {
     "Name": "JObjectStore",
-    "FileName": "./SiloStore.db"
+    "FileName": "./dbs/SiloStore.db"
   },
   "PubSubStore": {
     "Name": "PubSubStore",
-    "FileName": "./PubSubStore.db"
+    "FileName": "./dbs/PubSubStore.db"
   },
   "TestUser": {
     "username": "usera@vertechcon.net",

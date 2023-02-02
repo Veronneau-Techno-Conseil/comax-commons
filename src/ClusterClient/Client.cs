@@ -19,18 +19,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunAxiom.Commons.Client.Contracts.Grains.DateStateMonitorSupervisor;
+using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
+using CommunAxiom.Commons.CommonsShared.Contracts.UriRegistry;
+using Microsoft.Extensions.Logging;
+using CommunAxiom.Commons.Client.Contracts.Grains.Agent;
+using CommunAxiom.Commons.Client.Contracts.Grains.Explorer;
 
-namespace ClusterClient
+namespace CommunAxiom.Commons.Client.ClusterClient
 {
     public class Client : ICommonsClusterClient, IDisposable
     {
         private bool _disposed = false;
         private readonly IClusterClient _clusterClient;
-        private ICommonsClusterClient _commonsClusterClientImplementation;
+        private readonly ILogger _logger;
+        private Guid? _userID = null;
 
-        public Client(IClusterClient clusterClient)
+        public Client(IClusterClient clusterClient, ILogger<Client> logger)
         {
             _clusterClient = clusterClient;
+            _logger = logger;
         }
 
         ~Client()
@@ -38,14 +45,19 @@ namespace ClusterClient
             if (!_disposed) { Dispose(); }
         }
 
-        public IDateStateMonitorSupervisor GetDateStateMonitorSupervisor()
+        public IDataStateMonitorSupervisor GetDateStateMonitorSupervisor()
         {
-            return _clusterClient.GetGrain<IDateStateMonitorSupervisor>(Guid.Empty);
+            return _clusterClient.GetGrain<IDataStateMonitorSupervisor>(Guid.Empty);
         }
 
         public IAccount GetAccount()
         {
             return _clusterClient.GetGrain<IAccount>(Guid.Empty);
+        }
+
+        public IAgent GetAgent()
+        {
+            return _clusterClient.GetGrain<IAgent>(Guid.Empty);
         }
 
         public IAuthentication GetAuthentication()
@@ -68,9 +80,9 @@ namespace ClusterClient
             return _clusterClient.GetGrain<IIngestion>(ingestionId);
         }
 
-        public IPortfolio GetPortfolio(string portfolioId)
+        public IPortfolio GetPortfolio()
         {
-            return _clusterClient.GetGrain<IPortfolio>(portfolioId);
+            return _clusterClient.GetGrain<IPortfolio>(Guid.Empty);
         }
 
         public IProject GetProject(string projectId)
@@ -88,10 +100,15 @@ namespace ClusterClient
             return _clusterClient.GetGrain<IScheduler>(schedulerID);
         }
 
+        public IExplorer GetExplorer()
+        {
+            return _clusterClient.GetGrain<IExplorer>(Guid.Empty);
+        }
+
         public async Task<StreamSubscriptionHandle<SystemEvent>> SubscribeSystem(Func<SystemEvent, StreamSequenceToken, Task> fn, Func<Exception, Task> funcError, Func<Task> onCompleted)
         {
-            var res = await _clusterClient.GetStreamProvider(Constants.DefaultStream)
-                    .GetStream<SystemEvent>(Guid.Empty, Constants.DefaultNamespace)
+            var res = await _clusterClient.GetStreamProvider(OrleansConstants.Streams.DefaultStream)
+                    .GetStream<SystemEvent>(Guid.Empty, OrleansConstants.StreamNamespaces.DefaultNamespace)
                     .SubscribeAsync(fn, funcError, onCompleted);
             return res;
         }
@@ -99,11 +116,43 @@ namespace ClusterClient
         public async Task<(StreamSubscriptionHandle<AuthorizationInstructions>, AsyncEnumerableStream<AuthorizationInstructions>)> SubscribeAuth(Guid streamId)
         {
             var result = new AsyncEnumerableStream<AuthorizationInstructions>();
-            var handle = await _clusterClient.GetStreamProvider(Constants.DefaultStream)
-                    .GetStream<AuthorizationInstructions>(streamId, Constants.DefaultNamespace)
+            var handle = await _clusterClient.GetStreamProvider(OrleansConstants.Streams.DefaultStream)
+                    .GetStream<AuthorizationInstructions>(streamId, OrleansConstants.StreamNamespaces.DefaultNamespace)
                     .SubscribeAsync(result);
             return (handle, result);
         }
+
+        public IUriRegistry GetUriRegistry(string uri)
+        {
+            string actual = OrleansConstants.BLANK_ID;
+            if (!string.IsNullOrWhiteSpace(uri))
+            {
+                if (!uri.StartsWith("usr://") && !uri.StartsWith("com://"))
+                {
+                    throw new ArgumentException("Id should be a uri");
+                }
+                actual = uri;
+            }
+            return _clusterClient.GetGrain<IUriRegistry>(actual);
+        }
+
+        private async Task<Guid> LoadUserId()
+        {
+            if (_userID == null)
+                _userID = await this.GetUriRegistry("").GetOrCreate();
+            return _userID.Value;
+        }
+
+        public async Task<IEventMailboxClient> GetEventMailbox(Guid? id = null)
+        {
+            Guid? userID = id;
+            if (userID == null)
+                userID = await this.LoadUserId();
+            var gr = _clusterClient.GetGrain<IEventMailbox>(userID.Value);
+            var cl = new EventMailboxClient(_clusterClient, gr, _logger);
+            return cl;
+        }
+
 
         public void Dispose()
         {

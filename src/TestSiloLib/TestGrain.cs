@@ -10,7 +10,7 @@ namespace TestContracts
     {
         private readonly IPersistentState<JObject> _jobjDetails;
         private readonly IPersistentState<JObjContract> _stdDetails;
-        public TestGrain([PersistentState("test-jobj-state", Constants.Storage.JObjectStore)] IPersistentState<JObject> jobjDetails,
+        public TestGrain([PersistentState("test-jobj-state", OrleansConstants.Storage.JObjectStore)] IPersistentState<JObject> jobjDetails,
             [PersistentState("test-std-state")] IPersistentState<JObjContract> stdDetails)
         {
             _jobjDetails = jobjDetails;

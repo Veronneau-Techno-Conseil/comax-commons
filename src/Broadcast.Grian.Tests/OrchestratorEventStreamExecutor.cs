@@ -1,6 +1,7 @@
 ﻿using Broadcast.Grian.Tests.Stream;
 using CommunAxiom.Commons.Client.Grains.BroadcastGrain;
 using CommunAxiom.Commons.Shared.RuleEngine;
+using CommunAxiom.Commons.Shared.RulesEngine;
 using FluentAssertions;
 using GrainTests.Shared;
 using NUnit.Framework;
@@ -32,8 +33,8 @@ namespace Broadcast.Grian.Tests
                 From = "com://local",
                 FromOwner = "ust://{usrid}",
                 To = "com://*",
-                Type = "NEW_DATA_VERSION",
-                Scope = "PARTNERS"
+                Type = MessageTypes.CommonsAgentEvents.MSG_TYPE_NEW_DATA,
+                Scope = MessageScopes.MSG_SCOPE_PARTNERS
             };
 
             await _orchestratorEventStreamExecutor.Execute(message);

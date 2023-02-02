@@ -12,6 +12,8 @@ namespace CommunAxiom.Commons.Shared.OIDC
         private readonly HttpClient _httpClient;
         private readonly OIDCSettings _settings;
         private DiscoveryDocumentResponse? _tokenMetadata = null;
+        int metadataRetries = 5;
+
 
         public DiscoveryDocumentResponse TokenMetadata 
         {
@@ -19,8 +21,16 @@ namespace CommunAxiom.Commons.Shared.OIDC
             {
                 if(_tokenMetadata == null)
                 {
-                    string url = _settings.Authority.TrimEnd('/') + '/';
-                    _tokenMetadata = _httpClient.GetDiscoveryDocumentAsync(url).GetAwaiter().GetResult();
+                    int trials = 0;
+                    while(trials < metadataRetries && (_tokenMetadata == null))
+                    {
+                        string url = _settings.Authority.TrimEnd('/') + '/';
+                        _tokenMetadata = _httpClient.GetDiscoveryDocumentAsync(url).GetAwaiter().GetResult();
+                        if(_tokenMetadata.IsError)
+                            _tokenMetadata = null;
+                        trials++;
+                    }
+                    
                 }
                 return _tokenMetadata;
             }

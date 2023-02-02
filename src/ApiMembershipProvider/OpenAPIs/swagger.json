@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "Referee",
+    "title": "CommunAxiom.Commons.CommonsShared.MembershipApi",
     "version": "1.0"
   },
   "paths": {
@@ -310,8 +310,7 @@
         "properties": {
           "beforeDate": {
             "type": "string",
-            "format": "date-time",
-            "readOnly": true
+            "format": "date-time"
           }
         },
         "additionalProperties": false
@@ -321,8 +320,7 @@
         "properties": {
           "clusterId": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -331,8 +329,11 @@
         "type": "object",
         "properties": {
           "tryInitTableVersion": {
-            "type": "boolean",
-            "readOnly": true
+            "type": "boolean"
+          },
+          "clusterId": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -492,8 +493,7 @@
           },
           "etag": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "tableVersion": {
             "$ref": "#/components/schemas/TableVersion"

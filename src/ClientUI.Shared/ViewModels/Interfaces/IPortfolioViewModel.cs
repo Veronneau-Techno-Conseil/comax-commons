@@ -1,6 +1,7 @@
 ﻿using CommunAxiom.Commons.ClientUI.Shared.Models;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Client.Contracts.IO;
+using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
 
 namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces
 {

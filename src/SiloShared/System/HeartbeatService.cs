@@ -26,17 +26,11 @@ namespace CommunAxiom.Commons.Client.SiloShared.System
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
 
-            await clusterManagement.SetSilo(Silos.Main);
-
-
-
+            await clusterManagement.StartSilo();
             logger.LogInformation("Service auth already set, switching to main silo");
-
-
 
             while (!stoppingToken.IsCancellationRequested)
             {
-
                 await clusterManagement.Heartbeat();
                 await Task.Delay(1000);
             }

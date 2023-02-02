@@ -10,9 +10,7 @@ namespace CommunAxiom.Commons.Client.Contracts.Auth
 {
     public interface IAuthentication : IGrainWithGuidKey
     {
-        Task<OperationResult<AuthorizationInstructions>> LaunchServiceAuthentication(string clientId, string clientSecret, string redirectUri);
         Task<OperationResult<AuthorizationInstructions>> LaunchAuthentication(string redirectUri);
-        Task<OperationResult<SessionInfo>> RetrieveToken(string clientId, string clientSecret, string devideCode, int interval);
         Task Proceed();
         Task Complete();
         Task SetResult(BrowserResult browserResult);
