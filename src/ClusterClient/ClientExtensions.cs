@@ -6,13 +6,17 @@ using Orleans.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 
-namespace ClusterClient
+namespace CommunAxiom.Commons.Client.ClusterClient
 {
     public static class ClientExtensions
     {
-        public static void SetupOrleansClient(this IServiceCollection collection)
+        public static void SetupOrleansClient(this IServiceCollection collection, string configFile)
         {
-            collection.AddSingleton<ICommonsClientFactory, ClientFactory>();            
+            collection.AddSingleton<ICommonsClientFactory>(sp => 
+            {
+                var fact = new ClientFactory(sp, configFile);
+                return fact;
+            });
         }
         
     }

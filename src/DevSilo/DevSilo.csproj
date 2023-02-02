@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -24,6 +24,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\AccountGrain\AccountGrain.csproj" />
+		<ProjectReference Include="..\DispatchGrain\DispatchGrain.csproj" />
 		<ProjectReference Include="..\ClusterClient\ClusterClient.csproj" />
 		<ProjectReference Include="..\DatasetGrain\DatasetGrain.csproj" />
 		<ProjectReference Include="..\DatasourceGrain\DatasourceGrain.csproj" />

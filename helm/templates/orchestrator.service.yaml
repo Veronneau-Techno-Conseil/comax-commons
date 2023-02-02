@@ -11,10 +11,12 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.orch.gatewayport }}
+{{- range .Values.service.ports }}
+    - port: {{ .port }}
+      targetPort: {{ .targetPort }}
       protocol: TCP
-      name: http
+      name: {{ .name }}
+{{- end }}
   selector:
     {{- include "comax-orchestrator.selectorLabels" . | nindent 4 }}
   {{- if .Values.service.loadBalancerClass }}

@@ -1,7 +1,9 @@
 {
   "OIDC": {
     "Authority": "https://accounts.communaxiom.org/",
-    "Scopes": "openid offline_access roles profile email"
+    "Scopes": "openid offline_access roles profile email",
+    "ClientId": "decore_defuturum_fusce_consequentis",
+    "Secret": "534361b1-ba60-4d0e-977b-e41fd1721a2d"
   },
   "LiteDbStorage": {
     "Name": "LiteDbStorage",
@@ -14,5 +16,24 @@
   "PubSubStore": {
     "Name": "PubSubStore",
     "FileName": "./PubSubStore.db"
+  },
+  "client_mode": "local",
+  "membership": {
+    "host": "https://referee.communaxiom.org",
+    "cacheDuration": "00:05:00"
+  },
+  "ClusterId": "0.0.1-a1",
+  "ServiceId": "CommonsClientCluster",
+  "siloPort": "7717",
+  "gatewayPort": "30000",
+  "advertisedIp": "10.10.2.2",
+  "listeningEndpoint": "0.0.0.0",
+  "CommonsMembership": {
+    "Host": "https://localhost:5004"
+  },
+  "AgentConfig": {
+    "LiveTickerPeriod": 30,
+    "ConnectionCheckPeriod": 30,
+    "SaveStatePeriod": 30
   }
 }

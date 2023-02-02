@@ -8,5 +8,7 @@
   "AddPortfolio": "Create Portfolio",
   "PortfolioName": "Name",
   "Save": "Save",
-  "Cancel": "Cancel"
+  "Cancel": "Cancel",
+  "FieldMetadataSaved": "Field metadata saved successfully.",
+  "DataConfigurationSaved": "Data Configuration saved successfully."
 }

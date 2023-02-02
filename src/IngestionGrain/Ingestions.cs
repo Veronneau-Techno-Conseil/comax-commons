@@ -11,12 +11,14 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
     [Reentrant]
     public class Ingestions : Grain, IIngestion
     {
-        private readonly Business _business;
-
+        private Business _business;
+        private readonly Importer _importer;
+        private readonly IPersistentState<IngestionHistory> _history;
+        
         public Ingestions(Importer importer, [PersistentState("ingestion-history")] IPersistentState<IngestionHistory> history)
         {
-            _business = new Business(importer, new GrainFactory(this.GrainFactory), this.GrainReference.GrainIdentity.PrimaryKeyString);
-            _business.Init(history);
+            _importer = importer;
+            _history = history;
         }
 
         public Task<IngestionHistory> GetHistory()
@@ -29,5 +31,11 @@ namespace CommunAxiom.Commons.Client.Grains.IngestionGrain
             return _business.Run();
         }
 
+        public override Task OnActivateAsync()
+        {
+            _business = new Business(_importer, new GrainFactory(this.GrainFactory, this.GetStreamProvider), this.GrainReference.GrainIdentity.PrimaryKeyString);
+            _business.Init(_history);
+            return base.OnActivateAsync(); 
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CommunAxiom.Commons.Client.Contracts.Account;
+using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared;
 using CommunAxiom.Commons.Shared.OIDC;
 using Microsoft.Extensions.Configuration;
@@ -13,10 +14,12 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
     public class AccountBusiness
     {
         private readonly IConfiguration _configuration;
+        private readonly ISettingsProvider _settingsProvider;
         private AccountRepo _accountRepo;
-        public AccountBusiness(IConfiguration configuration)
+        public AccountBusiness(IConfiguration configuration, ISettingsProvider settingsProvider)
         {
             this._configuration = configuration;
+            this._settingsProvider = settingsProvider;
         }
 
         public void Init(IPersistentState<AccountDetails> actDetails)
@@ -52,7 +55,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
 
         public async Task Initialize(AccountDetails accountDetails)
         {
-            if (!string.IsNullOrWhiteSpace(accountDetails.ClientID) && !string.IsNullOrWhiteSpace(accountDetails.ClientSecret))
+            if (!string.IsNullOrWhiteSpace(accountDetails.ClientID))
             {
                 await this.UpdateClientCredentials(accountDetails);
             }
@@ -66,8 +69,9 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
         {
             //todo: Complete token maintenance / status
             TokenClient tokenClient = new TokenClient(_configuration);
-            
-            var (isSuccess, data) = await tokenClient.AuthenticateClient(details.ClientID, details.ClientSecret, TokenClient.SCOPES_OFFLINE);
+            var settings = await _settingsProvider.GetOIDCSettings();
+
+            var (isSuccess, data) = await tokenClient.AuthenticateClient(details.ClientID, settings.Secret, TokenClient.SCOPES_OFFLINE);
             if (!isSuccess)
             {
                 details.State = AccountState.AuthenticationError;
@@ -78,7 +82,9 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             }
             else
             {
-                details.State = AccountState.CredentialsSet;
+                var principal = await tokenClient.RequestIntrospection(details.ClientID, settings.Secret, data.access_token);
+                details.ApplicationUri = principal.Item2.GetUri();
+                details.State = AccountState.Initial;
                 details.AccessToken = data.access_token;
                 details.RefreshToken = data.refresh_token;
                 //5 minutes before token expiration

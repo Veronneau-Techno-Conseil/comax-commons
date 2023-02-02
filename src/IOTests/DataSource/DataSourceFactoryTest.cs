@@ -40,18 +40,18 @@ namespace CommunAxiom.Commons.Ingestion.Tests.DataSource
         {
             var textDataSourceReader = new TextDataSourceReader(_configValidatorLookup.Object);
 
-            _serviceResolver.Setup(x => x.Invoke(DataSourceType.FILE)).Returns(textDataSourceReader);
+            _serviceResolver.Setup(x => x.Invoke(DataSourceType.File)).Returns(textDataSourceReader);
 
-            var reader = _sourceFactory.Create(DataSourceType.FILE);
+            var reader = _sourceFactory.Create(DataSourceType.File);
             reader.Should().BeOfType<TextDataSourceReader>();
         }
 
         [Test]
         public void WhenServiceProviderIsResolvedNullThenSourceFactoryShouldThrowNullReferenceException()
         {
-            var sourceType = DataSourceType.FILE;
+            var sourceType = DataSourceType.File;
 
-            _serviceResolver.Setup(x => x.Invoke(DataSourceType.FILE)).Returns(() => null);
+            _serviceResolver.Setup(x => x.Invoke(DataSourceType.File)).Returns(() => null);
 
             Action act = () => _sourceFactory.Create(sourceType);
 

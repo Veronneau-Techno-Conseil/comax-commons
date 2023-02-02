@@ -8,9 +8,9 @@ namespace CommunAxiom.Commons.Client.SiloShared.System
 {
     public interface IClusterManagement
     {
-        Silos CurrentSilo { get; }
+        public bool SiloStarted { get; }
         Task Heartbeat();
-        Task SetSilo(Silos requiredSilo);
-        Task<bool> IsServiceAuthSet();
+        Task StartSilo();
+        
     }
 }

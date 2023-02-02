@@ -1,4 +1,4 @@
-﻿using ClusterClient;
+﻿using CommunAxiom.Commons.Client.ClusterClient;
 using CommunAxiom.Commons.Client.Contracts.Account;
 using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +38,6 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
         public async Task<IActionResult> GetDetails(string GrainId)
         {
             var details =  await _clientFactory.WithClusterClient(c => c.GetAccount().GetDetails());
-            details.ClientSecret = String.Empty;
             return Ok(details);
         }
 

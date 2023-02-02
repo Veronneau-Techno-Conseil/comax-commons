@@ -1,0 +1,17 @@
+﻿@using Blazorise
+@using Blazorise.TreeView;
+
+<h3>PortfolioTreeview</h3>
+
+
+<TreeView Nodes="PortfolioListResult"
+          GetChildNodes="@(item => item.Children)"
+          HasChildNodes="@(item => item.Children?.Any() == true)"
+          @bind-SelectedNode="SelectedPortfolio"
+          @bind-ExpandedNodes="ExpandedPortfolio">
+    <NodeContent>
+        <img class="icon-25" src="@GetIcon(context.Type)" />
+        <span @onclick="() => ShowCard(context)" class="ml-2 mr-2 has-text-weight-bold icon-pos"> @context.Text </span>
+    </NodeContent>
+</TreeView>
+

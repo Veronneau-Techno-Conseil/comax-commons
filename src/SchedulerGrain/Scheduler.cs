@@ -12,19 +12,22 @@ namespace SchedulerGrain
     [GrainDirectory(GrainDirectoryName = "MyGrainDirectory")]
     public class Scheduler : Grain, IScheduler
     {
-        private readonly SchedulerBusiness _schedulerBusiness;
+        private SchedulerBusiness _schedulerBusiness;
         private IDisposable _delayDeActivation, _executeScheduled;
-
+        private IPersistentState<Schedulers> _scheduler;
+        private IPersistentState<SchedulersList> _schedulersList;
 
         public Scheduler([PersistentState("scheduler")] IPersistentState<Schedulers> scheduler,
             [PersistentState("schedulersList")] IPersistentState<SchedulersList> schedulersList)
         {
-            _schedulerBusiness = new SchedulerBusiness(new GrainFactory(this.GrainFactory));
-            _schedulerBusiness.Init(scheduler, schedulersList);
+            _scheduler = scheduler;
+            _schedulersList = schedulersList;
         }
 
         public override Task OnActivateAsync()
         {
+            _schedulerBusiness = new SchedulerBusiness(new GrainFactory(this.GrainFactory, this.GetStreamProvider));
+            _schedulerBusiness.Init(_scheduler, _schedulersList);
             _delayDeActivation = RegisterTimer(x => DelayGrainDeactivation(), true,
                 TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(5)); //Consider changing the timer frequency if needed
             _executeScheduled = RegisterTimer(x => ExecuteAndUpdateScheduled(), true,

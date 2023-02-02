@@ -1,4 +1,4 @@
-﻿using CommunAxiom.Commons.Client.ClusterEventStream.Extentions;
+﻿using CommunAxiom.Commons.Client.AgentClusterRuntime.Extentions;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using Orleans.Streams;
 using System.Threading.Tasks;
@@ -16,9 +16,9 @@ namespace CommunAxiom.Commons.Client.Grains.BroadcastGrain
 
         public async Task Execute(Message param)
         {
-            var _asyncStream = _streamProvider.GetEventStream();
+            var asyncStream = _streamProvider.GetEventStream();
 
-            await _asyncStream.OnNextAsync(param);
+            await asyncStream.OnNextAsync(param);
         }
     }
 }

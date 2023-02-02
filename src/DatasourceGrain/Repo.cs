@@ -9,10 +9,12 @@ namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
     public class Repo
     {
         private readonly IPersistentState<SourceState> _dataSourceState;
-
-        public Repo(IPersistentState<SourceState> dataSourceState)
+        private readonly IPersistentState<FileHash> _hashState;
+        
+        public Repo(IPersistentState<SourceState> dataSourceState, IPersistentState<FileHash> hashState)
         {
             _dataSourceState = dataSourceState;
+            _hashState = hashState;
         }
 
         public async Task<SourceState> ReadConfig()
@@ -42,6 +44,18 @@ namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
         public async Task DeleteConfig()
         {
             await _dataSourceState.ClearStateAsync();
+        }
+
+        public async Task SetFileHash(byte[] hash)
+        {
+            _hashState.State.Value = hash;
+            await _hashState.WriteStateAsync();
+        }
+        
+        public async Task<byte[]> GetFileHash()
+        {
+            await _hashState.ReadStateAsync();
+            return _hashState.State.Value;
         }
     }
 }

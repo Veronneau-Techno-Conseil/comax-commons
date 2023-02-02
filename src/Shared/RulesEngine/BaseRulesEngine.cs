@@ -55,6 +55,9 @@
 
         public async Task Process(TParam param)
         {
+            if (param == null)
+                return;
+
             var values = this.ExtractValues(param);
 
             var operationResult = this.Validate(values);

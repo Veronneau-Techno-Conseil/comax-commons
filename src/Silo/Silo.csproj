@@ -14,7 +14,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
-	<PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
 	<PackageReference Include="Microsoft.Orleans.Core" Version="3.6.5" />
 	<PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.6.5" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.6.5" />
@@ -23,17 +23,27 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AccountGrain\AccountGrain.csproj" />
+    <ProjectReference Include="..\AgentGrain\AgentGrain.csproj" />
     <ProjectReference Include="..\ClusterClient\ClusterClient.csproj" />
     <ProjectReference Include="..\DatasetGrain\DatasetGrain.csproj" />
     <ProjectReference Include="..\DatasourceGrain\DatasourceGrain.csproj" />
+    <ProjectReference Include="..\DataStateMonitorGrain\DataStateMonitorGrain.csproj" />
+    <ProjectReference Include="..\DataStateMonitorSupervisorGrain\DataStateMonitorSupervisorGrain.csproj" />
     <ProjectReference Include="..\DataTransferGrain\DataTransferGrain.csproj" />
+    <ProjectReference Include="..\DispatchGrain\DispatchGrain.csproj" />   
+    <ProjectReference Include="..\BroadcastGrain\BroadcastGrain.csproj" />   
+    <ProjectReference Include="..\ExplorerGrain\ExplorerGrain.csproj" />
     <ProjectReference Include="..\IngestionGrain\IngestionGrain.csproj" />
     <ProjectReference Include="..\LiteDbStorageProvider\LiteDbStorageProvider.csproj" />
+    <ProjectReference Include="..\MailGrain\MailGrain.csproj" />
     <ProjectReference Include="..\PortfolioGrain\PortfolioGrain.csproj" />
     <ProjectReference Include="..\ProjectGrain\ProjectGrain.csproj" />
     <ProjectReference Include="..\ReplicationGrain\ReplicationGrain.csproj" />
     <ProjectReference Include="..\SchedulerGrain\SchedulerGrain.csproj" />
     <ProjectReference Include="..\SiloShared\SiloShared.csproj" />
+    <ProjectReference Include="..\StorageGrain\StorageGrain.csproj" />
+	<ProjectReference Include="..\Orchestrator.Client\Orchestrator.Client.csproj" />
+	<ProjectReference Include="..\UriRegistryGrain\UriRegistryGrain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

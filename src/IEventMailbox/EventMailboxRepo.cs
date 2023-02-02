@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Comax.Commons.Orchestrator.Contracts.EventMailbox;
+using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
 using Orleans.Runtime;
 
-namespace Comax.Commons.Orchestrator.EventMailboxGrain
+namespace CommunAxiom.Commons.CommonsShared.EventMailboxGrain
 {
     public class EventMailboxRepo
     {

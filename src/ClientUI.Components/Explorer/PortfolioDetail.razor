@@ -1,0 +1,14 @@
+﻿@page "/explore/portfolio/{pfid}"
+
+@using Blazorise
+@using Blazorise.TreeView;
+@using CommunAxiom.Commons.Client.Contracts.Grains.Explorer;
+@using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
+@using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
+
+<div class="container">
+    <div class="level content">
+        <h1 class="level-item is-4">@Localizer["Shared Portfolios"]</h1>
+    </div>
+    <PortfolioTreeview PortfolioList="_items"></PortfolioTreeview>
+</div>

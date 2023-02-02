@@ -7,11 +7,18 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace CommunAxiom.Commons.Orleans.Security
 {
     public class AccessControl
     {
+        private static List<string> _unsecureAuthorisedGrains = new List<string>()
+        {
+            "Orleans.Runtime.TypeManager",
+            "Orleans.Streams.PubSubRendezvousGrain"
+        };
+
         private static IEnumerable<AuthorizeClaimAttribute> GetAttributes(IIncomingGrainCallContext grainCallContext)
         {
             var atts = new List<AuthorizeClaimAttribute>();
@@ -48,6 +55,25 @@ namespace CommunAxiom.Commons.Orleans.Security
 
             return atts.Count() > 0;
         }
+
+        public static bool PassthroughAuthorize(IIncomingGrainCallContext grainCallContext)
+        {
+            var atts = new List<AuthorizePassthrough>();
+            var authorizeClaimAttributes =
+                grainCallContext.InterfaceMethod.GetCustomAttributes<AuthorizePassthrough>();
+
+            if (authorizeClaimAttributes != null && authorizeClaimAttributes.Count() > 0)
+                atts.AddRange(authorizeClaimAttributes);
+
+            authorizeClaimAttributes =
+                grainCallContext.ImplementationMethod.GetCustomAttributes<AuthorizePassthrough>();
+
+            if (authorizeClaimAttributes != null && authorizeClaimAttributes.Count() > 0)
+                atts.AddRange(authorizeClaimAttributes);
+
+            return atts.Count() > 0 || _unsecureAuthorisedGrains.Contains(grainCallContext.ImplementationMethod.DeclaringType.FullName);
+        }
+
         public static AccessControlValidationResult IsAuthorized(IIncomingGrainCallContext grainCallContext, ClaimsPrincipal? claimsPrincipal)
         {
             var authorizeClaimAttributes = GetAttributes(grainCallContext);

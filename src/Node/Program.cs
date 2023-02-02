@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using Comax.Commons.Orchestrator.CentralGrain;
 
 namespace Comax.Commons.Orchestrator
 {

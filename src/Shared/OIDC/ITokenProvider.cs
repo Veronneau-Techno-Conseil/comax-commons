@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Comax.Commons.Shared.OIDC
+namespace CommunAxiom.Commons.Shared.OIDC
 {
     public interface ITokenProvider
     {

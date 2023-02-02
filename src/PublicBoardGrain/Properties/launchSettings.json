@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "PublicBoardGrain": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:8053;http://localhost:8054"
+    }
+  }
+}

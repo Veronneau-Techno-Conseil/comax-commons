@@ -1,5 +1,5 @@
 ﻿using Comax.Commons.Orchestrator.Contracts;
-using Comax.Commons.Orchestrator.Contracts.Mailbox;
+using Comax.Commons.Orchestrator.Contracts.PublicBoard;
 using CommunAxiom.Commons.Orleans;
 using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.RuleEngine;
@@ -20,10 +20,10 @@ namespace Comax.Commons.Orchestrator.MailboxGrain
         private readonly ILogger _logger;
         private readonly PublicBoardBusiness _publicBoardBusiness;
 
-        public PublicBoard(ILogger logger, [PersistentState("storageGrain")] IPersistentState<PublicBoardIndex> storageState)
+        public PublicBoard(ILogger logger, [PersistentState("publicBoard")] IPersistentState<PublicBoardIndex> storageState)
         {
             PublicBoardRepo publicBoardRepo = new PublicBoardRepo(storageState);
-            GrainFactory grainFactory = new GrainFactory(this.GrainFactory);
+            GrainFactory grainFactory = new GrainFactory(this.GrainFactory, this.GetStreamProvider);
             _publicBoardBusiness = new PublicBoardBusiness(publicBoardRepo, grainFactory, logger);
             _subsManager = new ObserverManager<IPublicBoardObserver>(TimeSpan.FromMinutes(5), logger, "subs");
             _logger = logger;

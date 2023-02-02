@@ -12,6 +12,8 @@ namespace CommunAxiom.Commons.Shared.OIDC
         private readonly HttpClient _httpClient;
         private readonly OIDCSettings _settings;
         private DiscoveryDocumentResponse? _tokenMetadata = null;
+        int metadataRetries = 5;
+
 
         public DiscoveryDocumentResponse TokenMetadata 
         {
@@ -19,8 +21,16 @@ namespace CommunAxiom.Commons.Shared.OIDC
             {
                 if(_tokenMetadata == null)
                 {
-                    string url = _settings.Authority.TrimEnd('/') + '/';
-                    _tokenMetadata = _httpClient.GetDiscoveryDocumentAsync(url).GetAwaiter().GetResult();
+                    int trials = 0;
+                    while(trials < metadataRetries && (_tokenMetadata == null))
+                    {
+                        string url = _settings.Authority.TrimEnd('/') + '/';
+                        _tokenMetadata = _httpClient.GetDiscoveryDocumentAsync(url).GetAwaiter().GetResult();
+                        if(_tokenMetadata.IsError)
+                            _tokenMetadata = null;
+                        trials++;
+                    }
+                    
                 }
                 return _tokenMetadata;
             }
@@ -46,6 +56,33 @@ namespace CommunAxiom.Commons.Shared.OIDC
             {
                 _configured = true;
             }
+        }
+
+        public async Task<(bool, TokenData?)> RefreshToken(string refreshToken)
+        {
+            await this.Configure();
+
+            var res = await _httpClient.RequestRefreshTokenAsync(new RefreshTokenRequest
+            {
+                Address = TokenMetadata.TokenEndpoint,
+                RefreshToken = refreshToken,
+                ClientId = _settings.ClientId,
+                ClientSecret = _settings.Secret
+            });
+
+            if (res.HttpResponse.IsSuccessStatusCode)
+            {
+                return (true, new TokenData { access_token = res.AccessToken, expires_in = res.ExpiresIn, refresh_token = res.RefreshToken, token_type = res.TokenType });
+            }
+            else if (res.HttpResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return (false, null);
+            }
+            else
+            {
+                throw new Exception($"Unexpected result calling token endpoint: {res.HttpStatusCode}=> {res.HttpErrorReason}, {await res.HttpResponse.Content.ReadAsStringAsync()}");
+            }
+
         }
 
         public async Task<(bool, TokenData?)> AuthenticateClient(string clientId, string secret, string scope)

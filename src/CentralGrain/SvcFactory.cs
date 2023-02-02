@@ -1,4 +1,4 @@
-﻿using Comax.Commons.Shared.OIDC;
+﻿using CommunAxiom.Commons.Shared.OIDC;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Comax.Commons.Orchestrator.CentralGrain
+namespace CommunAxiom.Commons.CommonsShared.CentralGrain
 {
     public class SvcFactory
     {

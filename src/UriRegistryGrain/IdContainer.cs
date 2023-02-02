@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Comax.Commons.Orchestrator.UriRegistryGrain
+namespace CommunAxiom.Commons.CommonsShared.UriRegistryGrain
 {
     public class IdContainer
     {

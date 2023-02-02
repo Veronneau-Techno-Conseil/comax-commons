@@ -1,7 +1,11 @@
+using Blazored.Toast.Services;
 using Blazorise;
+using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.ClientUI.Shared.Extensions;
+using CommunAxiom.Commons.ClientUI.Shared.Helper;
 using CommunAxiom.Commons.ClientUI.Shared.Models;
+using CommunAxiom.Commons.ClientUI.Shared.ViewModels;
 using CommunAxiom.Commons.ClientUI.Shared.ViewModels.Interfaces;
 using CommunAxiom.Commons.Ingestion;
 using CommunAxiom.Commons.Ingestion.DataSource;
@@ -9,7 +13,6 @@ using CommunAxiom.Commons.Ingestion.Ingestor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Localization;
-using Radzen.Blazor;
 
 namespace ClientUI.Components.Portfolio
 {
@@ -20,27 +23,28 @@ namespace ClientUI.Components.Portfolio
         [Inject] public IPortfolioViewModel PortfolioViewModel { get; set; }
         [Inject] public IStringLocalizer<Portfolio> Localizer { get; set; }
         [Inject] public IMetadataParser MetadataParser { get; set; }
-        
-        public string SelectedDataSource { get; private set; }
-        
+        [Inject] private IToastService ToastService { get; set; }
+        public DataSourceType SelectedDataSource { get; private set; }
+
         public string SelectedTab = "tab1";
-        
+
         public IList<PortfolioModel> PortfolioList;
         public IEnumerable<PortfolioTreeViewItem> PortfolioListResult;
         public IList<PortfolioTreeViewItem> ExpandedPortfolio = new List<PortfolioTreeViewItem>();
         public PortfolioModel ModalViewModel = new PortfolioModel();
-        
+
         private List<string> _types;
         public Modal? ModalRefefence;
         public bool CancelClose;
         private PortfolioTreeViewItem SelectedPortfolio { get; set; } = new PortfolioTreeViewItem();
         private bool HideCard { get; set; } = true;
 
-        private Dictionary<string, DataSourceConfiguration> Sources = new Dictionary<string, DataSourceConfiguration>();
+        private Dictionary<string, DataSourceConfiguration> ConfigurationsKeyValuePairs =
+            new Dictionary<string, DataSourceConfiguration>();
 
         private void OnChangeType(string type)
         {
-            ModalViewModel.Type = type;
+            ModalViewModel.Type = (PortfolioType)Enum.Parse(typeof(PortfolioType), type);
         }
 
         private void OnSelectedTab(string tabName)
@@ -58,7 +62,7 @@ namespace ClientUI.Components.Portfolio
             IsLoading = true;
 
             var result = await PortfolioViewModel.GetSourceState(treeViewItem.Id.ToString());
-            
+
             if (result.Fields != null)
             {
                 FieldMetaDataList = result.Fields;
@@ -68,33 +72,33 @@ namespace ClientUI.Components.Portfolio
             {
                 if (result.Configurations == null)
                 {
-                    DataSourceConfigurationChange(PortfolioViewModel.GetDatasources()[0]);
+                    DataSourceConfigurationChange(DataSourceType.File);
                 }
                 else
                 {
-                    Sources = result.Configurations;
-                    SelectedDataSource = result.DataSourceType.GetDisplayDescription();
+                    ConfigurationsKeyValuePairs = result.Configurations;
+                    SelectedDataSource = result.DataSourceType;
                 }
             }
             else
             {
-                DataSourceConfigurationChange(PortfolioViewModel.GetDatasources()[0]);
+                DataSourceConfigurationChange(DataSourceType.File);
             }
 
             IsLoading = false;
             StateHasChanged();
         }
 
-        private void DataSourceConfigurationChange(string sourceType)
+        private void DataSourceConfigurationChange(DataSourceType sourceType)
         {
             var importer = new Importer(DataSourceFactory, IngestorFactory);
             var sourceConfig = new SourceConfig
             {
-                DataSourceType = Enum.Parse<DataSourceType>(sourceType),
+                DataSourceType = sourceType,
                 Configurations = new Dictionary<string, DataSourceConfiguration>()
             };
             importer.Configure(sourceConfig);
-            Sources = sourceConfig.Configurations;
+            ConfigurationsKeyValuePairs = sourceConfig.Configurations;
         }
 
         private Task ShowModal(PortfolioTreeViewItem currentPortfolio)
@@ -131,7 +135,7 @@ namespace ClientUI.Components.Portfolio
             };
 
             await PortfolioViewModel.CreatePortfolio(newPortfolio);
-            
+
             await Notify(new DashboardItem
             {
                 Title = newPortfolio.Name,
@@ -140,13 +144,13 @@ namespace ClientUI.Components.Portfolio
                 Criticality = ItemCriticality.Success,
                 CreateDateTime = new DateTime()
             });
-            
+
             AddToTree(SelectedPortfolio, new PortfolioTreeViewItem
             {
                 Id = newPortfolio.ID,
                 Text = newPortfolio.Name,
                 ParentId = newPortfolio.ParentId,
-                Type = Enum.Parse<PortfolioType>(newPortfolio.Type)
+                Type = newPortfolio.Type
             });
 
             ClearModel();
@@ -166,32 +170,31 @@ namespace ClientUI.Components.Portfolio
             ModalViewModel.ID = Guid.Empty;
             ModalViewModel.ParentId = Guid.Empty;
             ModalViewModel.Name = string.Empty;
-            ModalViewModel.Type = _types[0];
+            ModalViewModel.Type = CommunAxiom.Commons.Client.Contracts.Grains.Portfolio.PortfolioType.Folder;
         }
 
         [Inject] public IDataSourceFactory DataSourceFactory { get; set; }
         [Inject] public IIngestorFactory IngestorFactory { get; set; }
-        
+
         private HubConnection? hubConnection;
-        
+
         [Inject] public NavigationManager NavigationManager { get; set; }
-        
+
         protected override async Task OnInitializedAsync()
         {
-
             _types = PortfolioViewModel.GetPortfolioTypes();
-            ModalViewModel.Type = _types[0];
+            ModalViewModel.Type = PortfolioType.Folder;
 
-            SelectedDataSource = PortfolioViewModel.GetDatasources()[0];
+            SelectedDataSource = DataSourceType.File;
 
             PortfolioList = await PortfolioViewModel.GetPortfolios();
             PortfolioListResult = PortfolioList?.ToTree(o => o.ID, o => o.ParentId);
             if (PortfolioListResult != null) ExpandAll(PortfolioListResult);
-            
+
             hubConnection = new HubConnectionBuilder()
                 .WithUrl(NavigationManager.ToAbsoluteUri("/systemhub"))
                 .Build();
-            
+
             await hubConnection.StartAsync();
         }
 
@@ -211,27 +214,23 @@ namespace ClientUI.Components.Portfolio
         private void OnChangeDatasource(ChangeEventArgs args)
         {
             var sourceType = args.Value.ToString();
-            
-            var dataSourceType = Enum.Parse<DataSourceType>(sourceType);
-            
-            if (dataSourceType == DataSourceType.FILE)
-            {
-                DataSourceConfigurationChange(sourceType);
-                SelectedDataSource = sourceType;
-            }
+            var sourceTypeEnum = Enum.Parse<DataSourceType>(sourceType);
+            DataSourceConfigurationChange(sourceTypeEnum);
+            SelectedDataSource = sourceTypeEnum;
         }
 
         public string SelectedFileName = string.Empty;
-        
+        public string SelectedFileType = string.Empty;
+
         public async Task OnFileChanged(FileChangedEventArgs e)
         {
-            
             if (e.Files == null || e.Files.Length == 0)
                 return;
 
             var fileStream = e.Files[0];
             SelectedFileName = fileStream.Name;
-            
+            SelectedFileType = fileStream.Type;
+
             using (var stream = new MemoryStream())
             {
                 await fileStream.WriteToStreamAsync(stream);
@@ -242,9 +241,12 @@ namespace ClientUI.Components.Portfolio
                     var fileContent = await reader.ReadToEndAsync();
                     if (!string.IsNullOrEmpty(fileContent))
                     {
-                        var source = Sources.Values.FirstOrDefault(x => x.Name == "SampleFile");
-                        source.Value = fileContent;
-                        source.DisplayValue = SelectedFileName;
+                        var sampleFile = ConfigurationsKeyValuePairs.Values.FirstOrDefault(x => x.Name == "SampleFile");
+                        sampleFile.Value = fileContent;
+                        sampleFile.DisplayValue = SelectedFileName;
+                        
+                        var contentType = ConfigurationsKeyValuePairs.Values.FirstOrDefault(x => x.Name == "ContentType");
+                        contentType.Value = fileStream.Type;
                     }
                 }
             }
@@ -337,15 +339,19 @@ namespace ClientUI.Components.Portfolio
         {
             await PortfolioViewModel.SaveConfig(this.SelectedPortfolio.Id.ToString(), new SourceConfig
             {
-                DataSourceType = Enum.Parse<DataSourceType>(SelectedDataSource),
-                Configurations = Sources
+                DataSourceType = SelectedDataSource,
+                Configurations = ConfigurationsKeyValuePairs
             });
+
+            ToastService.ShowSuccess(Localizer["DataConfigurationSaved"]);
         }
 
         public async Task SaveFieldMetaData()
         {
             await PortfolioViewModel.SaveFieldMetaData(SelectedPortfolio.Id.ToString(), FieldMetaDataList);
-            
+
+            ToastService.ShowSuccess(Localizer["FieldMetadataSaved"]);
+
             var result = await PortfolioViewModel.GetSourceState(SelectedPortfolio.Id.ToString());
 
             if (result.Fields != null)
@@ -353,23 +359,31 @@ namespace ClientUI.Components.Portfolio
                 FieldMetaDataList = result.Fields;
             }
         }
-
-
+        
         private void OnFieldMetadataSelected(DataSourceConfiguration sourceConfiguration)
         {
-
-            if (sourceConfiguration.Name =="SampleFile" && !string.IsNullOrEmpty(sourceConfiguration.Value))
+            if (sourceConfiguration.Name == "SampleFile" && !string.IsNullOrEmpty(sourceConfiguration.Value))
             {
                 FieldMetaDataList.Clear();
-                FieldMetaDataList.AddRange(MetadataParser.ReadMetadata(sourceConfiguration.Value));
+
+                var value = sourceConfiguration.Value;
+                
+                if (SelectedFileType.Contains("csv"))
+                {
+                    value = Converter.CsvToJson(sourceConfiguration.Value, ",");
+                }
+                
+                FieldMetaDataList.AddRange(MetadataParser.ReadMetadata(value));
             }
         }
         
+        
+
         private async Task Notify(DashboardItem notification)
         {
             if (hubConnection is not null)
             {
-                await hubConnection.SendAsync("SendNotification",notification);
+                await hubConnection.SendAsync("SendNotification", notification);
             }
         }
     }

@@ -1,9 +1,10 @@
 ﻿using Comax.Commons.Orchestrator.Client;
-using Comax.Commons.Orchestrator.Contracts.EventMailbox;
+using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
 using CommunAxiom.Commons.Orleans;
 using CommunAxiom.Commons.Shared.RuleEngine;
 using CommunAxiom.Commons.Shared.RulesEngine;
 using FluentAssertions;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -32,70 +33,73 @@ namespace OrchestratorIntegration.Tests.SOI
                 {
                     Id = Guid.NewGuid(),
                     From = MessageHelper.UserUri(user.Id),
-                    To = MessageHelper.UserUri(contacts[0].Id),
+                    To = contacts[0].Uri,
                     CreatedDate = DateTime.UtcNow,
                     FromOwner = MessageHelper.UserUri(user.Id),
                     Payload = "Test message body",
-                    Scope = MessageHelper.MSG_SCOPE_PRIVATE,
+                    Scope = MessageScopes.MSG_SCOPE_PRIVATE,
                     Subject = "Test message subject",
-                    Type = MessageHelper.MSG_TYPE_DIRECT
+                    Type = MessageTypes.Communicate.MSG_TYPE_DIRECT
                 };
                 var soi = await client.GetSubjectOfInterest();
                 await soi.Broadcast(msg);
 
                 //Fetch message
                 var c = contacts[0];
-                var reg = client.GetUriRegistry(c.Id);
+                var reg = client.GetUriRegistry(c.Uri);
                 var userID = await reg.GetOrCreate();
                 var mb = await client.GetEventMailbox(userID);
-                
-                var testCall = await mb.HasMail();
-                testCall.Should().BeTrue();
 
-                var strmid = await mb.GetStreamId();
-                int msgCnt = 0;
-                var handle = await client.SubscribeEventMailboxStream(strmid,
-                    (mm, sst) =>
-                    {
-                        msgCnt++;
-                        mm.Should().NotBeNull();
-                        return Task.CompletedTask;
-                    }, ex =>
-                    {
-                        Assert.Fail($"Should not error - {ex}");
-                        return Task.CompletedTask;
-                    }, () =>
-                    {
-                        return Task.CompletedTask;
-                    });
-
-                var (hdl, enumerable) = await client.EnumEventMailbox(strmid);
-
-                _ = Task.Run(async () =>
-                {
-                    await foreach (var item in enumerable)
-                    {
-                        msgCnt++;
-                        await mb.DeleteMail(item.MsgId);
-                    }
-                });
-
-                var strm = client.ClusterClient.GetStreamProvider(Constants.DefaultStream).GetStream<MailMessage>(strmid, Constants.DefaultNamespace);
-                await strm.OnNextAsync(new MailMessage
-                {
-                    From = "test"
-                });
-
-                await mb.StartStream();
-                
                 int cnt = 0;
-                while(msgCnt < 2 && cnt < 10){
+                int msgCnt = 0;
+                var testCall = await mb.HasMail();
+
+                while (!testCall && cnt < 10)
+                {
+                    Thread.Sleep(200);
+                    cnt++;
+                    testCall = await mb.HasMail();
+                }
+                testCall.Should().BeTrue();
+                cnt = 0;
+                
+                List<MailMessage> msgs = new List<MailMessage>();
+                var obs = new DelegateMbObserver((mm) =>
+                {
+                    msgCnt++;
+                    mm.Should().NotBeNull();
+                    msgs.Add(mm);
+                });
+
+                await mb.Subscribe(obs);
+                
+                while(msgCnt < 1 && cnt < 10){
                     await Task.Run(() => Thread.Sleep(10000));
                     cnt++;
                 }
-                await strm.OnCompletedAsync();
+
+                foreach(var item in msgs)
+                {
+                    await mb.DeleteMail(item.MsgId);
+                }
+                
                 msgCnt.Should().BeGreaterThan(0);
             });
+        }
+    }
+
+    public class DelegateMbObserver : IMailboxObserver
+    {
+        private readonly Action<MailMessage> _action;
+        public DelegateMbObserver(Action<MailMessage> action) 
+        { 
+            _action = action;
+        }
+
+        public Task NewMail(MailMessage message)
+        {
+            _action(message);
+            return Task.CompletedTask;
         }
     }
 }

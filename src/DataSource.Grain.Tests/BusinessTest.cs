@@ -15,14 +15,14 @@ namespace Ingestion.Grain.Tests
         {
             IPersistentState<SourceState> store = new PersistentStorageMock<SourceState>();
 
-            var business = new Business(new Repo(store));
+            var business = new Business(new Repo(store, null));
 
-            await business.SetConfig(DataSourceType.FILE, new Dictionary<string, DataSourceConfiguration> { ["Name"] = new DataSourceConfiguration { Name = "Name" } });
+            await business.SetConfig(DataSourceType.File, new Dictionary<string, DataSourceConfiguration> { ["Name"] = new DataSourceConfiguration { Name = "Name" } });
 
             var state = await business.ReadConfig();
 
             Assert.IsNotNull(state);
-            Assert.AreEqual(DataSourceType.FILE, state.DataSourceType);
+            Assert.AreEqual(DataSourceType.File, state.DataSourceType);
             Assert.AreEqual("Name", state.Configurations["Name"].Name);
 
             await business.DeleteConfig();

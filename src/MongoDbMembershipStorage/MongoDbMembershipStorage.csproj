@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<AssemblyName>Comax.Commons.Orchestrator.MongoDbMembershipStorage</AssemblyName>
+		<RootNamespace>Comax.Commons.Orchestrator.MongoDbMembershipStorage</RootNamespace>
+
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MongoDB.Bson" Version="2.17.1" />
+		<PackageReference Include="MongoDB.Driver" Version="2.17.1" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\MembershipProvider\MembershipProvider.csproj" />
+	</ItemGroup>
+
+</Project>

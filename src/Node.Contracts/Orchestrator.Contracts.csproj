@@ -10,7 +10,11 @@
 		
 		
 		<PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator" Version="3.6.5" />
-		<PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="3.6.5">
+		<PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.6.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.6.5">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -18,6 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\CommonsSharedContracts\CommonsSharedContracts.csproj" />
 		<ProjectReference Include="..\Orleans\Orleans.csproj" />
 		<ProjectReference Include="..\Shared\Shared.csproj" />
 	</ItemGroup>

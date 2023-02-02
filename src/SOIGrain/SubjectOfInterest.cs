@@ -19,8 +19,8 @@ namespace Comax.Commons.Orchestrator.SOIGrain
         public async Task<OperationResult> Broadcast(Message message)
         {
             //TODO: Validate message from against authenticated user
-            var comaxGrainFactory = new CommunAxiom.Commons.Orleans.GrainFactory(GrainFactory);
-            SOIBroadcastRulesEngine broadcastRulesEngine = new SOIBroadcastRulesEngine(this.GetUser(), this.GetStreamProvider(Constants.ImplicitStream), comaxGrainFactory);
+            var comaxGrainFactory = new CommunAxiom.Commons.Orleans.GrainFactory(GrainFactory, this.GetStreamProvider);
+            SOIBroadcastRulesEngine broadcastRulesEngine = new SOIBroadcastRulesEngine(this.GetUser(), this.GetStreamProvider(CommunAxiom.Commons.Orleans.OrleansConstants.Streams.ImplicitStream), comaxGrainFactory);
             var r = broadcastRulesEngine.Validate(message);
             if (r.IsError)
                 return r;

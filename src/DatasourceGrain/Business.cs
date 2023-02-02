@@ -40,5 +40,15 @@ namespace CommunAxiom.Commons.Client.Grains.DatasourceGrain
         {
             return _repo.DeleteConfig();
         }
+        
+        public async Task SetFileHash(byte[] hash)
+        {
+            await _repo.SetFileHash(hash);
+        }
+        
+        public Task<byte[]> GetFileHash()
+        {
+            return _repo.GetFileHash();
+        }
     }
 }

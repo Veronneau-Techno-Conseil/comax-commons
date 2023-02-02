@@ -5,6 +5,8 @@ using System.Net;
 using System.Net.Http.Json;
 using CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration;
 using CommunAxiom.Commons.Client.Contracts.IO;
+using CommunAxiom.Commons.Client.Contracts.Grains.Portfolio;
+using Blazorise;
 
 namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
 {
@@ -40,7 +42,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
                 {
                     ID = new Guid(RootKey),
                     Name = "Root",
-                    Type = "Folder",
+                    Type = PortfolioType.Folder,
                     ParentId = Guid.Empty
                 });
 
@@ -53,7 +55,7 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
             {
                 ID = new Guid(RootKey),
                 Name = "Root",
-                Type = "Folder",
+                Type = PortfolioType.Folder,
                 ParentId = Guid.Empty
             });
             
@@ -78,7 +80,17 @@ namespace CommunAxiom.Commons.ClientUI.Shared.ViewModels
             return $"_content/ClientUI.Components/icons/{iconName}.png";
         }
 
-        public List<string> GetDatasources() => new() { "FILE", "JSON_URL", "API" };
+        public string GetIcon(string iconName)
+        {
+            return $"_content/ClientUI.Components/icons/{iconName}.png";
+        }
+
+        public Dictionary<string, string> GetDatasources() => new()
+        { 
+            {
+                "File", "File"
+            }
+        };
 
         public List<string> GetPortfolioTypes()
         {

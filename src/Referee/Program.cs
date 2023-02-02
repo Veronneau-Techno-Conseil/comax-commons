@@ -1,25 +1,14 @@
-var builder = WebApplication.CreateBuilder(args);
+using Comax.Commons.Orchestrator.MembershipProvider;
+using CommunAxiom.CentralApi;
+using MongoDB.Driver;
+using Orleans;
+using System.Security.Cryptography.X509Certificates;
+using OpenIddict.Validation.AspNetCore;
+using Orleans.Configuration;
+using Comax.Commons.Orchestrator.MembershipProvider.Models;
+using Comax.Commons.Orchestrator.MongoDbMembershipStorage;
+using Referee;
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-  app.UseSwagger();
-  app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
+var app = new RefereeApp();
+app.Init();
 app.Run();

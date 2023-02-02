@@ -1,0 +1,17 @@
+{
+  "OIDC": {
+    "Authority": "https://accounts.communaxiom.org/",
+    "Scopes": "openid offline_access roles profile email",
+    "ClientId": "potione_ipsis_tanta_levius",
+    "Secret": "613b801b-6461-4efb-8ece-73f8c0bd89da"
+  },
+  "TestUser": {
+    "username": "userb@vertechcon.net",
+    "password": "Tester123!"
+  },
+  "CommonsMembership": {
+    "Host": "https://localhost:5005",
+    "CacheDuration": "00:05:00"
+  }
+
+}

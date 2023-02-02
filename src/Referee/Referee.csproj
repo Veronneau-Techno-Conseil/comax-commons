@@ -7,7 +7,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Orleans.Core" Version="3.6.5" />
+    <PackageReference Include="OpenIddict" Version="3.1.1" />
+    <PackageReference Include="OpenIddict.Validation" Version="3.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+	  <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="3.1.1" />
+	  <PackageReference Include="OpenIddict.Validation.SystemNetHttp" Version="3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MembershipApi\MembershipApi.csproj" />
+    <ProjectReference Include="..\MembershipProvider\MembershipProvider.csproj" />
+    <ProjectReference Include="..\MongoDbMembershipStorage\MongoDbMembershipStorage.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="cert.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="key.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

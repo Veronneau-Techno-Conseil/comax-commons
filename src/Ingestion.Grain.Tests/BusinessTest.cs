@@ -59,8 +59,8 @@ namespace Ingestion.Grain.Tests
         [Test]
         public async Task RunWhenNoErrors()
         {
-            _dataSourceFactory.Setup(o => o.Create(DataSourceType.FILE)).Returns(new TextDataSourceReader(_configValidatorLookup.Object));
-            _ingestorFactory.Setup(x => x.Create(IngestorType.JSON)).Returns(new JsonIngestor(_fieldValidatorLookup.Object));
+            _dataSourceFactory.Setup(o => o.Create(DataSourceType.File)).Returns(new TextDataSourceReader(_configValidatorLookup.Object));
+            _ingestorFactory.Setup(x => x.Create(IngestorType.JSON)).Returns(new JsonIngestor());
 
             var field = new FieldMetaData
             {
@@ -79,15 +79,25 @@ namespace Ingestion.Grain.Tests
                         {
                             Name = "SampleFile",
                             FieldType = ConfigurationFieldType.File,
-                            Value = JsonConvert.SerializeObject(new FileModel { Name = "sample1.txt", Path = "Samples/Files" })
+                            Value = JsonConvert.SerializeObject(new FileModel
+                                { Name = "sample1.txt", Path = "Samples/Files" })
+                        }
+                    },
+                    {
+                        "FilePath",
+                        new DataSourceConfiguration
+                        {
+                            Name = "FilePath",
+                            FieldType = ConfigurationFieldType.File,
+                            Value = "Samples/Files/sample1.txt"
                         }
                     }
                 },
-                DataSourceType = DataSourceType.FILE,
+                DataSourceType = DataSourceType.File,
                 Fields = new List<FieldMetaData> { field }
             };
 
-            _fieldValidatorLookup.Setup(x => x.Get("required-field")).Returns(new RequiredFieldValidator());
+            _fieldValidatorLookup.Setup(x => x.Get(FieldType.File)).Returns(new List<IFieldValidator> { new RequiredFieldValidator() });
 
             _dataSource.Setup(o => o.GetConfig()).ReturnsAsync(sourceState);
 
@@ -95,14 +105,14 @@ namespace Ingestion.Grain.Tests
             _grainFactory.Setup(o => o.GetGrain<IBroadcast>(grainKey, null)).Returns(_broadcast.Object);
 
             var mockIndexStorageGrain = new MockStorageGrain($"{grainKey}-index");
-            
+
             _grainFactory.Setup(o => o.GetGrain<IStorageGrain>($"{grainKey}-index", null)).Returns(mockIndexStorageGrain);
             _grainFactory.Setup(o => o.GetGrain<IStorageGrain>($"{grainKey}-data-0", null)).Returns(new MockStorageGrain($"{grainKey}-data-0"));
             _grainFactory.Setup(o => o.GetGrain<IStorageGrain>($"{grainKey}-data-1", null)).Returns(new MockStorageGrain($"{grainKey}-data-1"));
 
             _business.Init(new PersistentStorageMock<IngestionHistory>());
 
-            var status  = await _business.Run();
+            var status = await _business.Run();
 
             status.Should().Be(IngestionState.Completed);
 
@@ -110,9 +120,9 @@ namespace Ingestion.Grain.Tests
             var di = ix.ToObject<DataIndex>();
 
             di.Index.Count.Should().Be(2);
-            
+
             List<JObject> rows = new List<JObject>();
-            foreach(var item in di.Index)
+            foreach (var item in di.Index)
             {
                 var mockRowGrain = new MockStorageGrain(item.Id);
                 rows.Add(await mockRowGrain.GetData());
@@ -123,8 +133,6 @@ namespace Ingestion.Grain.Tests
             var row2 = JObject.Parse(@"{ 'property1': 'sample property 1 - 1', 'property4': 'sample property 4'}");
 
             rows.Should().BeEquivalentTo(new List<JObject> { row1, row2 });
-
         }
-
     }
 }

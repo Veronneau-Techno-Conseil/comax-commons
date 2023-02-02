@@ -9,13 +9,8 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Comax.Commons.Orchestrator.MembershipProvider;
-using MongoDB.Driver;
+using Comax.Commons.CommonsShared.ApiMembershipProvider;
+using CommunAxiom.Commons.Shared;
 
 namespace Comax.Commons.Orchestrator.Client
 {
@@ -29,41 +24,48 @@ namespace Comax.Commons.Orchestrator.Client
             this.configuration = configuration;
         }
 
-        private IClientBuilder GetBuilder()
+        private (IClientBuilder, HandlerToDelegateRelay) GetBuilder()
         {
+            var onDisconnect = new HandlerToDelegateRelay();
             var b = new ClientBuilder()
+                .ConfigureAppConfiguration((ctxt, cb) =>
+                {
+                    cb.AddConfiguration(configuration);
+                })
                 .ConfigureServices(services =>
                 {
                     var conf = serviceProvider.GetService<IOrchestratorClientConfig>();
                     if (conf != null)
                         conf.Configure(services);
                 })
-                    .ConfigureLogging(logging =>logging.AddConsole())
-                    .Configure<ClusterOptions>(options =>
-                    {
-                        options.ClusterId = "0.0.1-a1";
-                        options.ServiceId = "OrchestratorCluster";
-                    })
-                    .ConfigureApplicationParts(parts =>
-                    {
-                        parts.AddFromApplicationBaseDirectory();
-                    })
-                    //.UseStaticClustering(new IPEndPoint(IPAddress.Parse(configuration["gatewayIp"]), int.Parse(configuration["gatewayPort"])))
-                    .UseMongoDBClustering(mo =>
-                    {
-                        mo.DatabaseName = "clustermembers";
-                        mo.ClientName = "member_mongo";
-                        mo.CollectionConfigurator = cs =>
-                        {
-                            cs.WriteConcern = WriteConcern.Acknowledged;
-                            cs.ReadConcern = ReadConcern.Local;
-                        };
+                .ConfigureLogging(logging => logging.AddConsole())
+                .Configure<ClusterOptions>(options =>
+                {
+                    options.ClusterId = "0.0.1-a1";
+                    options.ServiceId = "OrchestratorCluster";
+                })
+                .ConfigureApplicationParts(parts =>
+                {
+                    parts.AddFromApplicationBaseDirectory();
+                })
+                .AddClusterConnectionLostHandler(onDisconnect.OnEvent);
 
-                    })
-                    //.UseLocalhostClustering(30001)
-                    .AddOutgoingGrainCallFilter(serviceProvider.GetService<SecureTokenOutgoingFilter>())
-                    .AddSimpleMessageStreamProvider(Constants.DefaultStream);
-            return b;
+            if (configuration["client_mode"] == "local")
+            {
+                b.UseLocalhostClustering(int.TryParse(configuration["client_port"], out int port) ? port: 30001);
+            }
+            else
+            {
+                b.UseApiClustering(mo =>
+                {
+                    configuration.GetSection("membership").Bind(mo);
+                });
+            }
+
+            b.AddOutgoingGrainCallFilter(serviceProvider.GetService<IOutgoingGrainCallFilter>())
+                .AddSimpleMessageStreamProvider(CommunAxiom.Commons.Orleans.OrleansConstants.Streams.DefaultStream);
+
+            return (b, onDisconnect);
         }
 
         public async Task<bool> TestConnection()
@@ -71,7 +73,7 @@ namespace Comax.Commons.Orchestrator.Client
             try
             {
                 Counter c = new Counter() { Value = 4 };
-                var builder = GetBuilder();
+                var (builder, onDisconnect) = GetBuilder();
                 using (var client = builder.Build())
                 {
                     await client.Connect(GetRetryFilter(c));
@@ -87,11 +89,12 @@ namespace Comax.Commons.Orchestrator.Client
         public async Task WithClusterClient(Func<IOrchestratorClient, Task> action)
         {
             Counter c = new Counter();
-            var builder = GetBuilder();
+            var (builder, onDisconnect) = GetBuilder();
             using (var client = builder.Build())
             {
                 await client.Connect(GetRetryFilter(c));
-                var cl = new Client(client);
+                var logger = serviceProvider.GetService<ILogger<Client>>();
+                var cl = new Client(client, logger, onDisconnect);
                 await action(cl);
                 await cl.Close();
             }
@@ -99,11 +102,12 @@ namespace Comax.Commons.Orchestrator.Client
         public async Task<TResult> WithClusterClient<TResult>(Func<IOrchestratorClient, Task<TResult>> action)
         {
             Counter c = new Counter();
-            var builder = GetBuilder();
+            var (builder, onDisconnected) = GetBuilder();
             using (var client = builder.Build())
             {
                 await client.Connect(GetRetryFilter(c));
-                var cl = new Client(client);
+                var logger = serviceProvider.GetService<ILogger<Client>>();
+                var cl = new Client(client, logger, onDisconnected);
                 var res = await action(cl);
                 await cl.Close();
                 return res;
@@ -113,26 +117,28 @@ namespace Comax.Commons.Orchestrator.Client
         public async Task<IOrchestratorClient> WithUnmanagedClient(Func<IOrchestratorClient, Task> action)
         {
             Counter c = new Counter();
-            var builder = GetBuilder();
+            var (builder, onDisconnect) = GetBuilder();
             var client = builder.Build();
             await client.Connect(GetRetryFilter(c));
-            var cl = new Client(client);
+            var logger = serviceProvider.GetService<ILogger<Client>>();
+            var cl = new Client(client, logger, onDisconnect);
             await action(cl);
             return cl;
         }
 
         public async Task<(IOrchestratorClient, TResult)> WithUnmanagedClient<TResult>(Func<IOrchestratorClient, Task<TResult>> action)
-                {
+        {
             Counter c = new Counter();
-            var builder = GetBuilder();
+            var (builder, onDisconnect) = GetBuilder();
             var client = builder.Build();
             await client.Connect(GetRetryFilter(c));
-            var cl = new Client(client);
+            var logger = serviceProvider.GetService<ILogger<Client>>();
+            var cl = new Client(client, logger, onDisconnect);
             return (cl, await action(cl));
         }
 
         private Func<Exception, Task<bool>> GetRetryFilter(Counter c)
-            {
+        {
             return async (Exception exception) =>
             {
                 serviceProvider.GetService<ILogger>()?.LogWarning(
@@ -147,12 +153,23 @@ namespace Comax.Commons.Orchestrator.Client
                 c.Value++;
                 return true;
             };
-            }
+        }
 
-                private class Counter
-            {
-                public int Value { get; set; } = 0;
-            }
+        public async Task<IOrchestratorClient> GetUnmanagedClient()
+        {
+            Counter c = new Counter();
+            var (builder, onDisconnect) = GetBuilder();
+            var client = builder.Build();
+            await client.Connect(GetRetryFilter(c));
+            var logger = serviceProvider.GetService<ILogger<Client>>();
+            var cl = new Client(client, logger, onDisconnect);
+            return cl;
+        }
+
+        private class Counter
+        {
+            public int Value { get; set; } = 0;
+        }
 
     }
 }

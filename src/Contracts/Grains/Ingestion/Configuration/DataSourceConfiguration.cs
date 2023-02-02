@@ -8,10 +8,12 @@ namespace CommunAxiom.Commons.Client.Contracts.Ingestion.Configuration
         public string Name { get; set; }
         public string DisplayName { get; set; }
         public string Hint { get; set; }
+        public bool IsReadonly { get; set; }
+        public bool IsRequired { get; set; }
 
         public ConfigurationFieldType FieldType { get; set; }
 
-        public IList<IFieldValidator> Validators { get; set; }
+        public IList<IConfigValidator> Validators { get; set; } = new List<IConfigValidator>();
 
         public string Parameter { get; set; }
 

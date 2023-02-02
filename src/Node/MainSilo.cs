@@ -1,20 +1,13 @@
 ﻿
-using Comax.Commons.Orchestrator.Contracts.Mailbox;
-using Comax.Commons.Shared.OIDC;
-using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.OIDC;
+using CommunAxiom.Commons.Orleans.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Hosting;
 using System.Threading.Tasks;
-using Comax.Commons.Orchestrator.Contracts.EventMailbox;
-using Comax.Commons.Orchestrator.Contracts.UriRegistry;
-using Comax.Commons.Orchestrator.UriRegistryGrain;
-using Comax.Commons.Orchestrator.EventMailboxGrain;
 using Comax.Commons.Orchestrator.Contracts.Central;
-using Comax.Commons.Orchestrator.CentralGrain;
 using System.Net.Http;
 using Comax.Commons.Orchestrator.MailboxGrain;
 using Comax.Commons.Orchestrator.Contracts.SOI;
@@ -22,8 +15,17 @@ using Comax.Commons.Orchestrator.SOIGrain;
 using Comax.Commons.Orchestrator.MailGrain;
 using MongoDB.Driver;
 //using Orleans.Providers.MongoDB.Utils;
-using Comax.Commons.Orchestrator.MembershipProvider;
 using Orleans.Configuration;
+using Comax.Commons.Orchestrator.Contracts.PublicBoard;
+using CommunAxiom.Commons.CommonsShared.CentralGrain;
+using CommunAxiom.Commons.CommonsShared.Contracts.UriRegistry;
+using CommunAxiom.Commons.CommonsShared.UriRegistryGrain;
+using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
+using CommunAxiom.Commons.CommonsShared.EventMailboxGrain;
+using Comax.Commons.CommonsShared.ApiMembershipProvider;
+using Comax.Commons.Orchestrator.Contracts;
+using Comax.Commons.Orchestrator.CommonsActorGrain;
+using Comax.Commons.Orchestrator.SharedPortfolio.Registry;
 
 namespace Comax.Commons.Orchestrator
 {
@@ -34,7 +36,7 @@ namespace Comax.Commons.Orchestrator
         public static ISiloHost Host { get { return _silo; } }
         public static bool IsSiloStarted { get; private set; }
 
-        public static async Task StartSilo()
+        public static async Task StartSilo(string configurationFile = null)
         {
             if (IsSiloStarted)
             {
@@ -48,24 +50,8 @@ namespace Comax.Commons.Orchestrator
 
                     services.CentralGrainSetup();
 
-                    services.AddSingleton<IMongoClientFactory>(sp =>
-                    {
-                        return new MongoClientFactory(conf);
-                    });
-
-                    services.Configure<MongoDBOptions>(mo =>
-                    {
-                        mo.DatabaseName = "clustermembers";
-                        mo.ClientName = "member_mongo";
-                        mo.CollectionConfigurator = cs =>
-                        {
-                            cs.WriteConcern = WriteConcern.Acknowledged;
-                            cs.ReadConcern = ReadConcern.Local;
-                        };
-
-                    });
-
-                    services.AddSingleton<IMembershipTable, MongoMembershipTable>();
+                    services.UseApiMembership(conf.GetSection("Membership"));
+                    services.Configure<OrchestratorConfig>(conf.GetSection("ClusterSettings"));
 
                     //register singleton services for each grain/interface
                     //services.AddSingleton<ISubjectOfInterest, SubjectOfInterest>();
@@ -74,7 +60,10 @@ namespace Comax.Commons.Orchestrator
 
                     services.AddSingleton<ISettingsProvider, OrchestratorSettingsProvider>();
                     services.AddSingleton<IClaimsPrincipalProvider, OIDCClaimsProvider>();
-                    services.AddSingleton<IIncomingGrainCallFilter, AccessControlFilter>();
+                    services.AddSingleton<IIncomingGrainCallFilter, AuthRequiredAccessControlFilter>();
+                    services.AddSingleton<IOutgoingGrainCallFilter, SiloSourcedOutgoingFilter>();
+                    services.AddSingleton<AppIdProvider>();
+
                     services.AddSingleton<ITokenProvider, ClientTokenProvider>();
                     services.AddTransient<HttpClient>();
 
@@ -83,7 +72,7 @@ namespace Comax.Commons.Orchestrator
 
                     services.AddSingleton<IEventMailbox, EventMailbox>();
 
-                })
+                }, configurationFile)
                 .UseDashboard()
                 //configure application parts for each grain
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(PublicBoard).Assembly).WithReferences())
@@ -91,7 +80,9 @@ namespace Comax.Commons.Orchestrator
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(EventMailbox).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Mail).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(SubjectOfInterest).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Central).Assembly).WithReferences());
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Central).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts=> parts.AddApplicationPart(typeof(CommonsActor).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts=> parts.AddApplicationPart(typeof(PortfolioRegistry).Assembly).WithReferences());
 
             var silo = builder.Build();
             await silo.StartAsync();
