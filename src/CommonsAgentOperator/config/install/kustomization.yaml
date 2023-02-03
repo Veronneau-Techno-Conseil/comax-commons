@@ -1,0 +1,15 @@
+namespace: communaxiom-commonsoperator-system
+namePrefix: communaxiom-commonsoperator-
+commonLabels:
+  operator: communaxiom-commonsoperator
+resources:
+- ./namespace.yaml
+- ../crds
+- ../rbac
+- ../operator
+images:
+- name: vertechcon/commonsoperator
+  newName: vertechcon/commonsoperator
+  newTag: latest
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
