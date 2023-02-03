@@ -45,7 +45,7 @@ pipeline {
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'dockerhub_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
                   sh '''
                     ex=$(docker buildx ls | grep multiarch)
-                    if [-z "$ex" ]; then docker buildx create --name multiarch --driver docker-container --use; else docker buildx use multiarch; fi
+                    if [ -z "$ex" ]; then docker buildx create --name multiarch --driver docker-container --use; else docker buildx use multiarch; fi
                   '''
                   sh "docker buildx create --platform linux/amd64,linux/arm64 --use"
                   sh "docker login -u ${USERNAME} -p ${PASSWORD}"
