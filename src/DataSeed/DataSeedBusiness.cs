@@ -13,6 +13,8 @@ using System.Net;
 using Comax.Commons.Orchestrator.DataChunkGrain;
 using CommunAxiom.Commons.CommonsShared.Contracts.DataChunk;
 using Orleans;
+using Orleans.Streams;
+using Microsoft.Extensions.Logging;
 
 namespace Comax.Commons.Orchestrator.DataSeedGrain
 {
@@ -21,11 +23,16 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
         private DataSeedRepo? _dataSeedRepo;
         private IComaxGrainFactory _comaxGrainFactory;
         private readonly string _grainKey;
+        private IAsyncStream<DataChunkObject> _stream;
+        private IStreamProvider _streamProvider;
+        private readonly ILogger _logger;
 
-        public DataSeedBusiness(IComaxGrainFactory comaxGrainFactory, string grainKey)
+        public DataSeedBusiness(IComaxGrainFactory comaxGrainFactory, string grainKey, IStreamProvider streamProvider, ILogger logger)
         {
             _comaxGrainFactory = comaxGrainFactory;
             _grainKey = grainKey;
+            _streamProvider = streamProvider;
+            _logger = logger;
         }
 
         public void Init(IPersistentState<DataSeedObject> dsState)
@@ -49,10 +56,9 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
             return result;
         }
 
-        public async Task<List<DataSeedObject>> BuildIndexes(DataSeedResult dsResult)
+        public async Task BuildIndexes(DataSeedResult dsResult)
         {
             var index = new DataIndex();
-            var dsDataList = new List<DataSeedObject>();
             // upload indexes into DataSeedGrain
             for(int i=0; i < dsResult.DS.Count; i++)
             {
@@ -61,14 +67,13 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
                 var indexStorage = _comaxGrainFactory.GetGrain<IDataSeed>(Guid.Parse(identifier));
                 dsData.Id = indexStorage.GetPrimaryKey();
                 dsData.Index = JObject.FromObject(dsResult.DS[i]);
-                dsDataList.Add(dsData);
+                await _dataSeedRepo.Save(dsData);
             }
-            return dsDataList;
+            
         }
-        public async Task<List<DataChunkObject>> BuildRows(DataChunkResult dcResult)
+        public async Task BuildRows(DataChunkResult dcResult)
         {
             //upload the rows into DataChunkGrain
-            var dcDataList = new List<DataChunkObject>();
             for (int i = 0; i < dcResult.DC.Count; i++)
             {
                 var dcData = new DataChunkObject();
@@ -79,9 +84,26 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
                 var indexStorage = _comaxGrainFactory.GetGrain<IDataSeed>(Guid.Parse(identifier));
                 dcData.IdDataSeed = indexStorage.GetPrimaryKey();
                 dcData.Data = JObject.FromObject(dcResult.DC[i]);
-                dcDataList.Add(dcData);
+                _stream = _streamProvider.GetStream<DataChunkObject>(dcData.Id, OrleansConstants.StreamNamespaces.DefaultNamespace);
+                await _stream.OnNextAsync(dcData);
             }
-            return dcDataList;
         }
+
+        public Task OnNextAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task OnCompletedAsync()
+        {     
+            return Task.CompletedTask;
+        }
+
+        public Task OnErrorAsync(Exception ex)
+        {
+            throw ex;
+        }
+
+        
     }
 }

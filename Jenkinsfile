@@ -43,11 +43,7 @@ pipeline {
                 
                 
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'dockerhub_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-                  sh """
-                    ex=$(docker buildx ls | grep multiarch)
-                    if [-z "$ex" ]; then docker buildx create --name multiarch --driver docker-container --use; else docker buildx use multiarch; fi
-                  """
-                                    
+                  sh 'if [ -z "$(docker buildx ls | grep multiarch)" ]; then docker buildx create --name multiarch --driver docker-container --use; else docker buildx use multiarch; fi'
                   sh "docker login -u ${USERNAME} -p ${PASSWORD}"
 				  
                   sh "docker buildx build --push -t vertechcon/comax-agentreferee:latest -t registry.vtck3s.lan/comax-agentreferee:${patch} --platform linux/amd64,linux/arm64 -f agent-referee.Dockerfile ."

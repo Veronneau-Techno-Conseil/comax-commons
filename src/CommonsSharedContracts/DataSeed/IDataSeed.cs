@@ -10,7 +10,7 @@ namespace CommunAxiom.Commons.CommonsShared.Contracts.DataSeed
     {
         Task RetrieveData(Guid id); //using DataIndex
         Task SendIndex(DataSeedResult value); //list of DataIndex
-        Task UploadData(DataChunkResult Data);
+        Task SetUploadStream(Guid value); //
         Task Validate(); // ?
     }
 }
