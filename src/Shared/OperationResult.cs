@@ -24,6 +24,8 @@ namespace CommunAxiom.Commons.Shared
 
     public class OperationResult
     {
+        public const string ERR_NOT_FOUND = "ERR_NOT_FOUND";
+        public const string ERR_INVALID_OPERATION = "ERR_INVALID_OPERATION";
         public const string ERR_UNEXP_NULL = "ERR_UNEXP_NULL";
         public const string ERR_UNEXP_ERR = "ERR_UNEXP_ERR";
         public const string PARAM_ERR = "PARAM_ERR";

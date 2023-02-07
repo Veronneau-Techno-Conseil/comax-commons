@@ -82,7 +82,9 @@ namespace Comax.Commons.Orchestrator
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(SubjectOfInterest).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(Central).Assembly).WithReferences())
                 .ConfigureApplicationParts(parts=> parts.AddApplicationPart(typeof(CommonsActor).Assembly).WithReferences())
-                .ConfigureApplicationParts(parts=> parts.AddApplicationPart(typeof(PortfolioRegistry).Assembly).WithReferences());
+                .ConfigureApplicationParts(parts=> parts.AddApplicationPart(typeof(PortfolioRegistry).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DataSeedGrain.DataSeed).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(DataChunkGrain.DataChunk).Assembly).WithReferences());
 
             var silo = builder.Build();
             await silo.StartAsync();

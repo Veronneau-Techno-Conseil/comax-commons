@@ -13,6 +13,8 @@ using Comax.Commons.Orchestrator.Contracts.PublicBoard;
 using CommunAxiom.Commons.CommonsShared.Contracts.EventMailbox;
 using Comax.Commons.Orchestrator.Contracts.CommonsActor;
 using Comax.Commons.Orchestrator.Contracts.Portfolio;
+using CommunAxiom.Commons.CommonsShared.Contracts.DataSeed;
+using CommunAxiom.Commons.CommonsShared.Contracts.DataChunk;
 
 namespace Comax.Commons.Orchestrator.Contracts.ComaxSystem
 {
@@ -28,7 +30,8 @@ namespace Comax.Commons.Orchestrator.Contracts.ComaxSystem
         Task<ISubjectOfInterest> GetSubjectOfInterest();
         IClusterClient ClusterClient { get; }
         IPortfolioRegistry GetPortfolioRegistry();
-
+        IDataSeed GetDataSeed(Guid id);
+        IAsyncStream<DataChunkObject> GetDataChunkStream(Guid id);
         Task Close();
     }
 }
