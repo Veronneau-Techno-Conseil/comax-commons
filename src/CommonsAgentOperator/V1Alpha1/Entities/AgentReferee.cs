@@ -23,11 +23,9 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
 
     public class AgentRefereeState
     {
+
         [JsonPropertyName("currentState")]
         public string CurrentState { get; set; } = Status.Unknown.ToString();
-
-        [JsonPropertyName("dbAccess")]
-        public bool DbAccess { get; set; } = false;
 
         [JsonPropertyName("stateTsMs")]
         public long StateTsMs { get; set; } = 0;
@@ -38,9 +36,33 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
 
     public class AgentRefereeSpec
     {
-        public string Image { get; set; } = "vertechcon/referee:0.0.1";
+        [JsonPropertyName("image")]
+        public string Image { get; set; } = "vertechcon/comax-agentreferee:latest";
 
-        public int Port { get; set; } = 5002;
+        [JsonPropertyName("listenPort")]
+        public int ListenPort { get; set; } = 5004;
+
+        [JsonPropertyName("oidcAuthority")]
+        public string OidcAuthority { get; set; }
+
+        [JsonPropertyName("oidcClientId")]
+        public string OidcClientId { get; set; }
+
+        [JsonPropertyName("oidcSecretName")]
+        public string OidcSecretName { get; set; }
+
+        [JsonPropertyName("oidcSecretKey")]
+        public string OidcSecretKey { get; set; }
+
+        [JsonPropertyName("useHttps")]
+        public bool UseHttps { get; set; }
+
+        [JsonPropertyName("certPath")]
+        public string CertPath { get; set; }
+        [JsonPropertyName("keyPath")]
+        public string KeyPath { get; set; }
+        [JsonPropertyName("dbProvider")]
+        public string DbProvider { get; set; }
 
         /// <summary>
         /// Optional resource limits and requests.
@@ -48,25 +70,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         /// </summary>
         [JsonPropertyName("resources")]
         public V1ResourceRequirements? Resources { get; set; } = new();
-
-        [JsonPropertyName("dbServerName")]
-        public string DbServerName { get; set; }
-
-        [JsonPropertyName("dbUser")]
-        public string DbUser { get; set; }
-
-        /// <summary>
-        /// Name of secret where password for dbUser is stored.
-        /// </summary>
-        [JsonPropertyName("dbPasswordSecretName")]
-        public string DbPasswordSecretName { get; set; } = null!;
-
-        /// <summary>
-        /// Key in DbPasswordSecretName which the password is stored in.
-        /// </summary>
-        [JsonPropertyName("dbPasswordSecretKey")]
-        public string DbPasswordSecretKey { get; set; } = "password";
-
+        
         /// <summary>
         /// Additional environment variables to add to the primary container.
         /// </summary>
