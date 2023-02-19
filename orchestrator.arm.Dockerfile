@@ -1,4 +1,4 @@
-ARG IMG_NAME=6.0-jammy-arm32v7
+ARG IMG_NAME=7.0-jammy-arm32v7
 
 # syntax=docker/dockerfile:1
 FROM mcr.microsoft.com/dotnet/sdk:${IMG_NAME} AS build-env
