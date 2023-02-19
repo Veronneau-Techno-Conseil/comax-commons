@@ -1,6 +1,9 @@
-﻿using DotnetKubernetesClient;
+﻿
+
+using IdentityModel;
 using k8s;
 using k8s.Models;
+using KubeOps.KubernetesClient;
 
 namespace CommunAxiom.Commons.Client.Hosting.Operator
 {
@@ -66,6 +69,32 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator
             }
 
             throw new NotImplementedException();
+        }
+
+        public static async Task DeleteObject<TObj>(this IKubernetesClient cl, ILogger logger, string nameSpace, string name) where TObj : class, IKubernetesObject<V1ObjectMeta>
+        {
+            var objRef = await cl.Get<TObj>(
+                name,
+                nameSpace
+            );
+
+            if (objRef == null)
+            {
+                logger.LogError(
+                    "Failed to find agent referee for resource {Name} in namespace {Namespace}",
+                    name,
+                    nameSpace
+                );
+            }
+            else
+            {
+                await cl.Delete(objRef);
+                logger.LogInformation(
+                    "Removed Agent Referee for {Name} in namespace {Namespace}",
+                    name,
+                    nameSpace
+                );
+            }
         }
     }
 }

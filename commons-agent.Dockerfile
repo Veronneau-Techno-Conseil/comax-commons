@@ -30,4 +30,4 @@ EXPOSE 30000
 RUN chown 1000: ./
 RUN chmod -R u+x ./
 USER 1000
-ENTRYPOINT ["dotnet", "/app/Comax.Commons.Orchestrator.dll"]
+ENTRYPOINT ["dotnet", "/app/CommunAxiom.Commons.Client.Silo.dll"]

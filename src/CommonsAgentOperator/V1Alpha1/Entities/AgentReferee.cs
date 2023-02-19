@@ -12,12 +12,14 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
 ]
     public class AgentReferee : CustomKubernetesEntity<AgentRefereeSpec, AgentRefereeState>
     {
-        public string DeploymentName
+
+    }
+
+    public static class AgentRefereeExtensions
+    {
+        public static string GetDeploymentName(this AgentReferee agentReferee)
         {
-            get
-            {
-                return $"{this.Name()}-deployment";
-            }
+            return $"{agentReferee.Name()}-deployment";
         }
     }
 
@@ -70,7 +72,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         /// </summary>
         [JsonPropertyName("resources")]
         public V1ResourceRequirements? Resources { get; set; } = new();
-        
+
         /// <summary>
         /// Additional environment variables to add to the primary container.
         /// </summary>

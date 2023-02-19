@@ -1,8 +1,8 @@
 ﻿using CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder;
 using CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities;
-using DotnetKubernetesClient;
 using IdentityModel;
 using k8s.Models;
+using KubeOps.KubernetesClient;
 using KubeOps.Operator.Controller;
 using KubeOps.Operator.Controller.Results;
 using KubeOps.Operator.Finalizer;
@@ -15,7 +15,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
     [EntityRbac(typeof(V1Deployment), Verbs = RbacVerb.All)]
     [EntityRbac(typeof(V1Service), Verbs = RbacVerb.All)]
     [EntityRbac(typeof(V1Ingress), Verbs = RbacVerb.All)]
-    public class RefereeController: IResourceController<AgentReferee>
+    public class RefereeController : IResourceController<AgentReferee>
     {
         private readonly IKubernetesClient _client;
         private readonly ILogger<RefereeController> _logger;
@@ -92,7 +92,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
                         throw new ArgumentOutOfRangeException();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }
@@ -122,7 +122,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
         private async Task<AgentReferee> Update(AgentReferee entity)
         {
             var deployments = DeploymentBuilder.Build(entity);
-            foreach(var item in deployments)
+            foreach (var item in deployments)
                 await _client.UpdateObject(item);
             return entity;
         }
@@ -181,53 +181,9 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
         //     A task that completes, when the reconciliation is done.
         public async Task DeletedAsync(AgentReferee entity)
         {
+            await _client.DeleteObject<V1Service>(_logger, entity.Namespace(), $"{entity.GetDeploymentName()}-ep");
 
-            var svc = await _client.Get<V1Service>(
-                $"{entity.DeploymentName}-ep",
-                entity.Namespace()
-            );
-
-            if (svc == null)
-            {
-                _logger.LogError(
-                    "Failed to find service for resource {Name} in namespace {Namespace}",
-                    $"{entity.DeploymentName}-ep",
-                    entity.Namespace()
-                );
-            }
-            else
-            {
-                await _client.Delete(svc);
-                _logger.LogInformation(
-                    "Removed deployment for {Name} in namespace {Namespace}",
-                    $"{entity.DeploymentName}-ep",
-                    entity.Namespace()
-                );
-            }
-
-
-            var dep = await _client.Get<V1Deployment>(
-                entity.DeploymentName,
-                entity.Namespace()
-            );
-
-            if (dep == null)
-            {
-                _logger.LogError(
-                    "Failed to find deployment for resource {Name} in namespace {Namespace}",
-                    entity.Name(),
-                    entity.Namespace()
-                );
-            }
-            else
-            {
-                await _client.Delete(dep);
-                _logger.LogInformation(
-                    "Removed deployment for {Name} in namespace {Namespace}",
-                    entity.Name(),
-                    entity.Namespace()
-                );
-            }
+            await _client.DeleteObject<V1Deployment>(_logger, entity.Namespace(), entity.GetDeploymentName());
 
             _logger.LogInformation(
                 "{Name} in namespace {Namespace} deleted",

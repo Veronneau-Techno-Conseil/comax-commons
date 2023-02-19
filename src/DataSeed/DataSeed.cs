@@ -45,7 +45,7 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
 
         public async Task UploadData(DataChunkResult value)
         {
-            await _dataSeedBusiness.BuildRows(value);
+            //await _dataSeedBusiness.BuildRows(value);
         }
 
         public Task Validate()

@@ -46,9 +46,13 @@ pipeline {
                   sh 'if [ -z "$(docker buildx ls | grep multiarch)" ]; then docker buildx create --name multiarch --driver docker-container --use; else docker buildx use multiarch; fi'
                   sh "docker login -u ${USERNAME} -p ${PASSWORD}"
 				  
-                  sh "docker buildx build --push -t vertechcon/comax-agentreferee:latest -t registry.vtck3s.lan/comax-agentreferee:${patch} --platform linux/amd64,linux/arm64 -f agent-referee.Dockerfile ."
+                  sh "docker buildx build --push -t vertechcon/comax-agentreferee:latest -t vertechcon/comax-agentreferee:${patch} --platform linux/amd64,linux/arm64 -f agent-referee.Dockerfile ."
 				
-                  sh "docker buildx build --push -t vertechcon/comax-commonsagent:latest -t registry.vtck3s.lan/comax-commonsagent:${patch} --platform linux/amd64,linux/arm64 -f commons-agent.Dockerfile ."
+                  sh "docker buildx build --push -t vertechcon/comax-commonsagent:latest -t vertechcon/comax-commonsagent:${patch} --platform linux/amd64,linux/arm64 -f commons-agent.Dockerfile ."
+				  
+				  sh "docker buildx build --push -t vertechcon/comax-apistorage:latest -t vertechcon/comax-apistorage:${patch} --platform linux/amd64,linux/arm64 -f commons-apistorage.Dockerfile ."
+
+                  sh "docker buildx build --push -t vertechcon/comax-commonsclient:latest -t vertechcon/comax-commonsclient:${patch} --platform linux/amd64,linux/arm64 -f commons-client.Dockerfile ."
                 
                 }
                 
