@@ -37,9 +37,7 @@ pipeline {
                 }
 
                 sh "echo \"Build registry.vtck3s.lan/comax-orchestrator:${patch} pushed to registry \n\" >> SUMMARY"
-                sh "docker buildx build -t registry.vtck3s.lan/comax-orchestrator:latest-arm64 -t registry.vtck3s.lan/comax-orchestrator:${patch}-arm64 --platform linux/arm64 -f orchestrator.Dockerfile ."
-                sh "docker push registry.vtck3s.lan/comax-orchestrator:latest-arm64"
-                sh "docker push registry.vtck3s.lan/comax-orchestrator:${patch}-arm64"
+                sh "docker buildx build --push -t registry.vtck3s.lan/comax-orchestrator:latest-arm64 -t registry.vtck3s.lan/comax-orchestrator:${patch}-arm64 --platform linux/arm64 -f orchestrator.Dockerfile ."
                 
                 
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'dockerhub_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
