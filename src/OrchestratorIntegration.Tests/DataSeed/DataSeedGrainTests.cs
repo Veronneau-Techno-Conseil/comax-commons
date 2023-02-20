@@ -97,6 +97,14 @@ namespace OrchestratorIntegration.Tests.DataSeed
 
                 await strm.OnCompletedAsync();
             });
+
+            //var res = await cf.WithClusterClient(async cl =>
+            //{
+            //    var ds = cl.GetDataSeed(newid);
+            //    var res = await ds.StreamDataFromStorage(streamId);
+            //    return res;
+            //});
+            //res.Should().NotBeNull();
         }
     }
 }

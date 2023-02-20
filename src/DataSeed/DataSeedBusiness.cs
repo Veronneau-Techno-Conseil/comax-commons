@@ -51,13 +51,29 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
             return dsGuid;
         }
 
-        public async Task<DataIndex> StreamDataFromStorage(Guid streamId)
+        public async Task<OperationResult> StreamDataFromStorage(Guid streamId)
         {
             //instanciate the stream
+            var sp = _comaxGrainFactory.GetStreamProvider(OrleansConstants.Streams.DefaultStream);
+            _stream = sp.GetStream<DataChunkObject>(streamId, DataSeedConstants.DATA_SEED_NAMESPACE);
             //retrieve index from state
+            var ix = await GetIndex();
+            if (ix == null || ix.Id == Guid.Empty)
+            {
+                return new OperationResult
+                {
+                    IsError = true,
+                    Error = OperationResult.ERR_NOT_FOUND,
+                    Detail = "Index is empty"
+                };
+            }
             //iterate through index items
-            //call SendRow on index items passing along streamid
-            throw new NotImplementedException();
+            foreach (var item in ix.Index)
+            {
+                //call SendRow on index items passing along streamid not stream
+                await SendRow(item, streamId);
+            }
+            return new OperationResult();
         }
 
         public async Task<DataIndex> GetIndex()
@@ -69,11 +85,15 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
         {
             await _dataSeedRepo.Save(dsResult);
         }
-        public async Task SendRow(DataIndexItem ixItem, IAsyncStream<DataChunkObject> asyncStream)
+        public async Task SendRow(DataIndexItem ixItem, Guid streamId)
         {
             // using datachunk grain with ixItemId
+            var grain = _comaxGrainFactory.GetGrain<IDataChunk>(ixItem.Id);
             // retrieve data and send through stream using onnext
-            throw new NotImplementedException();
+            var data = await grain.GetData();
+
+            await _stream.OnNextAsync(data);
+            await _stream.OnCompletedAsync();
         }
 
         public async Task OnCompletedAsync()
