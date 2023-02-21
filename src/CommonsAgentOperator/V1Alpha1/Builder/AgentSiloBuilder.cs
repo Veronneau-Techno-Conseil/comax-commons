@@ -189,7 +189,6 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
        }
        #endregion
 
-
        #region MariaDbStore
 
        private static IEnumerable<IKubernetesObject<V1ObjectMeta>> BuildMariaDb(AgentSilo silo, IDictionary<string, string> labels)

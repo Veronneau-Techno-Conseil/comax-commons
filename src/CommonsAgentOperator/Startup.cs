@@ -1,7 +1,8 @@
-﻿using CommunAxiom.Commons.Client.Hosting.Operator.Models;
+﻿
 using CommunAxiom.Commons.Client.Hosting.Operator.Services;
 using CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1;
 using CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities;
+using CommunAxiom.Commons.Shared.OIDC;
 using KubeOps.KubernetesClient;
 //using CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities;
 
@@ -22,8 +23,8 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<OIDCConfig>(_configuration.GetSection("OIDC"));
-            services.AddHostedService<ConfigurationsMonitor>();
+            services.Configure<OIDCSettings>(x => _configuration.GetOIDCConfig("OIDC"));
+            services.AddTransient(x => _configuration.GetOIDCConfig("OIDC"));
 
             services.AddLogging(builder =>
             {
@@ -54,8 +55,6 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator
 #if DEBUG
                 .AddWebhookLocaltunnel()
 #endif
-                
-                
                 .AddEntity<AgentSilo>()
                 .AddController<AgentSiloController>()
                 .AddFinalizer<AgentSiloFinalizer>()
@@ -67,6 +66,8 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator
                 .AddEntity<AgentReferee>()
                 .AddController<RefereeController>()
                 .AddFinalizer<RefereeFinalizer>();
+
+            services.AddHostedService<ConfigurationsMonitor>();
         }
 
         public void Configure(IApplicationBuilder app)

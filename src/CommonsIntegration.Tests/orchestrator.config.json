@@ -45,5 +45,11 @@
     "AckFrequency": "15",
     "PortfolioSyncInterval": "30",
     "PortfolioSyncReminderInterval": "5"
+  },
+  "storage": "api",
+  "ApiStorage": {
+    "ApiStorageUri": "https://localhost:7066",
+    "SerializationProvider": "standard",
+    "SerializationConfig": ""
   }
 }

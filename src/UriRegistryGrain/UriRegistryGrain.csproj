@@ -1,28 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <Nullable>enable</Nullable>
-	  <AssemblyName>CommunAxiom.Commons.CommonsShared.UriRegistryGrain</AssemblyName>
-	  <RootNamespace>CommunAxiom.Commons.CommonsShared.UriRegistryGrain</RootNamespace>
-	  <LangVersion>10.0</LangVersion>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<Nullable>enable</Nullable>
+		<AssemblyName>CommunAxiom.Commons.CommonsShared.UriRegistryGrain</AssemblyName>
+		<RootNamespace>CommunAxiom.Commons.CommonsShared.UriRegistryGrain</RootNamespace>
+		<LangVersion>10.0</LangVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.6.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Orleans.Runtime.Abstractions" Version="3.6.5" />
-    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.6.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
 
-  <ItemGroup>
-    <ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
-  </ItemGroup>
+		<PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.6.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<PackageReference Include="Microsoft.Orleans.Runtime.Abstractions" Version="3.6.5" />
+
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Node.Contracts\Orchestrator.Contracts.csproj" />
+	</ItemGroup>
 
 </Project>

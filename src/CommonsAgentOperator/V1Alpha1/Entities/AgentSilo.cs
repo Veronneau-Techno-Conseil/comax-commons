@@ -18,7 +18,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
     {
         public static string GetDeploymentName(this AgentSilo agentReferee)
         {
-            return $"{agentReferee.Name()}-deployment";
+            return $"{agentReferee.Name()}-depl";
         }
     }
 

@@ -18,6 +18,7 @@ using CommunAxiom.Commons.Client.Silo;
 using System;
 using System.Collections.Generic;
 using CommunAxiom.Commons.Client.AgentService.OrchClient;
+using Comax.Commons.StorageProvider;
 
 namespace CommunAxiom.Commons.Client.SiloShared
 {
@@ -124,24 +125,32 @@ namespace CommunAxiom.Commons.Client.SiloShared
         public static IServiceCollection SetStorage(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOptions();
-            services.SetJSONLiteDbSerializationProvider();
-            services.Configure<LiteDbConfig>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, configuration.GetSection("LiteDbStorage"));
-            services.Configure<LiteDbConfig>(OrleansConstants.Storage.PubSubStore, configuration.GetSection(OrleansConstants.Storage.PubSubStore));
-            services.Configure<LiteDbConfig>(OrleansConstants.Storage.JObjectStore, configuration.GetSection(OrleansConstants.Storage.JObjectStore));
+            services.SetJSONSerializationProvider();
 
-            services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, (svc, key) =>
+            if(configuration["storage"] == "litedb")
             {
-                return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
-            });
+                services.Configure<LiteDbConfig>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, configuration.GetSection("LiteDbStorage"));
+                services.Configure<LiteDbConfig>(OrleansConstants.Storage.PubSubStore, configuration.GetSection(OrleansConstants.Storage.PubSubStore));
+                services.Configure<LiteDbConfig>(OrleansConstants.Storage.JObjectStore, configuration.GetSection(OrleansConstants.Storage.JObjectStore));
 
-            services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(OrleansConstants.Storage.PubSubStore, (svc, key) =>
+                services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, (svc, key) =>
+                {
+                    return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
+                });
+
+                services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(OrleansConstants.Storage.PubSubStore, (svc, key) =>
+                {
+                    return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
+                });
+
+                services.AddLiteDbGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
+                services.AddWrappedLiteDbGrainStorage(OrleansConstants.Storage.PubSubStore);
+                services.AddJObjectLiteDbGrainStorage(OrleansConstants.Storage.JObjectStore);
+            }
+            else
             {
-                return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
-            });
 
-            services.AddLiteDbGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
-            services.AddWrappedLiteDbGrainStorage(OrleansConstants.Storage.PubSubStore);
-            services.AddJObjectLiteDbGrainStorage(OrleansConstants.Storage.JObjectStore);
+            }
 
             return services;
         }

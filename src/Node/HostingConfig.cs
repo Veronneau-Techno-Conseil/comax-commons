@@ -20,6 +20,7 @@ using CommunAxiom.Commons.Orleans;
 using static IdentityModel.ClaimComparer;
 using MongoDB.Driver;
 using Newtonsoft.Json;
+using Comax.Commons.StorageProvider;
 
 namespace Comax.Commons.Orchestrator
 {
@@ -135,22 +136,43 @@ namespace Comax.Commons.Orchestrator
         public static IServiceCollection SetStorage(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOptions();
-            services.SetJSONLiteDbSerializationProvider();
-            services.Configure<LiteDbConfig>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, configuration.GetSection("LiteDbStorage"));
-            services.Configure<LiteDbConfig>(PubSubStore, configuration.GetSection(PubSubStore));
+            services.SetJSONSerializationProvider();
 
-            services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, (svc, key) =>
+            if (configuration["storage"] == "litedb")
             {
-                return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
-            });
+                
+                services.Configure<LiteDbConfig>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, configuration.GetSection("LiteDbStorage"));
+                services.Configure<LiteDbConfig>(PubSubStore, configuration.GetSection(PubSubStore));
 
-            services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(PubSubStore, (svc, key) =>
+                services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, (svc, key) =>
+                {
+                    return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
+                });
+
+                services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(PubSubStore, (svc, key) =>
+                {
+                    return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
+                });
+
+                services.AddLiteDbGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
+                services.AddWrappedLiteDbGrainStorage(PubSubStore);
+                services.AddJObjectLiteDbGrainStorage(OrleansConstants.Storage.JObjectStore);
+
+            }
+            else
             {
-                return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
-            });
+                services.Configure<ApiStorageConfiguration>("ApiStorage", configuration.GetSection("ApiStorage"));
+                services.AddSingletonNamedService<IOptionsMonitor<ApiStorageConfiguration>>("ApiStorage", (svc, key) =>
+                {
+                    return svc.GetService<IOptionsMonitor<ApiStorageConfiguration>>();
+                });
 
-            services.AddLiteDbGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
-            services.AddWrappedLiteDbGrainStorage(PubSubStore);
+                services.AddApiGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, "ApiStorage");
+                services.AddJObjectApiGrainStorage(OrleansConstants.Storage.JObjectStore, "ApiStorage");
+                services.AddWrappedApiGrainStorage(OrleansConstants.Storage.PubSubStore, "ApiStorage");
+
+            }
+            
 
             return services;
         }

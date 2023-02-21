@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
 
-	  <AssemblyName>Comax.Commons.LiteDbStorageProvider</AssemblyName>
-	<RootNamespace>Comax.Commons.StorageProvider</RootNamespace>
+	  <AssemblyName>Comax.Commons.ApiStorageProvider</AssemblyName>
+	<RootNamespace>Comax.Commons.ApiStorageProvider</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

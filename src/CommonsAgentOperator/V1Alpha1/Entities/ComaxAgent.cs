@@ -18,7 +18,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
     {
         public static string GetDeploymentName(this ComaxAgent agentReferee)
         {
-            return $"{agentReferee.Name()}-deployment";
+            return $"{agentReferee.Name()}-depl";
         }
     }
 
@@ -39,6 +39,9 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
 
         [JsonPropertyName("agentRefereeName")]
         public string AgentRefereeName { get; set; }
+
+        [JsonPropertyName("agentSiloName")]
+        public string AgentSiloName { get; set; }
     }
 
     public class ComaxAgentSpec

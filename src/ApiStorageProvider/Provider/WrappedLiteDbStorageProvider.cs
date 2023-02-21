@@ -26,14 +26,15 @@ namespace Comax.Commons.StorageProvider
 
 
         private ISerializationProvider _serializationProvider;
-        private readonly GrainStorageClient _grainStorageClient;
+        private readonly GrainStorageClientFactory _grainStorageClient;
         private readonly IServiceProvider _serviceProvider;
-        public WrappedLiteDbStorageProvider(string name, ILogger<WrappedLiteDbStorageProvider> logger, GrainStorageClient grainStorageClient, IServiceProvider serviceProvider)
+        public WrappedLiteDbStorageProvider(string name, ILogger<WrappedLiteDbStorageProvider> logger, GrainStorageClientFactory grainStorageClient, IServiceProvider serviceProvider)
         {
             _name = name;
             _logger = logger;
             _grainStorageClient = grainStorageClient;
             _serviceProvider = serviceProvider;
+            _serializationProvider = _serviceProvider.GetService<ISerializationProvider>() ?? _serviceProvider.GetRequiredServiceByName<ISerializationProvider>("standard");
         }
 
         private static string GetBlobName(string grainType, GrainReference grainId)
@@ -50,10 +51,11 @@ namespace Comax.Commons.StorageProvider
         {
 
             var blobName = GetBlobName(grainType, grainReference);
+            var cl = _grainStorageClient.Create();
 
-            if (await _grainStorageClient.Any(grainType, blobName))
+            if (await cl.Any(grainType, blobName))
             {
-                await _grainStorageClient.Delete(grainType, blobName);
+                await cl.Delete(grainType, blobName);
             }
 
             grainState.RecordExists = false;
@@ -63,10 +65,11 @@ namespace Comax.Commons.StorageProvider
         public async Task ReadStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
             var blobName = GetBlobName(grainType, grainReference);
+            var cl = _grainStorageClient.Create();
 
-            if (await _grainStorageClient.Any(grainType, blobName))
+            if (await cl.Any(grainType, blobName))
             {
-                var jo = await _grainStorageClient.GetValue(grainType, blobName);
+                var jo = await cl.GetValue(grainType, blobName);
                 var store = jo.ToObject<ByteValueStore>();
 
                 grainState.State = _serializationProvider.Deserialize(store.Value, grainState.Type);
@@ -84,6 +87,7 @@ namespace Comax.Commons.StorageProvider
         public async Task WriteStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
 
+            var cl = _grainStorageClient.Create();
             var blobName = GetBlobName(grainType, grainReference);
 
             if (grainState.State == null)
@@ -96,7 +100,7 @@ namespace Comax.Commons.StorageProvider
             ByteValueStore store = new ByteValueStore() { Value = contents };
             var jo = JObject.FromObject(store);
 
-            await _grainStorageClient.UpsetValue(grainType, blobName, jo);
+            await cl.UpsertValue(grainType, blobName, jo);
             grainState.RecordExists = true;
             grainState.ETag = blobName;
 

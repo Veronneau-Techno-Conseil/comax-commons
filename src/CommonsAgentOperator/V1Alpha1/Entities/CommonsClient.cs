@@ -4,26 +4,26 @@ using System.Text.Json.Serialization;
 
 namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
 {
+
     [KubernetesEntity(
-    ApiVersion = "v1alpha1",
-    Group = "communaxiom.org",
-    Kind = "AgentReferee",
-    PluralName = "agentrefs")
-]
-    public class AgentReferee : CustomKubernetesEntity<AgentRefereeSpec, AgentRefereeState>
+        ApiVersion = "v1alpha1",
+        Group = "communaxiom.org",
+        Kind = "ComaxCommonsClient",
+        PluralName = "comaxcomclients")]
+    public class ComaxCommonsClient : CustomKubernetesEntity<ComaxCommonsClientSpec, ComaxCommonsClientState>
     {
 
     }
 
-    public static class AgentRefereeExtensions
+    public static class ComaxCommonsClientExtensions
     {
-        public static string GetDeploymentName(this AgentReferee agentReferee)
+        public static string GetDeploymentName(this ComaxCommonsClient agentReferee)
         {
             return $"{agentReferee.Name()}-depl";
         }
     }
 
-    public class AgentRefereeState
+    public class ComaxCommonsClientState
     {
 
         [JsonPropertyName("currentState")]
@@ -34,15 +34,27 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
 
         [JsonPropertyName("stateTs")]
         public long StateTs { get; set; } = 0;
+
+        [JsonPropertyName("clusterState")]
+        public IDictionary<string, string> ClusterState { get; set; }
+
     }
 
-    public class AgentRefereeSpec
+    public class ComaxCommonsClientSpec
     {
-        [JsonPropertyName("image")]
-        public string Image { get; set; } = "vertechcon/comax-agentreferee:latest";
 
-        [JsonPropertyName("listenPort")]
-        public int ListenPort { get; set; } = 5004;
+        [JsonPropertyName("ingressHost")]
+        public string IngressHost { get; set; }
+
+        [JsonPropertyName("ingressCertManager")]
+        public string IngressCertManager { get; set; }
+
+        [JsonPropertyName("ingressCertSecret")]
+        public string IngressCertSecret { get; set; }
+
+        [JsonPropertyName("useHttps")]
+        public bool UseHttps { get; set; }
+
 
         [JsonPropertyName("oidcAuthority")]
         public string OidcAuthority { get; set; }
@@ -56,15 +68,25 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         [JsonPropertyName("oidcSecretKey")]
         public string OidcSecretKey { get; set; }
 
-        [JsonPropertyName("useHttps")]
-        public bool UseHttps { get; set; }
 
-        [JsonPropertyName("certPath")]
-        public string CertPath { get; set; }
-        [JsonPropertyName("keyPath")]
-        public string KeyPath { get; set; }
-        [JsonPropertyName("dbProvider")]
-        public string DbProvider { get; set; }
+        [JsonPropertyName("commonsClientImage")]
+        public string CommonsClientImage { get; set; }
+
+        [JsonPropertyName("commonsMembershipHost")]
+        public string CommonsMembershipHost { get; set; }
+
+
+        [JsonPropertyName("commonsMembershipCacheDuration")]
+        public string CommonsMembershipCacheDuration { get; set; }
+
+
+
+        [JsonPropertyName("clusterId")]
+        public string ClusterId { get; set; }
+
+        [JsonPropertyName("serviceId")]
+        public string ServiceId { get; set; }
+
 
         /// <summary>
         /// Optional resource limits and requests.
@@ -74,21 +96,10 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         public V1ResourceRequirements? Resources { get; set; } = new();
 
         /// <summary>
-        /// Additional environment variables to add to the primary container.
-        /// </summary>
-        [JsonPropertyName("environmentVariables")]
-        public IList<V1EnvVar> EnvironmentVariables { get; set; } = new List<V1EnvVar>();
-
-        /// <summary>
-        /// Optional extra annotations to add to deployment.
-        /// </summary>
-        [JsonPropertyName("annotations")]
-        public IDictionary<string, string> Annotations { get; set; } = new Dictionary<string, string>();
-
-        /// <summary>
         /// Optional extra labels to add to deployment.
         /// </summary>
         [JsonPropertyName("labels")]
         public IDictionary<string, string> Labels { get; set; } = new Dictionary<string, string>();
     }
+
 }

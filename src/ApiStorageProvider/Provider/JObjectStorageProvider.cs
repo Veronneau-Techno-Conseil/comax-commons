@@ -21,9 +21,9 @@ namespace Comax.Commons.StorageProvider
         private readonly ILogger<JObjectStorageProvider> _logger;
 
         private ISerializationProvider _serializationProvider;
-        private readonly GrainStorageClient _grainStorageClient;
+        private readonly GrainStorageClientFactory _grainStorageClient;
 
-        public JObjectStorageProvider(string name, ILogger<JObjectStorageProvider> logger, GrainStorageClient grainStorageClient)
+        public JObjectStorageProvider(string name, ILogger<JObjectStorageProvider> logger, GrainStorageClientFactory grainStorageClient)
         {
             _name = name;
             _logger = logger;
@@ -42,11 +42,12 @@ namespace Comax.Commons.StorageProvider
         }
         public async Task ClearStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
+            var cl = _grainStorageClient.Create();
             var blobName = GetBlobName(grainType, grainReference);
 
-            if (await _grainStorageClient.Any(grainType, blobName))
+            if (await cl.Any(grainType, blobName))
             {
-                await _grainStorageClient.Delete(grainType, blobName);
+                await cl.Delete(grainType, blobName);
             }
 
             grainState.RecordExists = false;
@@ -55,11 +56,12 @@ namespace Comax.Commons.StorageProvider
 
         public async Task ReadStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
+            var cl = _grainStorageClient.Create();
             var blobName = GetBlobName(grainType, grainReference);
 
-            if (await _grainStorageClient.Any(grainType, blobName))
+            if (await cl.Any(grainType, blobName))
             {
-                var jo = await _grainStorageClient.GetValue(grainType, blobName);
+                var jo = await cl.GetValue(grainType, blobName);
 
                 grainState.State = jo;
                 grainState.RecordExists = true;
@@ -75,6 +77,7 @@ namespace Comax.Commons.StorageProvider
         public async Task WriteStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
 
+            var cl = _grainStorageClient.Create();
             var blobName = GetBlobName(grainType, grainReference);
 
             if (grainState.State == null)
@@ -84,7 +87,7 @@ namespace Comax.Commons.StorageProvider
             }
 
             var jo = (JObject)grainState.State;
-            await _grainStorageClient.UpsetValue(grainType, blobName, jo);
+            await cl.UpsertValue(grainType, blobName, jo);
             grainState.RecordExists = true;
             grainState.ETag = blobName;
         }

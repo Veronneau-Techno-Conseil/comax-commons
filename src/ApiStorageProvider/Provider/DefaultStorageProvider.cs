@@ -1,4 +1,5 @@
-﻿using Comax.Commons.StorageProvider.Hosting;
+﻿using Comax.Commons.ApiStorageProvider.Provider;
+using Comax.Commons.StorageProvider.Hosting;
 using Comax.Commons.StorageProvider.Models;
 using Comax.Commons.StorageProvider.Serialization;
 using Microsoft.Extensions.Logging;
@@ -15,52 +16,52 @@ using System.Threading.Tasks;
 
 namespace Comax.Commons.StorageProvider
 {
-    public class DefaultStorageProvider : IGrainStorage, ILifecycleParticipant<ISiloLifecycle>
+    public class DefaultStorageProvider : BaseProvider
     {
         private readonly string _name;
         private readonly ILogger<DefaultStorageProvider> _logger;
         
         private ISerializationProvider _serializationProvider;
-        private readonly GrainStorageClient _grainStorageClient;
+        private readonly GrainStorageClientFactory _grainStorageClient;
 
-        public DefaultStorageProvider(string name, ILogger<DefaultStorageProvider> logger, GrainStorageClient grainStorageClient)
+        public DefaultStorageProvider(string name, ILogger<DefaultStorageProvider> logger, GrainStorageClientFactory grainStorageClient)
         {
             _name = name;
             _logger = logger;
             _grainStorageClient= grainStorageClient;
         }
 
-        public static string GetBlobName(string grainType, GrainReference grainId)
-        {
-            return string.Format("{0}-{1}.json", grainType, grainId.ToKeyString());
-        }
+        
 
-        public void Participate(ISiloLifecycle lifecycle)
+        public override void Participate(ISiloLifecycle lifecycle)
         {
             lifecycle.Subscribe(OptionFormattingUtilities.Name<DefaultStorageProvider>(_name),
                                     ServiceLifecycleStage.RuntimeInitialize, Init);
         }
-        public async Task ClearStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
+        public override async Task ClearStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
+            var cl = _grainStorageClient.Create();
+            var ss = Uri.EscapeDataString(grainType.Substring(grainType.LastIndexOf(".") + 1)+grainState.Type.Name);
+            var blobName = GetBlobName(ss, grainReference);
 
-            var blobName = GetBlobName(grainType, grainReference);
-
-            if (await _grainStorageClient.Any(grainType, blobName))
+            if (await cl.Any(ss, blobName))
             {
-                await _grainStorageClient.Delete(grainType, blobName);
+                await cl.Delete(ss, blobName);
             }
 
             grainState.RecordExists = false;
             grainState.State = null;
         }
 
-        public async Task ReadStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
+        public override async Task ReadStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
-            var blobName = GetBlobName(grainType, grainReference);
+            var cl = _grainStorageClient.Create();
+            var ss = Uri.EscapeDataString(grainType.Substring(grainType.LastIndexOf(".") + 1) + grainState.Type.Name);
+            var blobName = GetBlobName(ss, grainReference);
 
-            if(await _grainStorageClient.Any(grainType, blobName))
+            if(await cl.Any(ss, blobName))
             {
-                var jo = await _grainStorageClient.GetValue(grainType, blobName);
+                var jo = await cl.GetValue(ss, blobName);
 
                 grainState.State = jo.ToObject(grainState.Type);
                 grainState.RecordExists = true;
@@ -73,25 +74,27 @@ namespace Comax.Commons.StorageProvider
             grainState.ETag = blobName;
         }
 
-        public async Task WriteStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
+        public override async Task WriteStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
 
-            var blobName = GetBlobName(grainType, grainReference);
+            var cl = _grainStorageClient.Create();
+            var ss = Uri.EscapeDataString(grainType.Substring(grainType.LastIndexOf(".") + 1) + grainState.Type.Name);
+            var blobName = GetBlobName(ss, grainReference);
 
             if(grainState.State == null)
             {
-                await ClearStateAsync(grainType, grainReference, grainState);
+                await ClearStateAsync(ss, grainReference, grainState);
                 return;
             }
 
             var jo = JObject.FromObject(grainState.State);
-            await _grainStorageClient.UpsetValue(grainType, blobName, jo);
+            await cl.UpsertValue(ss, blobName, jo);
             grainState.RecordExists = true;
             grainState.ETag = blobName;
         }
 
 
-        private async Task Init(CancellationToken cancellationToken)
+        public async Task Init(CancellationToken cancellationToken)
         {
             
         }

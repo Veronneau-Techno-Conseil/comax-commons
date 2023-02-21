@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <AssemblyName>Comax.Commons.Orchestrator</AssemblyName>
     <RootNamespace>Comax.Commons.Orchestrator</RootNamespace>
   </PropertyGroup>
@@ -23,6 +23,7 @@
 
   <ItemGroup>
       <ProjectReference Include="..\ApiMembershipProvider\ApiMembershipProvider.csproj" />
+      <ProjectReference Include="..\ApiStorageProvider\ApiStorageProvider.csproj" />
       <ProjectReference Include="..\CentralGrain\CentralGrain.csproj" />
       <ProjectReference Include="..\CommonsActorGrain\CommonsActorGrain.csproj" />
       <ProjectReference Include="..\DataChunkGrain\DataChunkGrain.csproj" />

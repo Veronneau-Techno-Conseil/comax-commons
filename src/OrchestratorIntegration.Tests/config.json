@@ -35,10 +35,16 @@
   "siloPort": 7718,
   "gatewayPort": 30001,
   "advertisedIp": "127.0.0.1",
-  
+
   "client_mode": "local",
   "membership": {
     "host": "https://referee.communaxiom.org",
     "cacheDuration": "00:05:00"
+  },
+  "storage": "api",
+  "ApiStorage": {
+    "ApiStorageUri": "https://localhost:7066",
+    "SerializationProvider": "standard",
+    "SerializationConfig": ""
   }
 }

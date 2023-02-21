@@ -23,5 +23,6 @@
     "LiveTickerPeriod": 30,
     "ConnectionCheckPeriod": 30,
     "SaveStatePeriod": 30
-  }
+  },
+  "storage":  "litedb"
 }

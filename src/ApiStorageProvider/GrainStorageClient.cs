@@ -1,4 +1,5 @@
-﻿using CommunAxiom.Commons.Shared.OIDC;
+﻿using Comax.Commons.ApiStorageProvider;
+using CommunAxiom.Commons.Shared.OIDC;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using System;
@@ -9,47 +10,54 @@ using System.Threading.Tasks;
 
 namespace Comax.Commons.StorageProvider
 {
+    public class GrainStorageClientFactory
+    {
+        private readonly TokenManager _tokenManager;
+        private readonly ApiStorageConfiguration _apiStorageConfiguration;
+        public GrainStorageClientFactory(TokenManager tokenManager, ApiStorageConfiguration configs)
+        {
+            _tokenManager = tokenManager;
+            _apiStorageConfiguration = configs;
+        }
+
+        public GrainStorageClient Create()
+        {
+            return new GrainStorageClient(_tokenManager, _apiStorageConfiguration);
+        }
+    }
+
     public class GrainStorageClient
     {
-        private readonly ISettingsProvider _settingsProvider;
         private readonly ApiStorageConfiguration _apiStorageConfiguration;
+        private readonly TokenManager _tokenManager;
         private HttpClient _httpClient;
-        private TokenData _tokenData;
-        public GrainStorageClient(ISettingsProvider settingsProvider, IOptionsMonitor<ApiStorageConfiguration> configs)
+
+        private DateTime _tokenExpiration;
+
+        public GrainStorageClient(TokenManager tokenManager, ApiStorageConfiguration configs)
         {
-            _settingsProvider = settingsProvider;
-            _apiStorageConfiguration = configs.CurrentValue;
+            _tokenManager = tokenManager;
+            _apiStorageConfiguration = configs;
         }
 
         private async Task EnsureHttpClient()
         {
-            _httpClient = new HttpClient();
-            var settings = await _settingsProvider.GetOIDCSettings();
-            TokenClient tokenClient = new TokenClient(settings);
-            var (res, data) = await tokenClient.AuthenticateClient(settings.ClientId, settings.Secret, settings.Scopes);
-            if (!res)
-                throw new UnauthorizedAccessException("Authentication failed");
-
-            _tokenData = data;
-
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _tokenData.access_token);
-            _httpClient.BaseAddress = new Uri(_apiStorageConfiguration.ApiStorageUri);
+            if (_httpClient == null)
+            {
+                _httpClient = new HttpClient();
+                _httpClient.BaseAddress = new Uri(_apiStorageConfiguration.ApiStorageUri);
+                var td = await _tokenManager.Fetch();
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", td.access_token);
+            }
+            else if (DateTime.UtcNow > _tokenManager.TokenExpires)
+            {
+                var td = await _tokenManager.Fetch();
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", td.access_token);
+            }
         }
 
-        private async Task RefreshToken()
-        {
-            var settings = await _settingsProvider.GetOIDCSettings();
-            TokenClient tokenClient = new TokenClient(settings);
-            var (res, data) = await tokenClient.RefreshToken(_tokenData.refresh_token);
-            if (!res)
-                throw new UnauthorizedAccessException("Authentication failed");
 
-            _tokenData = data;
-
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _tokenData.access_token);
-        }
-
-        public async Task UpsetValue(string dataType, string key, JObject value)
+        public async Task UpsertValue(string dataType, string key, JObject value)
         {
             await EnsureHttpClient();
 
@@ -60,10 +68,10 @@ namespace Comax.Commons.StorageProvider
                 while (!success && trial < 2)
                 {
                     trial++;
-                    var res = await _httpClient.PostAsync($"State/{dataType}/{key}", stringContent);
+                    var res = await _httpClient.PostAsync($"Api/State/{dataType}/{key}", stringContent);
                     if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        await RefreshToken();
+                        await EnsureHttpClient();
                     }
                     else if (res.StatusCode != System.Net.HttpStatusCode.OK)
                         throw new Exception(res.ReasonPhrase);
@@ -88,10 +96,10 @@ namespace Comax.Commons.StorageProvider
             while (!success && trial < 2)
             {
                 trial++;
-                msg = await _httpClient.GetAsync($"State/{dataType}/{key}");
+                msg = await _httpClient.GetAsync($"Api/State/{dataType}/{key}");
                 if (msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    await RefreshToken();
+                    await EnsureHttpClient();
                 }
                 else if (msg.StatusCode != System.Net.HttpStatusCode.OK)
                     throw new Exception(msg.ReasonPhrase);
@@ -113,8 +121,8 @@ namespace Comax.Commons.StorageProvider
             await EnsureHttpClient();
 
             int trial = 0;
-            
-            var msg = await _httpClient.GetAsync($"State/Any/{dataType}/{key}");
+
+            var msg = await _httpClient.GetAsync($"Api/State/Any/{dataType}/{key}");
             if (msg.StatusCode != System.Net.HttpStatusCode.OK)
                 return false;
             else
@@ -127,7 +135,7 @@ namespace Comax.Commons.StorageProvider
 
             int trial = 0;
 
-            var msg = await _httpClient.DeleteAsync($"State/{dataType}/{key}");
+            var msg = await _httpClient.DeleteAsync($"Api/State/{dataType}/{key}");
             if (msg.StatusCode != System.Net.HttpStatusCode.OK)
                 return false;
             else

@@ -12,8 +12,9 @@ using KubeOps.Operator.Rbac;
 
 namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
 {
+   [EntityRbac(typeof(V1Namespace), Verbs = RbacVerb.All)]
    [EntityRbac(typeof(ComaxAgent), Verbs = RbacVerb.All)]
-   [EntityRbac(typeof(AgentReferee), Verbs = RbacVerb.All)]
+    [EntityRbac(typeof(AgentReferee), Verbs = RbacVerb.All)]
    [EntityRbac(typeof(V1PersistentVolumeClaim), Verbs = RbacVerb.All)]
    [EntityRbac(typeof(V1Deployment), Verbs = RbacVerb.All)]
    [EntityRbac(typeof(V1Service), Verbs = RbacVerb.All)]

@@ -30,10 +30,6 @@ pipeline {
         stage('Build') {
             steps {
                 
-
-                
-                                
-                
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'dockerhub_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
                   sh 'if [ -z "$(docker buildx ls | grep multiarch)" ]; then docker buildx create --name multiarch --driver docker-container --use; else docker buildx use multiarch; fi'
                   sh "docker login -u ${USERNAME} -p ${PASSWORD}"
@@ -47,16 +43,11 @@ pipeline {
 				  sh "docker buildx build --push -t vertechcon/comax-apistorage:latest -t vertechcon/comax-apistorage:${patch} --platform linux/amd64,linux/arm64 -f commons-apistorage.Dockerfile ."
 
                   sh "docker buildx build --push -t vertechcon/comax-commonsclient:latest -t vertechcon/comax-commonsclient:${patch} --platform linux/amd64,linux/arm64 -f commons-client.Dockerfile ."
+                  
+                  sh "docker buildx build --push -t vertechcon/comax-referee:latest -t vertechcon/comax-referee:${patch} --platform linux/amd64,linux/arm64 -f referee.Dockerfile ."
                 
                 }
-                
-                script {
-                    def customImage = docker.build("registry.vtck3s.lan/comax-referee:latest", "-f ./referee.Dockerfile .")
-                    customImage.push()
-                    customImage.push(patch)
-                }
-                sh 'echo "Build registry.vtck3s.lan/comax-referee:${patch} pushed to registry \n" >> SUMMARY'
-            
+
             }
 
             post {

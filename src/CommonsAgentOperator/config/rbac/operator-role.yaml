@@ -9,12 +9,13 @@ rules:
   - networking.k8s.io
   - coordination.k8s.io
   resources:
-  - agentrefs
+  - agentsilos
   - persistentvolumeclaims
   - services
   - ingresses
-  - agentsilos
+  - namespaces
   - comaxagents
+  - agentrefs
   - leases
   verbs:
   - '*'
@@ -36,7 +37,7 @@ rules:
 - apiGroups:
   - communaxiom.org
   resources:
-  - agentrefs/status
+  - agentsilos/status
   verbs:
   - get
   - patch
@@ -74,9 +75,9 @@ rules:
   - patch
   - update
 - apiGroups:
-  - communaxiom.org
+  - ""
   resources:
-  - agentsilos/status
+  - namespaces/status
   verbs:
   - get
   - patch
@@ -85,6 +86,14 @@ rules:
   - communaxiom.org
   resources:
   - comaxagents/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - communaxiom.org
+  resources:
+  - agentrefs/status
   verbs:
   - get
   - patch

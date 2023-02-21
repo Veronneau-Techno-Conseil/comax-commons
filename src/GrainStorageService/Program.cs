@@ -28,6 +28,7 @@ app.UseExceptionHandler("/Error");
     app.UseHsts();
 
 #if DEBUG
+Console.WriteLine("Launching mariadb in debug");
     var dbConf = app.Services.GetService<IOptionsMonitor<GrainStorageService.DbConf>>();
     var curconf = dbConf.CurrentValue;
     try

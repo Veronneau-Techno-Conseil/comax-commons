@@ -29,10 +29,10 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
                 Spec = CreateAgentRefereeDeploymentSpec(agentReferee, labels)
             };
 
-            yield return CreateService(agentReferee, labels);
+            yield return CreateRefereeService(agentReferee, labels);
         }
 
-        private static V1Service CreateService(AgentReferee agentReferee, IDictionary<string, string> labels)
+        private static V1Service CreateRefereeService(AgentReferee agentReferee, IDictionary<string, string> labels)
         {
             return new V1Service()
             {

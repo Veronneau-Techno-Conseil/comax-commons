@@ -3,6 +3,7 @@ using CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities;
 using CommunAxiom.Commons.Shared.OIDC;
 using k8s.Models;
 using KubeOps.KubernetesClient;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 using System.Text;
 
@@ -11,17 +12,17 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.Services
     public class ConfigurationsMonitor : BackgroundService
     {
         private readonly ILogger<ConfigurationsMonitor> _logger;
-        private readonly OIDCSettings _oidcSettings;
+        private OIDCSettings _oidcSettings;
         private readonly IConfiguration _configuration;
         private readonly IKubernetesClient _kubernetesClient;
 
         private DateTime _tokenExpires = DateTime.UtcNow;
         private TokenData _tokenData = null;
 
-        public ConfigurationsMonitor(IConfiguration configuration, ILogger<ConfigurationsMonitor> logger, IOptionsMonitor<OIDCSettings> oidcSettings, IKubernetesClient kubernetesClient)
+        public ConfigurationsMonitor(IConfiguration configuration, ILogger<ConfigurationsMonitor> logger, OIDCSettings oidcSettings, IKubernetesClient kubernetesClient)
         {
             _logger = logger;
-            _oidcSettings = oidcSettings.CurrentValue;
+            _oidcSettings = oidcSettings;
             _configuration = configuration;
             _kubernetesClient = kubernetesClient;
         }
@@ -55,6 +56,10 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.Services
                         HttpClient client = new HttpClient();
                         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", t);
                         Comax.Central.CentralApi centralApi = new Comax.Central.CentralApi(_configuration["CentralApi"], client);
+
+                        var specs = await centralApi.GetEcosystemSpecAsync("Comax - Commons");
+                        var images = specs.AppSpecs.ToDictionary(x => x.AppType, x => x);
+
                         var apps = await centralApi.HostedAppsAsync("Commons");
 
                         foreach (var app in apps)
@@ -88,22 +93,48 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.Services
                                     { "dbrootpw", enc.GetBytes(dic["dbrootpw"])}
                                 });
 
+                            //await _kubernetesClient.Save(v1Secret);
+                            
                             ComaxAgent comaxAgent = new ComaxAgent
                             {
                                 Metadata = new V1ObjectMeta(name: "commons-instance", namespaceProperty: app.Namespace),
                                 Spec = new ComaxAgentSpec
                                 {
-                                    RefereeImage = "",
-                                    AgentSiloImage = "",
-                                    StoreApiImage = "",
-                                    CommonsClientImage = "",
-                                    MariadbImage = ""
-                                }
+                                    RefereeImage = images["AgentReferee"].DockerImage(),
+                                    AgentSiloImage = images["Commons"].DockerImage(),
+                                    StoreApiImage = images["GrainStorageService"].DockerImage(),
+                                    CommonsClientImage = images["CommonsClient"].DockerImage(),
+                                    MariadbImage = images["CommonsMariaDb"].DockerImage(),
+
+                                    DbCredPasswordKey = "DbCredPassword",
+                                    DbCredRootPasswordKey = "dbrootpw",
+                                    DbCredSecretName = "commons-secret",
+                                    DbCredUsernameKey = "DbCredUsername",
+
+                                    GatewayPort = dic["GatewayPort"],
+                                    SiloPort = dic["SiloPort"],
+
+                                    ClusterId = dic["ClusterId"],
+                                    ServiceId = dic["ServiceId"],
+
+                                    IngressCertManager = _configuration["CertManager"],
+                                    IngressCertSecret = $"{dic["APP_HASH"]}-ingr-cert",
+                                    IngressHost = _configuration["IngressTemplate"].Replace("[HASH]", dic["APP_HASH"]),
+
+                                    MembershipAddress = dic["MembershipHost"],
+                                    OidcAuthority = dic["oidcAuthority"],
+                                    OidcClientId = dic["OidcClientId"],
+                                    OidcSecretKey = "OidcSecret",
+                                    OidcSecretName = "commons-secret"
+                                },
+                                Status = new ComaxAgentState()
                             };
+
+                            //await _kubernetesClient.Save(comaxAgent);
                         }
                     }
 
-                    await Task.Delay(30000);
+                    await Task.Delay(TimeSpan.FromMinutes(10));
                 }
                 catch (Exception ex)
                 {

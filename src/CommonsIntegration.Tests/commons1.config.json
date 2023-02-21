@@ -44,6 +44,7 @@
     "ConnectionCheckPeriod": 5,
     "SaveStatePeriod": 2,
     "SubscriptionTimeout": 420
-  }
+  },
+  "storage": "litedb"
 
 }
