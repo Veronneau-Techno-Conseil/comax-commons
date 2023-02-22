@@ -11,13 +11,15 @@ namespace Comax.Commons.Orchestrator.DataChunkGrain
 {
     public class DataChunk: Grain, IDataChunk
     {
-        private readonly IPersistentState<DataChunkObject> _dataChunkState;
+        private readonly IPersistentState<IdDataChunk> _dataChunkIdState;
+        private readonly IPersistentState<JObject> _dataChunkDataState;
         private readonly DataChunkRepo _repo;
 
-        public DataChunk([PersistentState("dataChunkGrain")] IPersistentState<DataChunkObject> dataChunkState)
+        public DataChunk([PersistentState("dataChunkGrain,dataStore")] IPersistentState<JObject> dataChunkData, [PersistentState("dataChunkGrain, idStore")] IPersistentState<IdDataChunk> dataChunkId)
         {
-            _dataChunkState = dataChunkState;
-            _repo = new DataChunkRepo(dataChunkState);
+            _dataChunkIdState = dataChunkId;
+            _dataChunkDataState = dataChunkData;
+            _repo = new DataChunkRepo(_dataChunkIdState, _dataChunkDataState);
         }
 
         public Task<DataChunkObject> GetData()

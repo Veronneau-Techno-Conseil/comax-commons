@@ -140,7 +140,7 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
 
         public async Task OnNextAsync(DataChunkObject item, StreamSequenceToken token = null)
         {
-            var dc = this._comaxGrainFactory.GetGrain<IDataChunk>(item.Id.ToString());
+            var dc = this._comaxGrainFactory.GetGrain<IDataChunk>(item.IdDataChunk.Id.ToString());
             await dc.SaveData(item);
         }
     }

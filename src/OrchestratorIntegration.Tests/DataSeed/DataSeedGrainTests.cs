@@ -57,7 +57,7 @@ namespace OrchestratorIntegration.Tests.DataSeed
                 var ds = cl.GetDataSeed(newid);
                 await ds.SendIndex(ix);
                 return await ds.GetIndex();
-            });        
+            });
 
             createdIx.Should().NotBeNull();
             createdIx.Id.Should().Be(ix.Id);
@@ -66,7 +66,11 @@ namespace OrchestratorIntegration.Tests.DataSeed
             {
                 new DataChunkObject
                 {
-                    Id =$"{newid}-data-1",
+                    IdDataChunk = new IdDataChunk
+                    {
+                        Id =$"{newid}-data-1",
+                        IdDataSeed = Guid.NewGuid()
+                    },
                     Data = JObject.FromObject(new Dummy
                     {
                         Name=$"{newid}-data-1 Name",
@@ -75,7 +79,11 @@ namespace OrchestratorIntegration.Tests.DataSeed
                 },
                 new DataChunkObject
                 {
-                    Id =$"{newid}-data-2",
+                    IdDataChunk = new IdDataChunk
+                    {
+                        Id =$"{newid}-data-2",
+                        IdDataSeed = Guid.NewGuid()
+                    },
                     Data = JObject.FromObject(new Dummy
                     {
                         Name=$"{newid}-data-2 Name",
@@ -100,7 +108,7 @@ namespace OrchestratorIntegration.Tests.DataSeed
 
             //var res = await cf.WithClusterClient(async cl =>
             //{
-            //    var ds = cl.GetDataSeed(newid);
+            //    var ds = cl.GetDataSeed(newid);//change to new id
             //    var res = await ds.StreamDataFromStorage(streamId);
             //    return res;
             //});
