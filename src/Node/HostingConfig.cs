@@ -137,9 +137,15 @@ namespace Comax.Commons.Orchestrator
             services.AddOptions();
             services.SetJSONLiteDbSerializationProvider();
             services.Configure<LiteDbConfig>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, configuration.GetSection("LiteDbStorage"));
+            services.Configure<LiteDbConfig>(OrleansConstants.Storage.JObjectStore, configuration.GetSection("LiteDbStorage"));
             services.Configure<LiteDbConfig>(PubSubStore, configuration.GetSection(PubSubStore));
 
             services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, (svc, key) =>
+            {
+                return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
+            });
+
+            services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(OrleansConstants.Storage.JObjectStore, (svc, key) =>
             {
                 return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
             });
@@ -150,6 +156,7 @@ namespace Comax.Commons.Orchestrator
             });
 
             services.AddLiteDbGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME);
+            services.AddJObjectLiteDbGrainStorage(OrleansConstants.Storage.JObjectStore);
             services.AddWrappedLiteDbGrainStorage(PubSubStore);
 
             return services;
