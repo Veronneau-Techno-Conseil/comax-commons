@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AgentService\AgentService.csproj" />
+    <ProjectReference Include="..\ApiStorageProvider\ApiStorageProvider.csproj" />
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\IO\CommunAxiom.Commons.Ingestion.csproj" />
     <ProjectReference Include="..\LiteDbStorageProvider\LiteDbStorageProvider.csproj" />

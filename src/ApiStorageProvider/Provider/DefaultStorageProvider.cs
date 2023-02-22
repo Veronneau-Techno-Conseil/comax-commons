@@ -24,7 +24,7 @@ namespace Comax.Commons.StorageProvider
         private ISerializationProvider _serializationProvider;
         private readonly GrainStorageClientFactory _grainStorageClient;
 
-        public DefaultStorageProvider(string name, ILogger<DefaultStorageProvider> logger, GrainStorageClientFactory grainStorageClient)
+        public DefaultStorageProvider(string name, ILogger<DefaultStorageProvider> logger, GrainStorageClientFactory grainStorageClient, ApiStorageConfiguration apiStorageConfiguration): base(apiStorageConfiguration)
         {
             _name = name;
             _logger = logger;

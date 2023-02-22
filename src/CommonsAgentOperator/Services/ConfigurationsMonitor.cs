@@ -59,7 +59,6 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.Services
 
                         var specs = await centralApi.GetEcosystemSpecAsync("Comax - Commons");
                         var images = specs.AppSpecs.ToDictionary(x => x.AppType, x => x);
-
                         var apps = await centralApi.HostedAppsAsync("Commons");
 
                         foreach (var app in apps)
@@ -93,10 +92,16 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.Services
                                     { "dbrootpw", enc.GetBytes(dic["dbrootpw"])}
                                 });
 
-                            //await _kubernetesClient.Save(v1Secret);
+                            var s = await _kubernetesClient.Get<V1Secret>("commons-secret", app.Namespace);
+                            if (s == null)
+                                await _kubernetesClient.Create(v1Secret);
+                            else    
+                                await _kubernetesClient.Update(v1Secret);
                             
                             ComaxAgent comaxAgent = new ComaxAgent
                             {
+                                ApiVersion = "communaxiom.org/v1alpha1",
+                                Kind = "ComaxAgent",
                                 Metadata = new V1ObjectMeta(name: "commons-instance", namespaceProperty: app.Namespace),
                                 Spec = new ComaxAgentSpec
                                 {
@@ -130,7 +135,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.Services
                                 Status = new ComaxAgentState()
                             };
 
-                            //await _kubernetesClient.Save(comaxAgent);
+                            await _kubernetesClient.SaveObject(comaxAgent);
                         }
                     }
 

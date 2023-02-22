@@ -24,5 +24,11 @@
     "ConnectionCheckPeriod": 30,
     "SaveStatePeriod": 30
   },
-  "storage":  "litedb"
+  "storage": "api",
+  "ApiStorage": {
+    "SenderName": "CommonsAgent",
+    "ApiStorageUri": "https://localhost:7066",
+    "SerializationProvider": "standard",
+    "SerializationConfig": ""
+  }
 }

@@ -112,7 +112,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
            {
                try
                {
-                   await _client.CreateObject(item);
+                   await _client.SaveObject(item);
                }
                catch (Exception ex)
                {
@@ -127,7 +127,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
        {
            var deployments = DeploymentBuilder.Build(entity);
            foreach (var item in deployments)
-               await _client.UpdateObject(item);
+               await _client.SaveObject(item);
            return entity;
        }
 

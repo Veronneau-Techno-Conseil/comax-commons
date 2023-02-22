@@ -1,4 +1,5 @@
-﻿using Comax.Commons.StorageProvider.Hosting;
+﻿using Comax.Commons.ApiStorageProvider.Provider;
+using Comax.Commons.StorageProvider.Hosting;
 using Comax.Commons.StorageProvider.Models;
 using Comax.Commons.StorageProvider.Serialization;
 
@@ -18,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Comax.Commons.StorageProvider
 {
-    internal class WrappedLiteDbStorageProvider : IGrainStorage, ILifecycleParticipant<ISiloLifecycle>
+    internal class WrappedLiteDbStorageProvider : BaseProvider
     {
         private readonly string _name;
 
@@ -28,7 +29,7 @@ namespace Comax.Commons.StorageProvider
         private ISerializationProvider _serializationProvider;
         private readonly GrainStorageClientFactory _grainStorageClient;
         private readonly IServiceProvider _serviceProvider;
-        public WrappedLiteDbStorageProvider(string name, ILogger<WrappedLiteDbStorageProvider> logger, GrainStorageClientFactory grainStorageClient, IServiceProvider serviceProvider)
+        public WrappedLiteDbStorageProvider(string name, ILogger<WrappedLiteDbStorageProvider> logger, GrainStorageClientFactory grainStorageClient, IServiceProvider serviceProvider, ApiStorageConfiguration apiStorageConfiguration) : base(apiStorageConfiguration)
         {
             _name = name;
             _logger = logger;
@@ -37,17 +38,13 @@ namespace Comax.Commons.StorageProvider
             _serializationProvider = _serviceProvider.GetService<ISerializationProvider>() ?? _serviceProvider.GetRequiredServiceByName<ISerializationProvider>("standard");
         }
 
-        private static string GetBlobName(string grainType, GrainReference grainId)
-        {
-            return string.Format("{0}-{1}.json", grainType, grainId.ToKeyString());
-        }
 
-        public void Participate(ISiloLifecycle lifecycle)
+        public override void Participate(ISiloLifecycle lifecycle)
         {
             lifecycle.Subscribe(OptionFormattingUtilities.Name<DefaultStorageProvider>(_name),
                                     ServiceLifecycleStage.RuntimeInitialize, Init);
         }
-        public async Task ClearStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
+        public override async Task ClearStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
 
             var blobName = GetBlobName(grainType, grainReference);
@@ -62,7 +59,7 @@ namespace Comax.Commons.StorageProvider
             grainState.State = null;
         }
 
-        public async Task ReadStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
+        public override async Task ReadStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
             var blobName = GetBlobName(grainType, grainReference);
             var cl = _grainStorageClient.Create();
@@ -84,7 +81,7 @@ namespace Comax.Commons.StorageProvider
         }
 
 
-        public async Task WriteStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
+        public override async Task WriteStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
 
             var cl = _grainStorageClient.Create();

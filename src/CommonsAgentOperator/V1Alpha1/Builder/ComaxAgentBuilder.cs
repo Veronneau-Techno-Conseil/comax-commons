@@ -1,6 +1,7 @@
 ﻿using CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities;
 using k8s;
 using k8s.Models;
+using System;
 using System.Collections.ObjectModel;
 using System.Resources;
 using System.Runtime.CompilerServices;
@@ -9,7 +10,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
 {
     public partial class DeploymentBuilder
     {
-        public static IEnumerable<IKubernetesObject<V1ObjectMeta>> Build(ComaxAgent agent)
+        public static IList<IKubernetesObject<V1ObjectMeta>> Build(ComaxAgent agent)
         {
             var labels = new Dictionary<string, string>()
            {
@@ -19,30 +20,30 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
                { Constants.Name, agent.Name() }
            };
 
-            agent.Status.AgentRefereeName = $"{agent.Name()}-ref";
-            agent.Status.AgentSiloName = $"{agent.Name()}-agt";
+            List<IKubernetesObject<V1ObjectMeta>> objects = new List<IKubernetesObject<V1ObjectMeta>>();
 
-            yield return new AgentReferee
+            objects.Add(new AgentReferee
             {
-                Metadata = new V1ObjectMeta
+                Metadata = new k8s.Models.V1ObjectMeta
                 {
-                    Name = agent.Status.AgentRefereeName,
+                    Name = agent.GetAgentRefereeName(),
                     NamespaceProperty = agent.Namespace(),
                     Labels = labels
                 },
                 Spec = CreateAgentRefereeSpec(agent, labels)
-            };
+            });
 
-            yield return new AgentSilo
+            objects.Add(new AgentSilo
             {
-                Metadata = new V1ObjectMeta
+                Metadata = new k8s.Models.V1ObjectMeta
                 {
-                    Name = agent.Status.AgentSiloName,
+                    Name = agent.GetAgentSiloName(),
                     NamespaceProperty = agent.Namespace(),
                     Labels = labels
                 },
                 Spec = CreateAgentSiloSpec(agent, labels)
-            };
+            });
+            return objects;
         }
 
         private static AgentSiloSpec CreateAgentSiloSpec(ComaxAgent agent, IDictionary<string, string> labels)
@@ -51,7 +52,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
             var spec = new AgentSiloSpec
             {
                 ClusterId = s.ClusterId,
-                CommonsMembership = $"http://{agent.Status.AgentRefereeName}.{agent.Namespace()}.svc.cluster.local",
+                CommonsMembership = $"http://{agent.GetAgentRefereeName()}.{agent.Namespace()}.svc.cluster.local",
                 DbCredPasswordKey= s.DbCredPasswordKey,
                 DbCredRootPasswordKey= s.DbCredRootPasswordKey,
                 DbCredSecretName= s.DbCredSecretName,

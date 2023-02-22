@@ -10,9 +10,24 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         Group = "communaxiom.org",
         Kind = "ComaxCommonsClient",
         PluralName = "comaxcomclients")]
-    public class ComaxCommonsClient : CustomKubernetesEntity<ComaxCommonsClientSpec, ComaxCommonsClientState>
+    public class ComaxCommonsClient : CustomKubernetesEntity<ComaxCommonsClientSpec, ComaxCommonsClientState>, IAssignableSpec<ComaxCommonsClientSpec>
     {
+        public ComaxCommonsClient()
+        {
+            this.ApiVersion = "communaxiom.org/v1alpha1";
+            this.Kind = "ComaxCommonsClient";
+        }
 
+        public void Assign(IAssignableSpec<ComaxCommonsClientSpec> other)
+        {
+            this.Spec.Assign(other.Spec);
+        }
+
+        public void Assign(IAssignableSpec other)
+        {
+            var ccc = (ComaxCommonsClient)other;
+            this.Spec.Assign(ccc.Spec);
+        }
     }
 
     public static class ComaxCommonsClientExtensions
@@ -40,9 +55,28 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
 
     }
 
-    public class ComaxCommonsClientSpec
+    public class ComaxCommonsClientSpec : IAssignable<ComaxCommonsClientSpec>
     {
+    
+        public void Assign(ComaxCommonsClientSpec other)
+        {
+            this.UseHttps = other.UseHttps;
+            this.ServiceId = other.ServiceId;
+            this.OidcSecretName = other.OidcSecretName;
+            this.OidcSecretKey = other.OidcSecretKey;
+            this.ClusterId = other.ClusterId;
+            this.CommonsClientImage = other.CommonsClientImage;
+            this.CommonsMembershipCacheDuration = other.CommonsMembershipCacheDuration;
+            this.CommonsMembershipHost = other.CommonsMembershipHost;
+            this.IngressCertManager = other.IngressCertManager;
+            this.IngressCertSecret = other.IngressCertSecret;
+            this.IngressHost = other.IngressHost;
+            this.Labels = other.Labels;
+            this.OidcAuthority = other.OidcAuthority;
+            this.OidcClientId = other.OidcClientId; 
+            this.Resources = other.Resources;
 
+        }
         [JsonPropertyName("ingressHost")]
         public string IngressHost { get; set; }
 

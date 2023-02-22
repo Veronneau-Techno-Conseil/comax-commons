@@ -5,14 +5,28 @@ using System.Text.Json.Serialization;
 namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
 {
     [KubernetesEntity(
-    ApiVersion = "v1alpha1",
-    Group = "communaxiom.org",
-    Kind = "AgentReferee",
-    PluralName = "agentrefs")
-]
-    public class AgentReferee : CustomKubernetesEntity<AgentRefereeSpec, AgentRefereeState>
+        ApiVersion = "v1alpha1",
+        Group = "communaxiom.org",
+        Kind = "AgentReferee",
+        PluralName = "agentrefs")]
+    public class AgentReferee : CustomKubernetesEntity<AgentRefereeSpec, AgentRefereeState>, IAssignableSpec<AgentRefereeSpec> 
     {
+        public AgentReferee()
+        {
+            this.ApiVersion = "communaxiom.org/v1alpha1";
+            this.Kind = "AgentReferee";
+        }
 
+        public void Assign(IAssignableSpec<AgentRefereeSpec> other)
+        {
+            this.Spec.Assign(other.Spec);
+        }
+
+        public void Assign(IAssignableSpec other)
+        {
+            var ao = (AgentReferee)other;
+            this.Spec.Assign(ao.Spec);
+        }
     }
 
     public static class AgentRefereeExtensions
@@ -36,8 +50,26 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         public long StateTs { get; set; } = 0;
     }
 
-    public class AgentRefereeSpec
+    public class AgentRefereeSpec : IAssignable<AgentRefereeSpec>
     {
+        public void Assign(AgentRefereeSpec other)
+        {
+            this.Annotations = other.Annotations;
+            this.CertPath = other.CertPath;
+            this.DbProvider = other.DbProvider;
+            this.EnvironmentVariables = other.EnvironmentVariables;
+            this.Image = other.Image;
+            this.KeyPath = other.KeyPath;
+            this.ListenPort = other.ListenPort;
+            this.OidcAuthority = other.OidcAuthority;
+            this.OidcClientId = other.OidcClientId;
+            this.OidcSecretKey = other.OidcSecretKey;
+            this.OidcSecretName = other.OidcSecretName;
+            this.UseHttps = other.UseHttps;
+            this.Labels = other.Labels;
+            this.Resources = other.Resources;
+        }
+
         [JsonPropertyName("image")]
         public string Image { get; set; } = "vertechcon/comax-agentreferee:latest";
 

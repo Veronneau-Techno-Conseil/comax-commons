@@ -17,8 +17,10 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
                 { Constants.Kind, "service" },
                 { Constants.Name, agentReferee.Name() }
             };
+            
+            List<IKubernetesObject<V1ObjectMeta>> objects = new List<IKubernetesObject<V1ObjectMeta>>();
 
-            yield return new V1Deployment
+            objects.Add(new V1Deployment
             {
                 Metadata = new V1ObjectMeta
                 {
@@ -27,9 +29,10 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
                     Labels = labels
                 },
                 Spec = CreateAgentRefereeDeploymentSpec(agentReferee, labels)
-            };
+            });
 
-            yield return CreateRefereeService(agentReferee, labels);
+            objects.Add(CreateRefereeService(agentReferee, labels));
+            return objects;
         }
 
         private static V1Service CreateRefereeService(AgentReferee agentReferee, IDictionary<string, string> labels)

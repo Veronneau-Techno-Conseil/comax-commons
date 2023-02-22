@@ -5,14 +5,21 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Comax.Commons.StorageProvider;
 
 namespace Comax.Commons.ApiStorageProvider.Provider
 {
     public abstract class BaseProvider : IGrainStorage, ILifecycleParticipant<ISiloLifecycle>
     {
+        protected readonly ApiStorageConfiguration _apiStorageConfiguration;
+        public BaseProvider(ApiStorageConfiguration apiStorageConfiguration)
+        {
+            _apiStorageConfiguration = apiStorageConfiguration;
+        }
+
         protected string GetBlobName(string grainType, GrainReference grainId)
         {
-            return Uri.EscapeDataString(string.Format("{0}-{1}.json", grainType, grainId.ToKeyString()));
+            return Uri.EscapeDataString($"{(string.IsNullOrWhiteSpace(_apiStorageConfiguration.SenderName)? "": _apiStorageConfiguration.SenderName + "-") }{grainType}-{grainId.ToKeyString()}.json");
         }
 
         protected string GetTypeKey(string grainType, IGrainState grainState)

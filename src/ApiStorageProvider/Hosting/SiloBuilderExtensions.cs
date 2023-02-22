@@ -36,7 +36,8 @@ namespace Comax.Commons.StorageProvider.Hosting
             return services.AddTransientNamedService<IGrainStorage>(name, (s,n)=>
                                         new DefaultStorageProvider(n, 
                                                             s.GetRequiredService<ILogger<DefaultStorageProvider>>(),
-                                                            s.GetRequiredService<GrainStorageClientFactory>()))
+                                                            s.GetRequiredService<GrainStorageClientFactory>(),
+                                                            s.GetRequiredService<IOptionsMonitor<ApiStorageConfiguration>>().Get(configKey ?? name)))
                            .AddTransientNamedService(name, (s, n) =>
                                 (ILifecycleParticipant<ISiloLifecycle>)s.GetRequiredServiceByName<IGrainStorage>(n));
         }
@@ -60,7 +61,8 @@ namespace Comax.Commons.StorageProvider.Hosting
                                         new WrappedLiteDbStorageProvider(n,
                                                             s.GetRequiredService<ILogger<WrappedLiteDbStorageProvider>>(),
                                                             s.GetRequiredService<GrainStorageClientFactory>(),
-                                                            s))
+                                                            s,
+                                                            s.GetRequiredService<IOptionsMonitor<ApiStorageConfiguration>>().Get(configKey ?? name)))
                            .AddTransientNamedService(name, (s, n) =>
                                 (ILifecycleParticipant<ISiloLifecycle>)s.GetRequiredServiceByName<IGrainStorage>(n));
         }
@@ -82,7 +84,8 @@ namespace Comax.Commons.StorageProvider.Hosting
             return services.AddTransientNamedService<IGrainStorage>(name, (s, n) =>
                                         new JObjectStorageProvider(n,
                                                             s.GetRequiredService<ILogger<JObjectStorageProvider>>(),
-                                                            s.GetRequiredService<GrainStorageClientFactory>()))
+                                                            s.GetRequiredService<GrainStorageClientFactory>(),
+                                                            s.GetRequiredService<IOptionsMonitor<ApiStorageConfiguration>>().Get(configKey ?? name)))
                            .AddTransientNamedService(name, (s, n) =>
                                 (ILifecycleParticipant<ISiloLifecycle>)s.GetRequiredServiceByName<IGrainStorage>(n));
         }

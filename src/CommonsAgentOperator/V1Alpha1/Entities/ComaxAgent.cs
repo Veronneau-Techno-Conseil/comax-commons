@@ -9,9 +9,24 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
     Group = "communaxiom.org",
     Kind = "ComaxAgent",
     PluralName = "comaxagents")]
-    public class ComaxAgent : CustomKubernetesEntity<ComaxAgentSpec, ComaxAgentState>
+    public class ComaxAgent : CustomKubernetesEntity<ComaxAgentSpec, ComaxAgentState>, IAssignableSpec<ComaxAgentSpec>
     {
+        public ComaxAgent() : base()
+        {
+            this.ApiVersion = "communaxiom.org/v1alpha1";
+            this.Kind = "ComaxAgent";
+        }
 
+        public void Assign(IAssignableSpec<ComaxAgentSpec> other)
+        {
+            this.Spec.Assign(other.Spec);
+        }
+
+        public void Assign(IAssignableSpec other)
+        {
+            var ca = (ComaxAgent)other;
+            this.Spec.Assign(ca.Spec);
+        }
     }
 
     public static class ComaxAgentExtensions
@@ -20,6 +35,17 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         {
             return $"{agentReferee.Name()}-depl";
         }
+
+        public static string GetAgentRefereeName(this ComaxAgent agent)
+        {
+            return $"{agent.Name()}-ref";
+        }
+
+        public static string GetAgentSiloName(this ComaxAgent agent)
+        {
+            return $"{agent.Name()}-agt";
+        }
+            
     }
 
     public class ComaxAgentState
@@ -37,15 +63,36 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         [JsonPropertyName("clusterState")]
         public IDictionary<string, string> ClusterState { get; set; }
 
-        [JsonPropertyName("agentRefereeName")]
-        public string AgentRefereeName { get; set; }
-
-        [JsonPropertyName("agentSiloName")]
-        public string AgentSiloName { get; set; }
     }
 
-    public class ComaxAgentSpec
+    public class ComaxAgentSpec : IAssignable<ComaxAgentSpec>
     {
+        public void Assign(ComaxAgentSpec other)
+        {
+            this.AgentSiloImage = other.AgentSiloImage;
+            this.ClusterId = other.ClusterId;
+            this.CommonsClientImage = other.CommonsClientImage;
+            this.DbCredPasswordKey = other.DbCredPasswordKey;
+            this.DbCredRootPasswordKey = other.DbCredRootPasswordKey;
+            this.DbCredSecretName = other.DbCredSecretName;
+            this.DbCredUsernameKey = other.DbCredUsernameKey;
+            this.GatewayPort = other.GatewayPort;
+            this.IngressCertManager = other.IngressCertManager;
+            this.IngressCertSecret = other.IngressCertSecret;
+            this.IngressHost = other.IngressHost;
+            this.Labels = other.Labels;
+            this.MariadbImage = other.MariadbImage;
+            this.MembershipAddress = other.MembershipAddress;
+            this.OidcAuthority = other.OidcAuthority;
+            this.OidcClientId = other.OidcClientId;
+            this.OidcSecretKey = other.OidcSecretKey;
+            this.OidcSecretName = other.OidcSecretName;
+            this.RefereeImage = other.RefereeImage;
+            this.ServiceId = other.ServiceId;
+            this.SiloPort = other.SiloPort;
+            this.StoreApiImage = other.StoreApiImage;
+            this.UseHttps = other.UseHttps;
+        }
 
         [JsonPropertyName("ingressHost")]
         public string IngressHost { get; set; }
@@ -89,7 +136,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         public string MariadbImage { get; set; }
 
 
-        
+
 
         [JsonPropertyName("membershipAddress")]
         public string MembershipAddress { get; set; }

@@ -10,8 +10,24 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         Group = "communaxiom.org",
         Kind = "AgentSilo",
         PluralName = "agentsilos")]
-    public class AgentSilo : CustomKubernetesEntity<AgentSiloSpec, AgentSiloState>
+    public class AgentSilo : CustomKubernetesEntity<AgentSiloSpec, AgentSiloState>, IAssignableSpec<AgentSiloSpec>
     {
+        public AgentSilo()
+        {
+            this.ApiVersion = "communaxiom.org/v1alpha1";
+            this.Kind = "AgentSilo";
+        }
+
+        public void Assign(IAssignableSpec<AgentSiloSpec> other)
+        {
+            this.Spec.Assign(other.Spec);
+        }
+
+        public void Assign(IAssignableSpec other)
+        {
+            var so = (AgentSilo)other;
+            this.Spec.Assign(so.Spec);
+        }
     }
 
     public static class AgentSiloExtensions
@@ -34,8 +50,33 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         public long StateTs { get; set; } = 0;
     }
 
-    public class AgentSiloSpec
+    public class AgentSiloSpec : IAssignable<AgentSiloSpec>
     {
+        public void Assign(AgentSiloSpec other)
+        {
+            this.Annotations = other.Annotations;
+            this.ClusterId = other.ClusterId;
+            this.CommonsMembership = other.CommonsMembership;
+            this.DbCredPasswordKey = other.DbCredPasswordKey;
+            this.DbCredRootPasswordKey = other.DbCredRootPasswordKey;
+            this.DbCredSecretName = other.DbCredSecretName;
+            this.DbCredUsernameKey = other.DbCredUsernameKey;
+            this.EnvironmentVariables = other.EnvironmentVariables;
+            this.GatewayPort = other.GatewayPort;
+            this.Image = other.Image;
+            this.Labels = other.Labels;
+            this.MariadbImage = other.MariadbImage;
+            this.MembershipAddress = other.MembershipAddress;
+            this.OidcAuthority = other.OidcAuthority;
+            this.OidcClientId = other.OidcClientId;
+            this.OidcSecretKey = other.OidcSecretKey;
+            this.OidcSecretName = other.OidcSecretName;
+            this.Resources = other.Resources;
+            this.ServiceId = other.ServiceId;
+            this.SiloPort = other.SiloPort;
+            this.StoreApiImage = other.StoreApiImage;            
+        }
+
         [JsonPropertyName("image")]
         public string Image { get; set; }
 

@@ -26,7 +26,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
            entity.Namespace()
            );
             
-           await _client.DeleteObject<ComaxAgent>(_logger, entity.Namespace(), entity.Status.AgentRefereeName);
+           await _client.DeleteObject<AgentReferee>(_logger, entity.Namespace(), entity.GetAgentRefereeName());
 
        }
    }

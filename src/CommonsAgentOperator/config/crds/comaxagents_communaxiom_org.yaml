@@ -30,10 +30,6 @@ spec:
                 additionalProperties:
                   type: string
                 type: object
-              agentRefereeName:
-                type: string
-              agentSiloName:
-                type: string
             type: object
           spec:
             description: Specification of the kubernetes object.

@@ -149,7 +149,15 @@ namespace CommunAxiom.Commons.Client.SiloShared
             }
             else
             {
+                services.Configure<ApiStorageConfiguration>("ApiStorage", configuration.GetSection("ApiStorage"));
+                services.AddSingletonNamedService<IOptionsMonitor<ApiStorageConfiguration>>("ApiStorage", (svc, key) =>
+                {
+                    return svc.GetService<IOptionsMonitor<ApiStorageConfiguration>>();
+                });
 
+                services.AddApiGrainStorage(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, "ApiStorage");
+                services.AddJObjectApiGrainStorage(OrleansConstants.Storage.JObjectStore, "ApiStorage");
+                services.AddWrappedApiGrainStorage(OrleansConstants.Storage.PubSubStore, "ApiStorage");
             }
 
             return services;

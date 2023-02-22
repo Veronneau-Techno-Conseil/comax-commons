@@ -17,7 +17,8 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
                 { Constants.Name, client.Name() }
             };
 
-            yield return new V1Deployment
+            List<IKubernetesObject<V1ObjectMeta>> objects = new List<IKubernetesObject<V1ObjectMeta>>();
+            objects.Add(new V1Deployment
             {
                 Metadata = new V1ObjectMeta
                 {
@@ -26,9 +27,11 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
                     Labels = labels
                 },
                 Spec = CreatCommonsClientDeploymentSpec(client, labels)
-            };
+            });
 
-            yield return CreateCommonsClientService(client, labels);
+            objects.Add(CreateCommonsClientService(client, labels));
+
+            return objects;
         }
 
         private static V1Service CreateCommonsClientService(ComaxCommonsClient client, IDictionary<string, string> labels)
