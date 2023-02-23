@@ -9,7 +9,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         Group = "communaxiom.org",
         Kind = "AgentReferee",
         PluralName = "agentrefs")]
-    public class AgentReferee : CustomKubernetesEntity<AgentRefereeSpec, AgentRefereeState>, IAssignableSpec<AgentRefereeSpec> 
+    public class AgentReferee : CustomKubernetesEntity<AgentRefereeSpec, AgentRefereeState>, IAssignableSpec<AgentRefereeSpec>
     {
         public AgentReferee()
         {
@@ -35,9 +35,13 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         {
             return $"{agentReferee.Name()}-depl";
         }
+        public static string GetServiceName(this AgentReferee agentReferee)
+        {
+            return $"{agentReferee.GetDeploymentName()}-ep";
+        }
     }
 
-    public class AgentRefereeState
+    public class AgentRefereeState : IComaxState
     {
 
         [JsonPropertyName("currentState")]

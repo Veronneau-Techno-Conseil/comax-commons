@@ -9,6 +9,7 @@ using KubeOps.Operator.Controller;
 using KubeOps.Operator.Controller.Results;
 using KubeOps.Operator.Finalizer;
 using KubeOps.Operator.Rbac;
+using k8s;
 
 namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
 {
@@ -19,17 +20,13 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
     [EntityRbac(typeof(V1Deployment), Verbs = RbacVerb.All)]
     [EntityRbac(typeof(V1Service), Verbs = RbacVerb.All)]
     [EntityRbac(typeof(V1Ingress), Verbs = RbacVerb.All)]
-    public class ComaxAgentController : IResourceController<ComaxAgent>
+    public class ComaxAgentController : BaseController<ComaxAgent, ComaxAgentSpec, ComaxAgentState>, IResourceController<ComaxAgent>
     {
-        private readonly IKubernetesClient _client;
-        private readonly ILogger<ComaxAgentController> _logger;
-        private readonly IFinalizerManager<ComaxAgent> _finalizeManager;
 
-        public ComaxAgentController(ILogger<ComaxAgentController> logger, IFinalizerManager<ComaxAgent> finalizeManager, IKubernetesClient client)
+        public ComaxAgentController(ILogger<ComaxAgentController> logger, IFinalizerManager<ComaxAgent> finalizeManager, IKubernetesClient client) :
+            base(logger, finalizeManager, client)
         {
-            _client = client;
-            _finalizeManager = finalizeManager;
-            _logger = logger;
+            
         }
 
         public async Task<ResourceControllerResult?> ReconcileAsync(ComaxAgent entity)
@@ -43,7 +40,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
                         entity = await UpdateStatus(entity);
                         entity = await Update(entity);
                         entity.Status.CurrentState = Status.Stable.ToString();
-                        await UpdateStatus(entity);
+                        entity = await UpdateStatus(entity);
                         break;
                     case Status.Unknown:
                         entity.Status.CurrentState = Status.Creating.ToString();
@@ -71,7 +68,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
                             );
 
                             entity.Status.CurrentState = Status.Broken.ToString();
-                            await UpdateStatus(entity);
+                            entity = await UpdateStatus(entity);
                             return ResourceControllerResult.RequeueEvent(TimeSpan.FromSeconds(10));
                         }
                         else
@@ -96,6 +93,11 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
                         throw new ArgumentOutOfRangeException();
                 }
             }
+            catch(k8s.Autorest.HttpOperationException exc)
+            {
+                _logger.LogError("Unable to perform operation", exc);
+
+            }
             catch (Exception ex)
             {
                 _logger.LogError("Unable to perform operation", ex);
@@ -104,73 +106,9 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
 
         }
 
-        private async Task<ComaxAgent> Create(ComaxAgent entity)
+        protected override IEnumerable<IKubernetesObject<V1ObjectMeta>> GetWorkload(ComaxAgent entity)
         {
-            var deployment = DeploymentBuilder.Build(entity);
-            
-            foreach (var item in deployment)
-            {
-                try
-                {
-                    await _client.SaveObject(item);
-                }
-                catch (Exception ex)
-                {
-                    throw;
-                }
-            }
-
-            return entity;
-        }
-
-        private async Task<ComaxAgent> Update(ComaxAgent entity)
-        {
-            var deployments = DeploymentBuilder.Build(entity);
-            
-            foreach (var item in deployments)
-                await _client.SaveObject(item);
-            return entity;
-        }
-
-        private async Task<ComaxAgent> UpdateStatus(ComaxAgent entity)
-        {
-            entity.Status.StateTs = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            entity.Status.StateTsMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            await _client.UpdateStatus(entity);
-            return entity;
-        }
-
-
-        // Summary:
-        //     Called for KubeOps.Operator.Kubernetes.ResourceEventType.StatusUpdated events
-        //     for a given entity.
-        //
-        // Parameters:
-        //   entity:
-        //     The entity that fired the status-modified event.
-        //
-        // Returns:
-        //     A task that completes, when the reconciliation is done.
-        public Task StatusModifiedAsync(ComaxAgent entity)
-        {
-            return Task.CompletedTask;
-        }
-
-        private async Task DeleteBrokenAsync(ComaxAgent entity)
-        {
-            _logger.LogInformation(
-                "Removing deployment for {Name} in namespace {Namespace}",
-                entity.Metadata.Name,
-                entity.Namespace()
-            );
-
-            await DeletedAsync(entity);
-
-            _logger.LogInformation(
-                "Removed deployment for {Name} in namespace {Namespace}",
-                entity.Metadata.Name,
-                entity.Namespace()
-            );
+            return Builder.DeploymentBuilder.Build(entity);
         }
 
         //
@@ -184,7 +122,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
         //
         // Returns:
         //     A task that completes, when the reconciliation is done.
-        public async Task DeletedAsync(ComaxAgent entity)
+        public override async Task DeletedAsync(ComaxAgent entity)
         {
             if(!string.IsNullOrWhiteSpace(entity.GetAgentRefereeName()))
                 await _client.DeleteObject<AgentReferee>(_logger, entity.Namespace(), entity.GetAgentRefereeName());

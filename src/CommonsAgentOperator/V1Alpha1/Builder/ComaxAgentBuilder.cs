@@ -22,7 +22,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
 
             List<IKubernetesObject<V1ObjectMeta>> objects = new List<IKubernetesObject<V1ObjectMeta>>();
 
-            objects.Add(new AgentReferee
+            var agRef = new AgentReferee
             {
                 Metadata = new k8s.Models.V1ObjectMeta
                 {
@@ -31,7 +31,9 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
                     Labels = labels
                 },
                 Spec = CreateAgentRefereeSpec(agent, labels)
-            });
+            };
+
+            objects.Add(agRef);
 
             objects.Add(new AgentSilo
             {
@@ -41,18 +43,18 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
                     NamespaceProperty = agent.Namespace(),
                     Labels = labels
                 },
-                Spec = CreateAgentSiloSpec(agent, labels)
+                Spec = CreateAgentSiloSpec(agent, labels, agRef.GetServiceName())
             });
             return objects;
         }
 
-        private static AgentSiloSpec CreateAgentSiloSpec(ComaxAgent agent, IDictionary<string, string> labels)
+        private static AgentSiloSpec CreateAgentSiloSpec(ComaxAgent agent, IDictionary<string, string> labels, string refereeServiceName)
         {
             var s = agent.Spec;
             var spec = new AgentSiloSpec
             {
                 ClusterId = s.ClusterId,
-                CommonsMembership = $"http://{agent.GetAgentRefereeName()}.{agent.Namespace()}.svc.cluster.local",
+                CommonsMembership = $"http://{refereeServiceName}.{agent.Namespace()}.svc.cluster.local:5004",
                 DbCredPasswordKey= s.DbCredPasswordKey,
                 DbCredRootPasswordKey= s.DbCredRootPasswordKey,
                 DbCredSecretName= s.DbCredSecretName,

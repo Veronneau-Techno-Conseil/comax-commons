@@ -42,7 +42,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
                 Metadata = new V1ObjectMeta
                 {
                     Labels = labels,
-                    Name = $"{agentReferee.GetDeploymentName()}-ep",
+                    Name = agentReferee.GetServiceName(),
                     NamespaceProperty = agentReferee.Namespace()
                 },
                 Spec = new V1ServiceSpec

@@ -38,7 +38,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         }
     }
 
-    public class AgentSiloState
+    public class AgentSiloState: IComaxState
     {
         [JsonPropertyName("currentState")]
         public string CurrentState { get; set; } = Status.Unknown.ToString();

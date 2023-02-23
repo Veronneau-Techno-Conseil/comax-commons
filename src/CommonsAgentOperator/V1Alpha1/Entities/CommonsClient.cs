@@ -38,7 +38,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         }
     }
 
-    public class ComaxCommonsClientState
+    public class ComaxCommonsClientState: IComaxState
     {
 
         [JsonPropertyName("currentState")]
