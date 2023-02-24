@@ -91,7 +91,7 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
             var grain = _comaxGrainFactory.GetGrain<IDataChunk>(ixItem.Id);
             // retrieve data and send through stream using onnext
             var data = await grain.GetData();
-
+            _uploadStreamSubscription = await _stream.SubscribeAsync(this);
             await _stream.OnNextAsync(data);
             await _stream.OnCompletedAsync();
         }

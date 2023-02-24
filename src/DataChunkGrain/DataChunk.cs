@@ -15,7 +15,7 @@ namespace Comax.Commons.Orchestrator.DataChunkGrain
         private readonly IPersistentState<JObject> _dataChunkDataState;
         private readonly DataChunkRepo _repo;
 
-        public DataChunk([PersistentState("dataChunkGrain,dataStore")] IPersistentState<JObject> dataChunkData, [PersistentState("dataChunkGrain, idStore")] IPersistentState<IdDataChunk> dataChunkId)
+        public DataChunk([PersistentState("dataChunkGrain_dataStore", OrleansConstants.Storage.JObjectStore)] IPersistentState<JObject> dataChunkData, [PersistentState("dataChunkGrain_idStore")] IPersistentState<IdDataChunk> dataChunkId)
         {
             _dataChunkIdState = dataChunkId;
             _dataChunkDataState = dataChunkData;
