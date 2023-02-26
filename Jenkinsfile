@@ -5,7 +5,7 @@ def patch = ''
 def shouldUninstall = ''
 def deployAction = ''
 def message = ''
-def buildEnvImage = 'vertechcon/comax-buildenv:1.0.1'
+def buildEnvImage = ''
 pipeline {
     agent any
     stages {
@@ -23,7 +23,7 @@ pipeline {
                     version = readFile('VERSION').trim()
                     chartVersion = readFile('./helm/VERSION').trim()
                     patch = version
-                    buildEnvImage = 'vertechcon/comax-buildenv:1.0.0'
+                    buildEnvImage = 'vertechcon/comax-buildenv:1.0.1'
                 }
                 echo "$buildEnvImage"
             }
