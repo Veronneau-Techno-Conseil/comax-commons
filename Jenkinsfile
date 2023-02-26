@@ -7,7 +7,11 @@ def deployAction = ''
 def message = ''
 pipeline {
     agent any
-
+    properties([
+        parameters{
+            string(name: 'buildEnvImage', defaultValue: '')
+        }
+    ])
     stages {
         stage('Prepare') {
             steps {
