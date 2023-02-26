@@ -25,7 +25,7 @@ pipeline {
                     patch = version
                     buildEnvImag = 'vertechcon/comax-buildenv:1.0.0'
                 }
-                echo '$buildEnvImage'
+                echo "$buildEnvImage"
             }
         }
         
@@ -71,7 +71,7 @@ pipeline {
         stage('Prep Helm Orchestrator') {
             agent {
                 docker {
-                    image '$buildEnvImage'
+                    image "$buildEnvImage"
                     reuseNode true
                 }
             }
@@ -87,7 +87,7 @@ pipeline {
         stage('Helm Orchestrator') {
             agent {
                 docker {
-                    image '$buildEnvImage'
+                    image "$buildEnvImage"
                     reuseNode true
                 }
             }
@@ -119,7 +119,7 @@ pipeline {
         stage('Prepare Application deployment Orchestrator') {
             agent {
                 docker {
-                    image '$buildEnvImage'
+                    image "$buildEnvImage"
                     reuseNode true
                 }
             }
@@ -149,7 +149,7 @@ pipeline {
         stage('Uninstall Application deployment Orchestrator') {
             agent {
                 docker {
-                    image '$buildEnvImage'
+                    image "$buildEnvImage"
                     reuseNode true
                 }
             }
@@ -167,7 +167,7 @@ pipeline {
         stage('Install Application deployment Orchestrator') {
             agent {
                 docker {
-                    image '$buildEnvImage'
+                    image "$buildEnvImage"
                     reuseNode true
                 }
             }
@@ -186,7 +186,7 @@ pipeline {
         stage('Upgrade Application deployment Orchestrator') {
             agent {
                 docker {
-                    image '$buildEnvImage'
+                    image "$buildEnvImage"
                     reuseNode true
                 }
             }
@@ -206,7 +206,7 @@ pipeline {
         stage('Prep Helm Referee') {
             agent {
                 docker {
-                    image '$buildEnvImage'
+                    image "$buildEnvImage"
                     reuseNode true
                 }
             }
@@ -221,7 +221,7 @@ pipeline {
         stage('Helm Referee') {
             agent {
                 docker {
-                    image '$buildEnvImage'
+                    image "$buildEnvImage"
                     reuseNode true
                 }
             }
@@ -253,7 +253,7 @@ pipeline {
         stage('Prepare Application deployment Referee') {
             agent {
                 docker {
-                    image '$buildEnvImage'
+                    image "$buildEnvImage"
                     reuseNode true
                 }
             }
@@ -283,7 +283,7 @@ pipeline {
         stage('Uninstall Application deployment Referee') {
             agent {
                 docker {
-                    image '$buildEnvImage'
+                    image "$buildEnvImage"
                     reuseNode true
                 }
             }
@@ -301,7 +301,7 @@ pipeline {
         stage('Install Application deployment Referee') {
             agent {
                 docker {
-                    image '$buildEnvImage'
+                    image "$buildEnvImage"
                     reuseNode true
                 }
             }
@@ -320,7 +320,7 @@ pipeline {
         stage('Upgrade Application deployment Referee') {
             agent {
                 docker {
-                    image '$buildEnvImage'
+                    image "$buildEnvImage"
                     reuseNode true
                 }
             }
