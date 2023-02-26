@@ -23,6 +23,7 @@ pipeline {
                     version = readFile('VERSION').trim()
                     chartVersion = readFile('./helm/VERSION').trim()
                     patch = version
+                    buildEnvImag = 'vertechcon/comax-buildenv:1.0.0'
                 }
             }
         }
