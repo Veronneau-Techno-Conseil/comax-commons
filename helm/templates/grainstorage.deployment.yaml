@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "comax-orchestrator.fullname" . }}
+  name: {{ include "comax-grainstorage.fullname" . }}
   labels:
     {{- include "comax-orchestrator.labels" . | nindent 4 }}
 spec:
@@ -10,15 +10,15 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "comax-orchestrator.selectorLabels" . | nindent 6 }}
+      {{- include "comax-grainstorage.selectorLabels" . | nindent 6 }}
   template:
-    metadata:
+    metadata: 
       {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "comax-orchestrator.selectorLabels" . | nindent 8 }}
+        {{- include "comax-grainstorage.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -33,66 +33,48 @@ spec:
           claimName: {{ .Values.pvcName }}
 
       containers:
-        - name: {{ .Chart.Name }}
+        - name: grainstorage
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.grainStorageRepository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.orch.gatewayport }}
+              containerPort: 80
               protocol: TCP
-          volumeMounts:
-          - name: datastore
-            mountPath: "/data"
           env:
           - name: OIDC__Authority
             value: {{ .Values.oidc.auth }}
           - name: OIDC__Scopes
             value: {{ .Values.oidc.scopes }}
           - name: OIDC__ClientId
-            value: {{ .Values.oidc.clientId }}
+            value: {{ .Values.oidc.grainStorageClientId }}
           - name: OIDC__Secret
             valueFrom:
               secretKeyRef:
                 name: {{ include "comax-orchestrator.secretName" . }}
-                key: OIDC__Secret
-          - name: LiteDbStorage__FileName
-            value: /data/SiloStore.db
-          - name: JObjectStore__FileName
-            value: /data/SiloStore.db
-          - name: PubSubStore__FileName
-            value: /data/PubSubStore.db
-          - name: CentralApiUrl
-            value: {{ .Values.centralApiUrl }}
-          - name: siloPort
-            value: "7718"
-          - name: gatewayPort
-            value: "30001"
-          - name: advertisedIp
-            {{- if not .Values.advertisedIp }}
+                key: OIDC__GrainStorageSecret
+          
+          - name: DbConfig__MemoryDb
+            value: "false"
+          - name: DbConfig__Server
+            value: {{ include "comax-mariadb.fullSvcName" . }}
+          - name: DbConfig__Username
+            value: {{ .Values.db.username }}
+          - name: DbConfig__Password
             valueFrom:
-              fieldRef:
-                fieldPath: status.podIP
-            {{- else }}
-            value: {{ .Values.advertisedIp }}
-            {{- end }}
-          - name: listeningEndpoint
-            {{- if not .Values.listeningEndpoint }}
-            valueFrom:
-              fieldRef:
-                fieldPath: status.podIP
-            {{- else }}
-            value: {{ .Values.listeningEndpoint }}
-            {{- end }}
-          - name: ApiStorage__SenderName
-            value: "Orchestrator"
-          - name: ApiStorage__ApiStorageUri
-            value: "http://{{- include "comax-grainstorage.fullSvcName" . }}"
-          - name: ApiStorage__SerializationProvider
-            value: "standard"
-          - name: ApiStorage__SerializationConfig
-            value: ""
+              secretKeyRef:
+                name: {{ include "comax-orchestrator.secretName" . }}
+                key: MYSQL_PASSWORD
+          - name: DbConfig__Database
+            value: "grainstates"
+          - name: DbConfig__ShouldDrop
+            value: "false"
+          - name: DbConfig__ShouldMigrate
+            value: "true"
+          - name: DbConfig__Port
+            value: "3306"
+            
           # livenessProbe:
           #   httpGet:
           #     path: /

@@ -284,7 +284,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder
                    secretKeyRef: new V1SecretKeySelector(spec.DbCredRootPasswordKey, spec.DbCredUsernameKey))),
                new V1EnvVar("MYSQL_PASSWORD", valueFrom: new V1EnvVarSource(
                    secretKeyRef: new V1SecretKeySelector(spec.DbCredRootPasswordKey, spec.DbCredPasswordKey))),
-               new V1EnvVar("MYSQL_PASSWORD", "grainstates")
+               new V1EnvVar("MYSQL_DATABASE", "grainstates")
            };
 
             var container = new V1Container

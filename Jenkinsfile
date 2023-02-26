@@ -67,6 +67,12 @@ pipeline {
             }
         }
         stage('Prep Helm Orchestrator') {
+            agent {
+                docker {
+                    image 'vertechcon/comax-buildenv:3.9.16-bullseye'
+                    reuseNode true
+                }
+            }
             steps {
                 sh 'mkdir penv && python3 -m venv ./penv'
                 sh '. penv/bin/activate && pwd && ls -l && pip install -r ./build/requirements.txt && python3 ./build/processchart.py'
@@ -77,6 +83,12 @@ pipeline {
             }
         }
         stage('Helm Orchestrator') {
+            agent {
+                docker {
+                    image 'vertechcon/comax-buildenv:3.9.16-bullseye'
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return chartAction == "DEPLOY"
@@ -103,6 +115,12 @@ pipeline {
             }
         }
         stage('Prepare Application deployment Orchestrator') {
+            agent {
+                docker {
+                    image 'vertechcon/comax-buildenv:3.9.16-bullseye'
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release')
@@ -127,6 +145,12 @@ pipeline {
             }
         }
         stage('Uninstall Application deployment Orchestrator') {
+            agent {
+                docker {
+                    image 'vertechcon/comax-buildenv:3.9.16-bullseye'
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && shouldUninstall == 'uninstall'
@@ -139,6 +163,12 @@ pipeline {
             }
         }
         stage('Install Application deployment Orchestrator') {
+            agent {
+                docker {
+                    image 'vertechcon/comax-buildenv:3.9.16-bullseye'
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && deployAction != "upgrade"
@@ -152,6 +182,12 @@ pipeline {
             }
         }
         stage('Upgrade Application deployment Orchestrator') {
+            agent {
+                docker {
+                    image 'vertechcon/comax-buildenv:3.9.16-bullseye'
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && deployAction == "upgrade"
@@ -166,6 +202,12 @@ pipeline {
         
         
         stage('Prep Helm Referee') {
+            agent {
+                docker {
+                    image 'vertechcon/comax-buildenv:3.9.16-bullseye'
+                    reuseNode true
+                }
+            }
             steps {
                 
                 sh 'curl -k https://charts.vtck3s.lan/api/charts/comax-referee/${chartVersion} | jq \'.name | "DEPLOY"\' > CHART_ACTION'
@@ -175,6 +217,12 @@ pipeline {
             }
         }
         stage('Helm Referee') {
+            agent {
+                docker {
+                    image 'vertechcon/comax-buildenv:3.9.16-bullseye'
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return chartAction == "DEPLOY"
@@ -201,6 +249,12 @@ pipeline {
             }
         }
         stage('Prepare Application deployment Referee') {
+            agent {
+                docker {
+                    image 'vertechcon/comax-buildenv:3.9.16-bullseye'
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release')
@@ -225,6 +279,12 @@ pipeline {
             }
         }
         stage('Uninstall Application deployment Referee') {
+            agent {
+                docker {
+                    image 'vertechcon/comax-buildenv:3.9.16-bullseye'
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && shouldUninstall == 'uninstall'
@@ -237,6 +297,12 @@ pipeline {
             }
         }
         stage('Install Application deployment Referee') {
+            agent {
+                docker {
+                    image 'vertechcon/comax-buildenv:3.9.16-bullseye'
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && deployAction != "upgrade"
@@ -250,6 +316,12 @@ pipeline {
             }
         }
         stage('Upgrade Application deployment Referee') {
+            agent {
+                docker {
+                    image 'vertechcon/comax-buildenv:3.9.16-bullseye'
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && deployAction == "upgrade"

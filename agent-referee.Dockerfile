@@ -1,7 +1,7 @@
 ARG IMG_NAME=7.0-alpine
 
 # syntax=docker/dockerfile:1
-FROM mcr.microsoft.com/dotnet/sdk:${IMG_NAME} AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:7.0-bullseye-slim-amd64 AS build-env
 WORKDIR /src
 
 # Copy csproj and restore as distinct layers
