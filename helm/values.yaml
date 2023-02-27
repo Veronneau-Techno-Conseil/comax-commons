@@ -36,6 +36,8 @@ oidc:
 db:
   server: "dbserver"
   username: "username"
+  password: "password"
+  rootPassword: "rootPassword"
   resources:
     limits:
       cpu: 250m

@@ -10,21 +10,21 @@ Expand the name of the secret.
 Expand the full service name.
 */}}
 {{- define "comax-orchestrator.fullSvcName" -}}
-{{- printf "%s.%s.svc.cluster.local" ( include "comax-orchestrator.name" . ) .Release.Namespace -}}
+{{- printf "%s.%s.svc.cluster.local" ( include "comax-orchestrator.fullname" . ) .Release.Namespace -}}
 {{- end }}
 
 {{/*
 Expand the full service name.
 */}}
 {{- define "comax-mariadb.fullSvcName" -}}
-{{- printf "%s.%s.svc.cluster.local" ( include "comax-mariadb.name" . ) .Release.Namespace -}}
+{{- printf "%s.%s.svc.cluster.local" ( include "comax-mariadb.fullname" . ) .Release.Namespace -}}
 {{- end }}
 
 {{/*
 Expand the full service name.
 */}}
 {{- define "comax-grainstorage.fullSvcName" -}}
-{{- printf "%s.%s.svc.cluster.local" ( include "comax-grainstorage.name" . ) .Release.Namespace -}}
+{{- printf "%s.%s.svc.cluster.local" ( include "comax-grainstorage.fullname" . ) .Release.Namespace -}}
 {{- end }}
 
 {{/*
