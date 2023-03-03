@@ -19,7 +19,7 @@
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
 	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.3" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
 	  <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Json.Newtonsoft" Version="7.0.0" />
 	  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
@@ -29,6 +29,15 @@
   <ItemGroup>
     <ProjectReference Include="..\DockerIntegration\DockerIntegration.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="cert.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="key.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

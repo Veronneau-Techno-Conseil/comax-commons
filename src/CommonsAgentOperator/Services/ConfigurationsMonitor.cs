@@ -1,6 +1,7 @@
 ﻿using Comax.Central;
 using CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities;
 using CommunAxiom.Commons.Shared.OIDC;
+using CommunAxiom.DotnetSdk.Helpers.OIDC;
 using k8s.Models;
 using KubeOps.KubernetesClient;
 using Microsoft.AspNetCore.DataProtection;
@@ -33,8 +34,8 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.Services
             {
                 _tokenData = null;
                 //Comax.Central.CentralApi centralApi = new Comax.Central.CentralApi();
-                Shared.OIDC.TokenClient tokenClient = new Shared.OIDC.TokenClient(_oidcSettings);
-                var (success, res) = await tokenClient.AuthenticateClient(_oidcSettings.ClientId, _oidcSettings.Secret, _oidcSettings.Scopes);
+                TokenClient tokenClient = new TokenClient(_oidcSettings);
+                var (success, res) = await tokenClient.AuthenticateClient(_oidcSettings.Scopes);
                 if (success)
                 {
                     _tokenData = res;

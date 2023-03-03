@@ -1,0 +1,27 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "OIDC": {
+    "Authority": "https://accounts.communaxiom.org/",
+    "Scopes": "offline_access roles profile email",
+    "ClientId": "odia_inscientia_optimi_proprius",
+    "Secret": "2008e7d6-836d-4648-9405-1e02182c0085"
+  },
+  "AllowedHosts": "*",
+  "DbConfig": {
+    "MemoryDb": false,
+    "Server": "localhost",
+    "Username": "root",
+    "Password": "bleharfads156",
+    "Database": "grainstates",
+    "ShouldDrop": "false",
+    "ShouldMigrate": "true",
+    "Port": "3306"
+  },
+  "ListenPort": 7066,
+  "UseHttps": false
+}

@@ -44,7 +44,7 @@
   "storage": "api",
   "ApiStorage": {
     "SenderName": "Orchestrator",
-    "ApiStorageUri": "https://localhost:7066",
+    "ApiStorageUri": "http://localhost:7066",
     "SerializationProvider": "standard",
     "SerializationConfig": ""
   }

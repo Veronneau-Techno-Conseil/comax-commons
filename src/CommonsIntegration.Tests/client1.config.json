@@ -12,6 +12,6 @@
   "CommonsMembership": {
     "Host": "https://localhost:5004",
     "CacheDuration": "00:05:00"
-  }
-
+  },
+  "client_mode": "local"
 }

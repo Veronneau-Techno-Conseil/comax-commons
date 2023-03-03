@@ -21,5 +21,7 @@
     "ShouldDrop": "false",
     "ShouldMigrate": "true",
     "Port": "3306"
-  }
+  },
+  "ListenPort": 7066,
+  "UseHttps": false
 }

@@ -45,10 +45,10 @@
     "SaveStatePeriod": 2,
     "SubscriptionTimeout": 420
   },
-  "storage": "api",
+  "storage": "litedb",
   "ApiStorage": {
     "SenderName": "Commons1",
-    "ApiStorageUri": "https://localhost:7066",
+    "ApiStorageUri": "http://localhost:7066",
     "SerializationProvider": "standard",
     "SerializationConfig": ""
   }

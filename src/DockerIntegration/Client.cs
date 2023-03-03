@@ -64,6 +64,17 @@ namespace DockerIntegration
 
             await client.Containers.StartContainerAsync(container.ID, new ContainerStartParameters { });
 
+            bool isRunning = false;
+            int ix = 0;
+            do
+            {
+                if (ix > 0)
+                    await Task.Delay(6000);
+                var res = await client.Containers.InspectContainerAsync(container.ID);
+                isRunning = res.State.Running;
+                ix++;
+            } while (!isRunning && ix < 5);
+            
             return true;
         }
 

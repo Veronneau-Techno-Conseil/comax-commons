@@ -1,4 +1,5 @@
 ﻿using CommunAxiom.Commons.Shared.OIDC;
+using CommunAxiom.DotnetSdk.Helpers.OIDC;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -24,7 +25,7 @@ namespace Comax.Commons.ApiStorageProvider
 
             var settings = await _settingsProvider.GetOIDCSettings();
             TokenClient tokenClient = new TokenClient(settings);
-            var (res, data) = await tokenClient.AuthenticateClient(settings.ClientId, settings.Secret, settings.Scopes);
+            var (res, data) = await tokenClient.AuthenticateClient(settings.Scopes);
             if (!res)
                 throw new UnauthorizedAccessException("Authentication failed");
             _tokenData = data;

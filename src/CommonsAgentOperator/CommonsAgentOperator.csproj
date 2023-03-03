@@ -8,6 +8,7 @@
     <RootNamespace>CommunAxiom.Commons.Client.Hosting.Operator</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CommunAxiom.DotnetSdk.Helpers" Version="0.0.6" />
     <PackageReference Include="KubeOps" Version="7.0.6" />
     <PackageReference Include="Microsoft.Extensions.ApiDescription.Client" Version="7.0.3">
       <PrivateAssets>all</PrivateAssets>
