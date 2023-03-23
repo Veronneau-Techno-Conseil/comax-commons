@@ -46,6 +46,7 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
         public async Task UploadData(DataChunkResult value)
         {
             //await _dataSeedBusiness.BuildRows(value);
+            throw new NotImplementedException();
         }
 
         public Task Validate()
@@ -66,7 +67,10 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
 
             return await _dataSeedBusiness.ListenForUpload(id);
         }
-
+        public async Task<OperationResult> StreamDataFromStorage(Guid streamId)
+        {
+            return await _dataSeedBusiness.StreamDataFromStorage(streamId);
+        }
         public async Task<DataIndex> GetIndex()
         {
             return await _dataSeedBusiness.GetIndex();

@@ -12,6 +12,7 @@ namespace CommunAxiom.Commons.CommonsShared.Contracts.DataSeed
         Task SendIndex(DataIndex value); //list of DataIndex
         Task<DataIndex> GetIndex();
         Task<OperationResult> SetUploadStream(Guid id);
+        Task<OperationResult> StreamDataFromStorage(Guid streamId);
         Task Validate(); // ?
     }
 }

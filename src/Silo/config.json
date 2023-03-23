@@ -5,6 +5,18 @@
     "ClientId": "decore_defuturum_fusce_consequentis",
     "Secret": "534361b1-ba60-4d0e-977b-e41fd1721a2d"
   },
+  "LiteDbStorage": {
+    "Name": "LiteDbStorage",
+    "FileName": "./SiloStore.db"
+  },
+  "JObjectStore": {
+    "Name": "JObjectStore",
+    "FileName": "./SiloStore.db"
+  },
+  "PubSubStore": {
+    "Name": "PubSubStore",
+    "FileName": "./PubSubStore.db"
+  },
   "client_mode": "local",
   "membership": {
     "host": "https://referee.communaxiom.org",

@@ -66,7 +66,11 @@ namespace OrchestratorIntegration.Tests.DataSeed
             {
                 new DataChunkObject
                 {
+                    IdDataChunk = new IdDataChunk
+                    {
                     Id =$"{newid}-data-1",
+                        IdDataSeed = Guid.NewGuid()
+                    },
                     Data = JObject.FromObject(new Dummy
                     {
                         Name=$"{newid}-data-1 Name",
@@ -75,7 +79,11 @@ namespace OrchestratorIntegration.Tests.DataSeed
                 },
                 new DataChunkObject
                 {
+                    IdDataChunk = new IdDataChunk
+                    {
                     Id =$"{newid}-data-2",
+                        IdDataSeed = Guid.NewGuid()
+                    },
                     Data = JObject.FromObject(new Dummy
                     {
                         Name=$"{newid}-data-2 Name",
@@ -97,6 +105,14 @@ namespace OrchestratorIntegration.Tests.DataSeed
 
                 await strm.OnCompletedAsync();
             });
+
+            var res = await cf.WithClusterClient(async cl =>
+            {
+                var ds = cl.GetDataSeed(newid);//change to new id
+                var res = await ds.StreamDataFromStorage(streamId);
+                return res;
+            });
+            res.Should().NotBeNull();
         }
     }
 }
