@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "comax-grainstorage.fullname" . }}
+  labels:
+    {{- include "comax-orchestrator.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "comax-grainstorage.selectorLabels" . | nindent 6 }}
+  template:
+    metadata: 
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "comax-grainstorage.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "comax-orchestrator.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+      - name: datastore
+        persistentVolumeClaim:
+          claimName: {{ .Values.pvcName }}
+
+      containers:
+        - name: grainstorage
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.grainStorageRepository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+          - name: OIDC__Authority
+            value: {{ .Values.oidc.auth }}
+          - name: OIDC__Scopes
+            value: {{ .Values.oidc.scopes }}
+          - name: OIDC__ClientId
+            value: {{ .Values.oidc.grainStorageClientId }}
+          - name: OIDC__Secret
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "comax-orchestrator.secretName" . }}
+                key: OIDC__GrainStorageSecret
+          
+          - name: DbConfig__MemoryDb
+            value: "false"
+          - name: DbConfig__Server
+            value: {{ include "comax-mariadb.fullSvcName" . }}
+          - name: DbConfig__Username
+            value: {{ .Values.db.username }}
+          - name: DbConfig__Password
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "comax-orchestrator.secretName" . }}
+                key: MYSQL_PASSWORD
+          - name: DbConfig__Database
+            value: "grainstates"
+          - name: DbConfig__ShouldDrop
+            value: "false"
+          - name: DbConfig__ShouldMigrate
+            value: "true"
+          - name: DbConfig__Port
+            value: "3306"
+            
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          #     scheme: HTTP
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          #     scheme: HTTP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

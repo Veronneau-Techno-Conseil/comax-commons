@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommunAxiom.DotnetSdk.Helpers.OIDC;
 
 namespace OrchestratorIntegration.Tests
 {
@@ -30,6 +31,7 @@ namespace OrchestratorIntegration.Tests
         public static IConfiguration Configuration { get; set; }
         public static IServiceProvider ServiceProvider { get; set; }
 
+        private static IHost _storageApiSvc;
         
 
         [OneTimeSetUp]
@@ -37,7 +39,11 @@ namespace OrchestratorIntegration.Tests
         {
             SetupTests();
             if (Configuration["client_mode"] == "local")
+            {
+                _storageApiSvc = await GrainStorageService.Application.CreateApp("./grainstoresvc.config.json");
+                _ = _storageApiSvc.RunAsync();
                 await MainSilo.StartSilo();
+            }
         }
 
         [OneTimeTearDown]
@@ -45,6 +51,10 @@ namespace OrchestratorIntegration.Tests
         {
             if (Configuration["client_mode"] == "local")
                 await MainSilo.StopSilo();
+            if(_storageApiSvc != null)
+            {
+                await _storageApiSvc.StopAsync();
+            }
         }
 
         public static void SetupTests()

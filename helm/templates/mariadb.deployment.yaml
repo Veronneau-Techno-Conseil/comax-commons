@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "comax-mariadb.fullname" . }}
+  labels:
+    {{- include "comax-mariadb.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.dbautoscaling.enabled }}
+  replicas: {{ .Values.dbReplicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "comax-mariadb.selectorLabels" . | nindent 8 }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata: 
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "comax-mariadb.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "comax-orchestrator.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+      - name: datastore
+        persistentVolumeClaim:
+          claimName: {{ .Values.pvcName }}
+      containers:
+      - name: mariadb
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        image: {{ .Values.image.mariadb }}
+        imagePullPolicy: IfNotPresent
+        ports:
+          - name: svcport
+            containerPort: 3306
+            protocol: TCP
+        resources: 
+          {{- toYaml .Values.db.resources | nindent 10 }}
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "comax-orchestrator.secretName" . }}
+                key: MYSQL_ROOT_PASSWORD
+          - name: MYSQL_USER
+            value: {{ .Values.db.username }}
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "comax-orchestrator.secretName" . }}
+                key: MYSQL_PASSWORD
+          - name: MYSQL_DATABASE
+            value: "grainstates" 
+        volumeMounts:
+        - name: datastore
+          mountPath: /var/lib/mysql
+          subPathExpr: mariadb
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30

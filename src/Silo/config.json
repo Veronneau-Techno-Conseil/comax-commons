@@ -35,5 +35,12 @@
     "LiveTickerPeriod": 30,
     "ConnectionCheckPeriod": 30,
     "SaveStatePeriod": 30
+  },
+  "storage": "api",
+  "ApiStorage": {
+    "SenderName": "CommonsAgent",
+    "ApiStorageUri": "https://localhost:7066",
+    "SerializationProvider": "standard",
+    "SerializationConfig": ""
   }
 }

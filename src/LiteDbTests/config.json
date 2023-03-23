@@ -14,5 +14,6 @@
   "PubSubStore": {
     "Name": "PubSubStore",
     "FileName": "./PubSubStore.db"
-  }
+  },
+  "storage": "litedb"
 }

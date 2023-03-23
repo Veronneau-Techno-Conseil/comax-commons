@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+
+	  <AssemblyName>Comax.Commons.ApiStorageProvider</AssemblyName>
+	<RootNamespace>Comax.Commons.ApiStorageProvider</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
+	  <PackageReference Include="Microsoft.Orleans.Core" Version="3.6.5" />
+	  <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.6.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\StorageProvider\SerializationProvider.csproj" />
+  </ItemGroup>
+
+</Project>
