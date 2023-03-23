@@ -3,7 +3,15 @@ kind: AgentReferee
 metadata: 
   name: agenttest
 spec:
-  dbServerName: myserver
-  dbUser: myuser
-  dbPasswordSecretName: pw
-  dbPasswordSecretKey: key
+  listenPort: 5004
+  oidcAuthority: "https://accounts.communaxiom.org"
+  #oidcClientId: 
+  #oidcSecretName:
+  #oidcSecretKey:
+  useHttps: false
+  certPath:
+  keyPath:
+  dbProvider: 
+  environmentVariables:
+    - name: my__var
+      value: somevalue

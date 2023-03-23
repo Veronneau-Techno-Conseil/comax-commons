@@ -20,8 +20,6 @@ spec:
             properties:
               currentState:
                 type: string
-              dbAccess:
-                type: boolean
               stateTsMs:
                 format: int64
                 type: integer
@@ -36,9 +34,25 @@ spec:
             properties:
               image:
                 type: string
-              port:
+              listenPort:
                 format: int32
                 type: integer
+              oidcAuthority:
+                type: string
+              oidcClientId:
+                type: string
+              oidcSecretName:
+                type: string
+              oidcSecretKey:
+                type: string
+              useHttps:
+                type: boolean
+              certPath:
+                type: string
+              keyPath:
+                type: string
+              dbProvider:
+                type: string
               resources:
                 nullable: true
                 properties:
@@ -49,14 +63,6 @@ spec:
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
                 type: object
-              dbServerName:
-                type: string
-              dbUser:
-                type: string
-              dbPasswordSecretName:
-                type: string
-              dbPasswordSecretKey:
-                type: string
               environmentVariables:
                 items:
                   properties:

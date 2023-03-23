@@ -42,6 +42,16 @@ pipeline {
                 sh "docker push registry.vtck3s.lan/comax-orchestrator:${patch}-arm64"
                 
                 
+                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'dockerhub_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                  sh 'if [ -z "$(docker buildx ls | grep multiarch)" ]; then docker buildx create --name multiarch --driver docker-container --use; else docker buildx use multiarch; fi'
+                  sh "docker login -u ${USERNAME} -p ${PASSWORD}"
+				  
+                  sh "docker buildx build --push -t vertechcon/comax-agentreferee:latest -t registry.vtck3s.lan/comax-agentreferee:${patch} --platform linux/amd64,linux/arm64 -f agent-referee.Dockerfile ."
+				
+                  sh "docker buildx build --push -t vertechcon/comax-commonsagent:latest -t registry.vtck3s.lan/comax-commonsagent:${patch} --platform linux/amd64,linux/arm64 -f commons-agent.Dockerfile ."
+                
+                }
+                
                 script {
                     def customImage = docker.build("registry.vtck3s.lan/comax-referee:latest", "-f ./referee.Dockerfile .")
                     customImage.push()
@@ -49,7 +59,7 @@ pipeline {
                 }
                 sh 'echo "Build registry.vtck3s.lan/comax-referee:${patch} pushed to registry \n" >> SUMMARY'
             
-			}
+            }
 
             post {
                 success {
@@ -156,8 +166,8 @@ pipeline {
                 }
             }
         }
-		
-		
+        
+        
         stage('Prep Helm Referee') {
             steps {
                 
@@ -254,7 +264,7 @@ pipeline {
                 }
             }
         }
-		
+        
         stage('Finalize') {
             steps {
                 script {

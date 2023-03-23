@@ -24,68 +24,77 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
         public RefereeController(ILogger<RefereeController> logger, IFinalizerManager<AgentReferee> finalizeManager, IKubernetesClient client)
         {
             _client = client;
+            _finalizeManager = finalizeManager;
+            _logger = logger;
         }
 
         public async Task<ResourceControllerResult?> ReconcileAsync(AgentReferee entity)
         {
-            switch (Enum.Parse<Status>(entity.Status.CurrentState))
+            try
             {
-                case Status.Stable:
-                    entity.Status.CurrentState = Status.Updating.ToString();
-                    entity = await UpdateStatus(entity);
-                    entity = await Update(entity);
-                    entity.Status.CurrentState = Status.Stable.ToString();
-                    await UpdateStatus(entity);
-                    break;
-                case Status.Unknown:
-                    entity.Status.CurrentState = Status.Creating.ToString();
-                    entity = await UpdateStatus(entity);
-                    entity = await Create(entity);
-                    entity.Status.CurrentState = Status.Stable.ToString();
-                    entity = await UpdateStatus(entity);
-                    await _finalizeManager.RegisterFinalizerAsync<RefereeFinalizer>(entity);
-                    break;
-                case Status.Creating:
-                case Status.Starting:
-                case Status.Updating:
-                    _logger.LogInformation(
-                        "Resource {Id} is currently in a non-editable state",
-                        entity.Name()
-                    );
-
-                    var timeDiff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - entity.Status.StateTs;
-                    if (timeDiff > 60 * 5)
-                    {
-                        _logger.LogInformation(
-                            "Resource {Name} have been in a non-editable state for {Seconds} seconds, setting state to broken",
-                            entity.Name(),
-                            timeDiff
-                        );
-
-                        entity.Status.CurrentState = Status.Broken.ToString();
+                switch (Enum.Parse<Status>(entity.Status.CurrentState))
+                {
+                    case Status.Stable:
+                        entity.Status.CurrentState = Status.Updating.ToString();
+                        entity = await UpdateStatus(entity);
+                        entity = await Update(entity);
+                        entity.Status.CurrentState = Status.Stable.ToString();
                         await UpdateStatus(entity);
-                        return ResourceControllerResult.RequeueEvent(TimeSpan.FromSeconds(10));
-                    }
-                    else
-                    {
+                        break;
+                    case Status.Unknown:
+                        entity.Status.CurrentState = Status.Creating.ToString();
+                        entity = await UpdateStatus(entity);
+                        entity = await Create(entity);
+                        entity.Status.CurrentState = Status.Stable.ToString();
+                        entity = await UpdateStatus(entity);
+                        await _finalizeManager.RegisterFinalizerAsync<RefereeFinalizer>(entity);
+                        break;
+                    case Status.Creating:
+                    case Status.Starting:
+                    case Status.Updating:
                         _logger.LogInformation(
-                            "Resource {Name} have been in a non-editable state for {Seconds} seconds, waiting for {Time} more seconds",
-                                entity.Name(),
-                            timeDiff,
-                            ((60 * 5) - timeDiff)
+                            "Resource {Id} is currently in a non-editable state",
+                            entity.Name()
                         );
 
-                        return ResourceControllerResult.RequeueEvent(TimeSpan.FromSeconds(Math.Max(10, timeDiff)));
-                    }
-                case Status.Broken:
-                    _logger.LogInformation("Broken resource {Name} encountered", entity.Name());
-                    _logger.LogInformation("Will remove any active deployment, but leave PVCs");
-                    await DeleteBrokenAsync(entity);
-                    break;
-                case Status.Stopped:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                        var timeDiff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - entity.Status.StateTs;
+                        if (timeDiff > 60 * 5)
+                        {
+                            _logger.LogInformation(
+                                "Resource {Name} have been in a non-editable state for {Seconds} seconds, setting state to broken",
+                                entity.Name(),
+                                timeDiff
+                            );
+
+                            entity.Status.CurrentState = Status.Broken.ToString();
+                            await UpdateStatus(entity);
+                            return ResourceControllerResult.RequeueEvent(TimeSpan.FromSeconds(10));
+                        }
+                        else
+                        {
+                            _logger.LogInformation(
+                                "Resource {Name} have been in a non-editable state for {Seconds} seconds, waiting for {Time} more seconds",
+                                    entity.Name(),
+                                timeDiff,
+                                ((60 * 5) - timeDiff)
+                            );
+
+                            return ResourceControllerResult.RequeueEvent(TimeSpan.FromSeconds(Math.Max(10, timeDiff)));
+                        }
+                    case Status.Broken:
+                        _logger.LogInformation("Broken resource {Name} encountered", entity.Name());
+                        _logger.LogInformation("Will remove any active deployment, but leave PVCs");
+                        await DeleteBrokenAsync(entity);
+                        break;
+                    case Status.Stopped:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            catch(Exception ex)
+            {
+                throw;
             }
             return await Task.FromResult<ResourceControllerResult?>(null);
 
@@ -94,9 +103,18 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
         private async Task<AgentReferee> Create(AgentReferee entity)
         {
             var deployment = DeploymentBuilder.Build(entity);
-            
-            foreach(var item in deployment)
-                await _client.Create(item);
+
+            foreach (var item in deployment)
+            {
+                try
+                {
+                    await _client.CreateObject(item);
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+            }
 
             return entity;
         }
@@ -105,7 +123,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
         {
             var deployments = DeploymentBuilder.Build(entity);
             foreach(var item in deployments)
-                await _client.Update(item);
+                await _client.UpdateObject(item);
             return entity;
         }
 
@@ -141,26 +159,8 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
                 entity.Namespace()
             );
 
-            entity.Status.CurrentState = Status.Stopped.ToString();
-            // Set status to stopped. If it breaks here, it's unrecoverable for now.
-            entity = await UpdateStatus(entity);
+            await DeletedAsync(entity);
 
-            var dep = await _client.Get<V1Deployment>(
-                entity.DeploymentName,
-                entity.Namespace()
-            );
-
-            if (dep == null)
-            {
-                _logger.LogError(
-                    "Failed to find deployment for resource {Name} in namespace {Namespace}",
-                    entity.Name(),
-                    entity.Namespace()
-                );
-                throw new Exception("Failed to find deployment.");
-            }
-
-            await _client.Delete(dep);
             _logger.LogInformation(
                 "Removed deployment for {Name} in namespace {Namespace}",
                 entity.Name(),
@@ -179,15 +179,61 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
         //
         // Returns:
         //     A task that completes, when the reconciliation is done.
-        public Task DeletedAsync(AgentReferee entity)
+        public async Task DeletedAsync(AgentReferee entity)
         {
-            _logger.LogInformation(
-            "{Name} in namespace {Namespace} deleted",
-            entity.Name(),
-            entity.Namespace()
-        );
 
-            return Task.CompletedTask;
+            var svc = await _client.Get<V1Service>(
+                $"{entity.DeploymentName}-ep",
+                entity.Namespace()
+            );
+
+            if (svc == null)
+            {
+                _logger.LogError(
+                    "Failed to find service for resource {Name} in namespace {Namespace}",
+                    $"{entity.DeploymentName}-ep",
+                    entity.Namespace()
+                );
+            }
+            else
+            {
+                await _client.Delete(svc);
+                _logger.LogInformation(
+                    "Removed deployment for {Name} in namespace {Namespace}",
+                    $"{entity.DeploymentName}-ep",
+                    entity.Namespace()
+                );
+            }
+
+
+            var dep = await _client.Get<V1Deployment>(
+                entity.DeploymentName,
+                entity.Namespace()
+            );
+
+            if (dep == null)
+            {
+                _logger.LogError(
+                    "Failed to find deployment for resource {Name} in namespace {Namespace}",
+                    entity.Name(),
+                    entity.Namespace()
+                );
+            }
+            else
+            {
+                await _client.Delete(dep);
+                _logger.LogInformation(
+                    "Removed deployment for {Name} in namespace {Namespace}",
+                    entity.Name(),
+                    entity.Namespace()
+                );
+            }
+
+            _logger.LogInformation(
+                "{Name} in namespace {Namespace} deleted",
+                entity.Name(),
+                entity.Namespace()
+            );
         }
     }
 }

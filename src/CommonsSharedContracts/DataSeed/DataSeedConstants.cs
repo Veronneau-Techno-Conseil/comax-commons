@@ -4,8 +4,8 @@ using System.Text;
 
 namespace CommunAxiom.Commons.CommonsShared.Contracts.DataSeed
 {
-    public class DataSeedState
+    public static class DataSeedConstants
     {
-        public List<DataSeedObject> DataSeeds { get; set; } = new List<DataSeedObject>();
+        public const string DATA_SEED_NAMESPACE = "DataSeeds";
     }
 }
