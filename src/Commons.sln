@@ -169,7 +169,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestIntegrations", "TestInt
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hosting", "Hosting", "{F6BF060C-4B9D-482D-A29F-DE7C5C9EB67F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonsAgentOperator", "CommonsAgentOperator\CommonsAgentOperator.csproj", "{7A9503E2-F6BE-43DA-80C8-BB4D451983B6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonsAgentOperator", "CommonsAgentOperator\CommonsAgentOperator.csproj", "{7A9503E2-F6BE-43DA-80C8-BB4D451983B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
