@@ -2,6 +2,7 @@
 using CommunAxiom.Commons.Client.Contracts.ComaxSystem;
 using CommunAxiom.Commons.Shared.Configuration;
 using CommunAxiom.Commons.Shared.OIDC;
+using CommunAxiom.DotnetSdk.Helpers.OIDC;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;

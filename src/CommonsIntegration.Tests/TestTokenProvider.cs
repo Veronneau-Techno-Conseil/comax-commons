@@ -1,5 +1,6 @@
 ﻿using CommunAxiom.Commons.Shared;
 using CommunAxiom.Commons.Shared.OIDC;
+using CommunAxiom.DotnetSdk.Helpers.OIDC;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using System;

@@ -1,9 +1,0 @@
-apiVersion: communaxiom.org/v1alpha1
-kind: AgentReferee
-metadata: 
-  name: agenttest
-spec:
-  dbServerName: myserver
-  dbUser: myuser
-  dbPasswordSecretName: pw
-  dbPasswordSecretKey: key

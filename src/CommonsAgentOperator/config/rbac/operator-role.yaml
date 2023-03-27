@@ -5,7 +5,7 @@ metadata:
 rules:
 - apiGroups:
   - communaxiom.org
-  - ''
+  - ""
   - networking.k8s.io
   - coordination.k8s.io
   resources:
@@ -13,6 +13,9 @@ rules:
   - persistentvolumeclaims
   - services
   - ingresses
+  - namespaces
+  - comaxagents
+  - agentsilos
   - leases
   verbs:
   - '*'
@@ -23,7 +26,7 @@ rules:
   verbs:
   - '*'
 - apiGroups:
-  - ''
+  - ""
   resources:
   - events
   verbs:
@@ -40,7 +43,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - ''
+  - ""
   resources:
   - persistentvolumeclaims/status
   verbs:
@@ -56,7 +59,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - ''
+  - ""
   resources:
   - services/status
   verbs:
@@ -67,6 +70,30 @@ rules:
   - networking.k8s.io
   resources:
   - ingresses/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - namespaces/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - communaxiom.org
+  resources:
+  - comaxagents/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - communaxiom.org
+  resources:
+  - agentsilos/status
   verbs:
   - get
   - patch

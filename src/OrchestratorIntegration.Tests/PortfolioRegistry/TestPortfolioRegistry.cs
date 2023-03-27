@@ -1,6 +1,7 @@
 ﻿using Comax.Commons.Orchestrator.Client;
 using Comax.Commons.Orchestrator.Contracts.Portfolio.Models;
 using CommunAxiom.Commons.Shared.OIDC;
+using CommunAxiom.DotnetSdk.Helpers.OIDC;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
@@ -39,7 +40,7 @@ namespace OrchestratorIntegration.Tests.PortfolioRegistry
                 Cluster.Configuration.Bind("ClientOIDC", oidc);
                 Cluster.Configuration.Bind("OIDC", oidcOrch);
                 TokenClient tc = new TokenClient(oidcOrch);
-                var (res, auth) = await tc.AuthenticateClient(oidc.ClientId, oidc.Secret, oidc.Scopes);
+                var (res, auth) = await tc.AuthenticateClient(oidc.Scopes, oidc.ClientId, oidc.Secret);
                 var (pRes, principal) = await tc.RequestIntrospection(oidcOrch.ClientId, oidcOrch.Secret, auth.access_token);
                 auth.Should().NotBeNull();
                 

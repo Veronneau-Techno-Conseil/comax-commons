@@ -17,6 +17,12 @@
     "Name": "PubSubStore",
     "FileName": "./PubSubStore.db"
   },
+  "ApiStorage": {
+    "SenderName": "Orchestrator",
+    "ApiStorageUri": "https://localhost:7066",
+    "SerializationProvider": "standard",
+    "SerializationConfig": ""
+  },
   "CentralApiUrl": "https://central.communaxiom.org",
   "siloPort": 7718,
   "gatewayPort": 30001,
@@ -30,5 +36,6 @@
   "ClusterSettings": {
     "PortfolioSyncInterval": "30000",
     "PortfolioSyncReminderInterval": "5000"
-  }
+  }, 
+  "storage": "apistorage"
 }

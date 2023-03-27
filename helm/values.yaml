@@ -3,9 +3,12 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
+dbReplicaCount: 1
 
 image:
-  repository: registry.vtck3s.lan/comax-orchestrator
+  repository: vertechcon/comax-orchestrator
+  grainStorageRepository: vertechcon/comax-apistorage
+  mariadb: mariadb:10.9-jammy
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -14,6 +17,8 @@ imagePullSecrets: []
 nameOverride: "cxorch"
 fullnameOverride: ""
 pvcName: "orchdatastore"
+advertisedIp: ""
+listeningEndpoint: ""
 orch:
   siloport: 7718
   gatewayport: 30001
@@ -24,7 +29,19 @@ oidc:
   auth: "https://oidc.auth/"
   scopes: "openid offline_access roles profile email"
   clientId: ""
+  grainStorageClientId: ""
   secret: ""
+  grainStorageSecret: ""
+
+db:
+  server: "dbserver"
+  username: "username"
+  password: "password"
+  rootPassword: "rootPassword"
+  resources:
+    limits:
+      cpu: 250m
+      memory: 128M
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -36,9 +53,6 @@ serviceAccount:
   name: ""
 
 podAnnotations: {}
-
-advertisedIp: ""
-listeningEndpoint: ""
 
 podSecurityContext:
   runAsNonRoot: true
@@ -86,6 +100,14 @@ resources: {}
   # requests:
   #   cpu: 100m
   #   memory: 128Mi
+
+
+dbautoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
 
 autoscaling:
   enabled: false

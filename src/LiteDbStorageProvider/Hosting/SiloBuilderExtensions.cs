@@ -66,15 +66,6 @@ namespace Comax.Commons.StorageProvider.Hosting
                                 (ILifecycleParticipant<ISiloLifecycle>)s.GetRequiredServiceByName<IGrainStorage>(n));
         }
 
-        public static IServiceCollection SetDefaultLiteDbSerializationProvider(this IServiceCollection services)
-        {
-            services.AddSingletonNamedService<ISerializationProvider, StdSerializationProvider>("standard");
-            return services;
-        }
-        public static IServiceCollection SetJSONLiteDbSerializationProvider(this IServiceCollection services)
-        {
-            services.AddSingletonNamedService<ISerializationProvider, NewtonsoftSerializationProvider>("standard");
-            return services;
-        }
+        
     }
 }

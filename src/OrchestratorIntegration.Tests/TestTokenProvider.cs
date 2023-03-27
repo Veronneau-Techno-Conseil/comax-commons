@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommunAxiom.DotnetSdk.Helpers.OIDC;
 
 namespace OrchestratorIntegration.Tests
 {
@@ -39,7 +40,7 @@ namespace OrchestratorIntegration.Tests
             {
                 if (_tokens.ContainsKey(_oIDCSettings.ClientId))
                     return _tokens[_oIDCSettings.ClientId];
-                var (res, token) = await _tokenClient.AuthenticateClient(_oIDCSettings.ClientId, _oIDCSettings.Secret, _oIDCSettings.Scopes);
+                var (res, token) = await _tokenClient.AuthenticateClient(_oIDCSettings.Scopes);
                 tokenData = token;
                 result = res;
             }
