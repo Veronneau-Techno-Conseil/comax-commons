@@ -1,4 +1,5 @@
 ﻿using CommunAxiom.Commons.Shared.OIDC;
+using CommunAxiom.DotnetSdk.Helpers.OIDC;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -35,7 +36,7 @@ namespace CommunAxiom.Commons.Orleans.Security
                 if (settings == null)
                     return null;
                 TokenClient tokenClient = new TokenClient(settings);
-                var (success, res) = await tokenClient.AuthenticateClient(settings.ClientId, settings.Secret, settings.Scopes);
+                var (success, res) = await tokenClient.AuthenticateClient(settings.Scopes);
                 if (success) 
                 {
                     _timeout = DateTime.UtcNow.AddSeconds(res.expires_in);

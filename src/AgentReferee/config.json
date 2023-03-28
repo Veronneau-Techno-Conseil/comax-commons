@@ -18,7 +18,7 @@
   },
   "OIDC": {
     "Authority": "https://accounts.communaxiom.org/",
-    "Scopes": "offline_access roles profile email",
+    "Scopes": "offline_access roles profile email", 
     "ClientId": "falso_continent_teneam_discordiae",
     "Secret": "d67f46f5-9151-4ecb-b1df-8e58ec901382"
   },

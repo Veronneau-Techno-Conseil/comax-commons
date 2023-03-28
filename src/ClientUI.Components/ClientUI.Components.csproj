@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <SpaRoot>$(MSBuildProjectDirectory)/</SpaRoot>
@@ -28,11 +28,11 @@
         <PackageReference Include="Blazorise.Bulma" Version="1.0.6" />
         <PackageReference Include="Blazorise.Components" Version="1.0.6" />
         <PackageReference Include="Blazorise.TreeView" Version="1.0.6" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.8" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.8" />
-        <PackageReference Include="Microsoft.Extensions.Localization" Version="6.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.3" />
         <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
-        <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
 
     </ItemGroup>
 

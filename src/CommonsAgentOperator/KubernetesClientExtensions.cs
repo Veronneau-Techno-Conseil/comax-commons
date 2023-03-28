@@ -1,71 +1,111 @@
-﻿using DotnetKubernetesClient;
+﻿
+
+using CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities;
+using IdentityModel;
 using k8s;
 using k8s.Models;
+using KubeOps.KubernetesClient;
+using Microsoft.Extensions.ObjectPool;
+using System.Linq.Expressions;
+using System.Reflection;
+using static CommunAxiom.Commons.Client.Hosting.Operator.KubernetesClientExtensions;
 
 namespace CommunAxiom.Commons.Client.Hosting.Operator
 {
     public static class KubernetesClientExtensions
     {
-        public static async Task<IKubernetesObject<V1ObjectMeta>> CreateObject(this IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj)
+        public interface IGenWrapper
         {
-            if(obj is V1Deployment)
+            Task<IKubernetesObject<V1ObjectMeta>> Save(IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj);
+            Task<IKubernetesObject<V1ObjectMeta>> Create(IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj);
+            Task<IKubernetesObject<V1ObjectMeta>> Update(IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj);
+        }
+        public class ExecuteWrapper<T> : IGenWrapper where T : class, IKubernetesObject<V1ObjectMeta>
+        {
+            public async Task<IKubernetesObject<V1ObjectMeta>> Save(IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj)
             {
-                var depl = (V1Deployment)obj;
-                return await cl.Create(depl);
+                var o = await cl.Get<T>(obj.Metadata.Name, obj.Namespace());
+                if (o == null)
+                    return (IKubernetesObject<V1ObjectMeta>)await cl.Create<T>((T)obj);
+                else
+        {
+                    if(obj is IAssignableSpec)
+            {
+                        ((IAssignableSpec)o).Assign(obj as IAssignableSpec);
+                        return (IKubernetesObject<V1ObjectMeta>)await cl.Update<T>(o);
             }
-            else if (obj is V1Service) 
+                    else
             {
-                var svc = (V1Service)obj;
-                return await cl.Create(svc);
+                        ((dynamic)o).Spec = ((dynamic)obj).Spec;
+                        return (IKubernetesObject<V1ObjectMeta>)await cl.Update<T>(o);
+                    }
+                    throw new InvalidOperationException("Cannot assign spec");
             }
-            else if (obj is V1ServiceAccount)
-            {
-                var sa = (V1ServiceAccount)obj;
-                return await cl.Create(sa);
-            }
-            else if (obj is V1Ingress)
-            {
-                var ing = (V1Ingress)obj;
-                return await cl.Create(ing);
-            }
-            else if (obj is V1ConfigMap)
-            {
-                var cm = (V1ConfigMap)obj;
-                return await cl.Create(cm);
             }
 
-            throw new NotImplementedException();
+            public async Task<IKubernetesObject<V1ObjectMeta>> Create(IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj)
+            {
+                return (IKubernetesObject<V1ObjectMeta>)await cl.Create<T>((T)obj);
+            }
+
+            public async Task<IKubernetesObject<V1ObjectMeta>> Update(IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj)
+            {
+                return (IKubernetesObject<V1ObjectMeta>)await cl.Update<T>((T)obj);
+            }
         }
 
-        public static async Task<IKubernetesObject<V1ObjectMeta>> UpdateObject(this IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj)
+        public static async Task<IKubernetesObject<V1ObjectMeta>> SaveObject(this IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj)
         {
-            if (obj is V1Deployment)
-            {
-                var depl = (V1Deployment)obj;
-                return await cl.Update(depl);
-            }
-            else if (obj is V1Service)
-            {
-                var svc = (V1Service)obj;
-                return await cl.Update(svc);
-            }
-            else if (obj is V1ServiceAccount)
-            {
-                var sa = (V1ServiceAccount)obj;
-                return await cl.Update(sa);
-            }
-            else if (obj is V1Ingress)
-            {
-                var ing = (V1Ingress)obj;
-                return await cl.Update(ing);
-            }
-            else if (obj is V1ConfigMap)
-            {
-                var cm = (V1ConfigMap)obj;
-                return await cl.Update(cm);
+            var tpWrapper = typeof(ExecuteWrapper<>);
+            var tp = obj.GetType();
+            var genWrapperTp = tpWrapper.MakeGenericType(tp);
+            var exeWrapper = (IGenWrapper)Activator.CreateInstance(genWrapperTp);
+
+            return await exeWrapper.Save(cl, obj);
             }
 
-            throw new NotImplementedException();
+        public static async Task<IKubernetesObject<V1ObjectMeta>> CreateObject(this IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj)
+            {
+            var tpWrapper = typeof(ExecuteWrapper<>);
+            var tp = obj.GetType();
+            var genWrapperTp = tpWrapper.MakeGenericType(tp);
+            var exeWrapper = (IGenWrapper)Activator.CreateInstance(genWrapperTp);
+            return await exeWrapper.Create(cl, obj);
+            }
+
+        public static async Task<IKubernetesObject<V1ObjectMeta>> UpdateObject(this IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj)
+            {
+            var tpWrapper = typeof(ExecuteWrapper<>);
+            var tp = obj.GetType();
+            var genWrapperTp = tpWrapper.MakeGenericType(tp);
+            var exeWrapper = (IGenWrapper)Activator.CreateInstance(genWrapperTp);
+            return await exeWrapper.Update(cl, obj);
+            }
+
+        public static async Task DeleteObject<TObj>(this IKubernetesClient cl, ILogger logger, string nameSpace, string name) where TObj : class, IKubernetesObject<V1ObjectMeta>
+            {
+            var objRef = await cl.Get<TObj>(
+                name,
+                nameSpace
+            );
+
+            if (objRef == null)
+            {
+                logger.LogError(
+                    "Failed to find agent referee for resource {Name} in namespace {Namespace}",
+                    name,
+                    nameSpace
+                );
+            }
+            else
+            {
+                await cl.Delete(objRef);
+                logger.LogInformation(
+                    "Removed Agent Referee for {Name} in namespace {Namespace}",
+                    name,
+                    nameSpace
+                );
+            }
         }
     }
 }

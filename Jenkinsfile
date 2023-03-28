@@ -5,9 +5,9 @@ def patch = ''
 def shouldUninstall = ''
 def deployAction = ''
 def message = ''
+def buildEnvImage = ''
 pipeline {
     agent any
-
     stages {
         stage('Prepare') {
             steps {
@@ -23,42 +23,41 @@ pipeline {
                     version = readFile('VERSION').trim()
                     chartVersion = readFile('./helm/VERSION').trim()
                     patch = version
+                    buildEnvImage = 'vertechcon/comax-buildenv:1.0.1'
                 }
+                echo "$buildEnvImage"
             }
         }
         
         stage('Build') {
             steps {
+                parallel(
+                    agt: {
+                        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'dockerhub_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                            sh 'if [ -z "$(docker buildx ls | grep multiarch)" ]; then docker buildx create --name multiarch --driver docker-container --use; else docker buildx use multiarch; fi'
+                            sh "docker login -u ${USERNAME} -p ${PASSWORD}"
                 
-                script {
-                    def orch = docker.build("registry.vtck3s.lan/comax-orchestrator:latest", "-f ./orchestrator.Dockerfile .")
-                    orch.push()
-                    orch.push(patch)
-                }
+                            sh "docker buildx build --push -t vertechcon/comax-commonsagent:latest -t vertechcon/comax-commonsagent:${patch} --platform linux/amd64,linux/arm64 -f commons-agent.Dockerfile ."
 
-                sh "echo \"Build registry.vtck3s.lan/comax-orchestrator:${patch} pushed to registry \n\" >> SUMMARY"
-                sh "docker buildx build -t registry.vtck3s.lan/comax-orchestrator:latest-arm64 -t registry.vtck3s.lan/comax-orchestrator:${patch}-arm64 --platform linux/arm64 -f orchestrator.Dockerfile ."
-                sh "docker push registry.vtck3s.lan/comax-orchestrator:latest-arm64"
-                sh "docker push registry.vtck3s.lan/comax-orchestrator:${patch}-arm64"
+                            sh "docker buildx build --push -t vertechcon/comax-commonsclient:latest -t vertechcon/comax-commonsclient:${patch} --platform linux/amd64,linux/arm64 -f commons-client.Dockerfile ."
                 
+                            sh "docker buildx build --push -t vertechcon/comax-agentreferee:latest -t vertechcon/comax-agentreferee:${patch} --platform linux/amd64,linux/arm64 -f agent-referee.Dockerfile ."
                 
+                        }
+                    },
+                    orch:{
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'dockerhub_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
                   sh 'if [ -z "$(docker buildx ls | grep multiarch)" ]; then docker buildx create --name multiarch --driver docker-container --use; else docker buildx use multiarch; fi'
                   sh "docker login -u ${USERNAME} -p ${PASSWORD}"
 				  
-                  sh "docker buildx build --push -t vertechcon/comax-agentreferee:latest -t registry.vtck3s.lan/comax-agentreferee:${patch} --platform linux/amd64,linux/arm64 -f agent-referee.Dockerfile ."
+                            sh "docker buildx build --push -t vertechcon/comax-orchestrator:latest -t vertechcon/comax-orchestrator:${patch} --platform linux/amd64,linux/arm64 -f orchestrator.Dockerfile ."
 				
-                  sh "docker buildx build --push -t vertechcon/comax-commonsagent:latest -t registry.vtck3s.lan/comax-commonsagent:${patch} --platform linux/amd64,linux/arm64 -f commons-agent.Dockerfile ."
+                            sh "docker buildx build --push -t vertechcon/comax-referee:latest -t vertechcon/comax-referee:${patch} --platform linux/amd64,linux/arm64 -f referee.Dockerfile ."
                 
+                            sh "docker buildx build --push -t vertechcon/comax-apistorage:latest -t vertechcon/comax-apistorage:${patch} --platform linux/amd64,linux/arm64 -f commons-apistorage.Dockerfile ."
                 }
-                
-                script {
-                    def customImage = docker.build("registry.vtck3s.lan/comax-referee:latest", "-f ./referee.Dockerfile .")
-                    customImage.push()
-                    customImage.push(patch)
                 }
-                sh 'echo "Build registry.vtck3s.lan/comax-referee:${patch} pushed to registry \n" >> SUMMARY'
-            
+                )
             }
 
             post {
@@ -70,6 +69,12 @@ pipeline {
             }
         }
         stage('Prep Helm Orchestrator') {
+            agent {
+                docker {
+                    image "$buildEnvImage"
+                    reuseNode true
+                }
+            }
             steps {
                 sh 'mkdir penv && python3 -m venv ./penv'
                 sh '. penv/bin/activate && pwd && ls -l && pip install -r ./build/requirements.txt && python3 ./build/processchart.py'
@@ -80,6 +85,12 @@ pipeline {
             }
         }
         stage('Helm Orchestrator') {
+            agent {
+                docker {
+                    image "$buildEnvImage"
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return chartAction == "DEPLOY"
@@ -106,6 +117,12 @@ pipeline {
             }
         }
         stage('Prepare Application deployment Orchestrator') {
+            agent {
+                docker {
+                    image "$buildEnvImage"
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release')
@@ -130,6 +147,12 @@ pipeline {
             }
         }
         stage('Uninstall Application deployment Orchestrator') {
+            agent {
+                docker {
+                    image "$buildEnvImage"
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && shouldUninstall == 'uninstall'
@@ -142,6 +165,12 @@ pipeline {
             }
         }
         stage('Install Application deployment Orchestrator') {
+            agent {
+                docker {
+                    image "$buildEnvImage"
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && deployAction != "upgrade"
@@ -155,6 +184,12 @@ pipeline {
             }
         }
         stage('Upgrade Application deployment Orchestrator') {
+            agent {
+                docker {
+                    image "$buildEnvImage"
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && deployAction == "upgrade"
@@ -169,6 +204,12 @@ pipeline {
         
         
         stage('Prep Helm Referee') {
+            agent {
+                docker {
+                    image "$buildEnvImage"
+                    reuseNode true
+                }
+            }
             steps {
                 
                 sh 'curl -k https://charts.vtck3s.lan/api/charts/comax-referee/${chartVersion} | jq \'.name | "DEPLOY"\' > CHART_ACTION'
@@ -178,6 +219,12 @@ pipeline {
             }
         }
         stage('Helm Referee') {
+            agent {
+                docker {
+                    image "$buildEnvImage"
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return chartAction == "DEPLOY"
@@ -204,6 +251,12 @@ pipeline {
             }
         }
         stage('Prepare Application deployment Referee') {
+            agent {
+                docker {
+                    image "$buildEnvImage"
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release')
@@ -228,6 +281,12 @@ pipeline {
             }
         }
         stage('Uninstall Application deployment Referee') {
+            agent {
+                docker {
+                    image "$buildEnvImage"
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && shouldUninstall == 'uninstall'
@@ -240,6 +299,12 @@ pipeline {
             }
         }
         stage('Install Application deployment Referee') {
+            agent {
+                docker {
+                    image "$buildEnvImage"
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && deployAction != "upgrade"
@@ -253,6 +318,12 @@ pipeline {
             }
         }
         stage('Upgrade Application deployment Referee') {
+            agent {
+                docker {
+                    image "$buildEnvImage"
+                    reuseNode true
+                }
+            }
             when{
                 expression {
                     return env.BRANCH_NAME.startsWith('release') && deployAction == "upgrade"
