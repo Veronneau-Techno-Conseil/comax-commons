@@ -162,49 +162,6 @@ namespace CommunAxiom.Commons.ClientUI.Server.Controllers
             }
         }
 
-        //[HttpPost("cluster")]
-        //public async Task<IActionResult> AuthenticateCluster(AuthStart auth, [FromServices]ICommonsClientFactory clusterClient, CancellationToken cancellationToken)
-        //{
-        //    //Ensure state is valid
-        //    return await clusterClient.WithClusterClient(async cc =>
-        //    {
-        //        try
-        //        {
-        //            var act = cc.GetAccount();
-        //            var state = await act.CheckState(false, auth.ClientId);
-
-        //            if (state == Client.Contracts.Account.AccountState.ClientMismatch)
-        //            {
-        //                //Should reinisitalize the whole cluster is clientId mismatch, clientid is supposed to be permanent and only secret changes
-        //                return Unauthorized(new OperationResult<string>()
-        //                {
-        //                    Detail = "Cannot authenticate against a different client id than that which is set in commons.",
-        //                    Error = AuthSteps.ERR_ClientMismatch,
-        //                    IsError = true,
-        //                    Result = AuthSteps.LOGIN
-        //                });
-        //            }
-
-        //            //Launch auth with redirect url in ref
-        //            var authSvc = cc.GetAuthentication();
-        //            string redirectUri = string.Format($"https://localhost:{Request.Host.Port}/api/authentication/login");
-        //            var instructions = await authSvc.LaunchServiceAuthentication(auth.ClientId, auth.ClientSecret, redirectUri);
-
-        //            return await CompleteAuthentication(cc, authSvc, instructions, cancellationToken);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            return Ok(new OperationResult<string>()
-        //            {
-        //                Detail = ex.Message,
-        //                Error = AuthSteps.ERR_Unexpected,
-        //                IsError = true,
-        //                Result = AuthSteps.ERR_Unexpected
-        //            });
-        //        }
-        //    });
-        //}
-
 
         [HttpPost()]
         public async Task<IActionResult> Authenticate([FromServices] ICommonsClientFactory clusterClient, CancellationToken cancellationToken)

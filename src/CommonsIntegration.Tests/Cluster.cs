@@ -2,9 +2,13 @@
 using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared.FlowControl;
 using CommunAxiom.Commons.Shared.OIDC;
+using CommunAxiom.DotnetSdk.Helpers;
+using CommunAxiom.DotnetSdk.Helpers.OIDC;
 using FluentAssertions;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Orleans;
@@ -25,6 +29,7 @@ namespace CommonsIntegration.Tests
             public IConfiguration Configuration { get; set; }
             public IServiceProvider ServiceProvider { get; set; }
             public SegregatedContext<Orchestrator> Context { get; set; }
+            public IHost StorageApiService { get; set; }
         }
 
         public static Commons CommonsInstance1 { get; set; }
@@ -76,6 +81,9 @@ namespace CommonsIntegration.Tests
                 {
                     SetupOrchestratorTests();
 
+                    OrchestratorInstance.StorageApiService = await GrainStorageService.Application.CreateApp("./grainstoresvc.config.json");
+                    _ = OrchestratorInstance.StorageApiService.RunAsync(cancellationTokenSource.Token);
+                   
                     return OrchestratorInstance;
                 },
                 cancellationTokenSource.Token,

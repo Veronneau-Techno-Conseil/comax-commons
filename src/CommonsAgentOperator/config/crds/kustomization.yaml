@@ -1,6 +1,9 @@
 commonLabels:
   operator-element: crd
 resources:
+- comaxcomclients_communaxiom_org.yaml
+- comaxagents_communaxiom_org.yaml
 - agentrefs_communaxiom_org.yaml
+- agentsilos_communaxiom_org.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization

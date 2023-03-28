@@ -10,21 +10,33 @@ namespace Comax.Commons.Orchestrator.DataSeedGrain
 {
     public class DataSeedRepo
     {
-        private readonly IPersistentState<DataSeedObject> _dataSeedRepo;
-        public DataSeedRepo(IPersistentState<DataSeedObject> dataSeedRepo)
+        private readonly IPersistentState<DataIndex> _dataIndexRepo;
+        private bool _isRead = false;
+
+        public async Task EnsureRead()
         {
-            this._dataSeedRepo = dataSeedRepo;
-        }
-        public async Task<DataSeedObject> Fetch()
-        {
-            await _dataSeedRepo.ReadStateAsync();
-            return _dataSeedRepo.State;
+            if (!_isRead)
+            {
+                await _dataIndexRepo.ReadStateAsync();
+                _isRead = true;
+            }
         }
 
-        public async Task Save(DataSeedObject value)
+        public DataSeedRepo(IPersistentState<DataIndex> dataIndexRepo)
         {
-            _dataSeedRepo.State = value;
-            await _dataSeedRepo.WriteStateAsync();
+            this._dataIndexRepo = dataIndexRepo;
+        }
+        public async Task<DataIndex> Fetch()
+        {
+            await EnsureRead();
+            return _dataIndexRepo.State;
+        }
+
+        public async Task Save(DataIndex value)
+        {
+            await EnsureRead();
+            _dataIndexRepo.State = value;
+            await _dataIndexRepo.WriteStateAsync();
         }
     }
 }

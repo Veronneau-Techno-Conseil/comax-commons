@@ -4,6 +4,7 @@ using System;
 using CommunAxiom.Commons.Client.AgentClusterRuntime;
 using CommunAxiom.Commons.Shared.OIDC;
 using Microsoft.Extensions.DependencyInjection;
+using CommunAxiom.DotnetSdk.Helpers.OIDC;
 
 namespace CommonsIntegration.Tests
 {
@@ -88,7 +89,7 @@ namespace CommonsIntegration.Tests
                 
                 var settings = await ctxt.Silo.ServiceProvider.GetService<ISettingsProvider>().GetOIDCSettings();
                 TokenClient tokenClient = new TokenClient(settings);
-                var (res, data) = await tokenClient.AuthenticateClient(settings.ClientId, settings.Secret, settings.Scopes);
+                var (res, data) = await tokenClient.AuthenticateClient(settings.Scopes);
 
                 cf.Token = data.access_token;
                 return await cf.WithClusterClient(async cc =>

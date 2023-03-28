@@ -19,6 +19,8 @@ using Comax.Commons.Orchestrator.Contracts.PublicBoard;
 using Microsoft.Extensions.Logging;
 using Comax.Commons.Orchestrator.Contracts.CommonsActor;
 using Comax.Commons.Orchestrator.Contracts.Portfolio;
+using CommunAxiom.Commons.CommonsShared.Contracts.DataSeed;
+using CommunAxiom.Commons.CommonsShared.Contracts.DataChunk;
 
 namespace Comax.Commons.Orchestrator.Client
 {
@@ -97,6 +99,16 @@ namespace Comax.Commons.Orchestrator.Client
             var uriValue = uri ?? (await this.LoadUser()).Uri;
             var gr = _clusterClient.GetGrain<ICommonsActor>(uriValue);
             return gr;
+        }
+
+        public IDataSeed GetDataSeed(Guid id)
+        {
+            return _clusterClient.GetGrain<IDataSeed>(id);
+        }
+
+        public IAsyncStream<DataChunkObject> GetDataChunkStream(Guid id)
+        {
+            return _clusterClient.GetStreamProvider(OrleansConstants.Streams.DefaultStream).GetStream<DataChunkObject>(id, DataSeedConstants.DATA_SEED_NAMESPACE);
         }
 
         public ICentral GetCentral()

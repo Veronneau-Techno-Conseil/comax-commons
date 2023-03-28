@@ -2,6 +2,7 @@
 using CommunAxiom.Commons.Orleans.Security;
 using CommunAxiom.Commons.Shared;
 using CommunAxiom.Commons.Shared.OIDC;
+using CommunAxiom.DotnetSdk.Helpers.OIDC;
 using Microsoft.Extensions.Configuration;
 using Orleans.Runtime;
 using System;
@@ -71,7 +72,7 @@ namespace CommunAxiom.Commons.Client.Grains.AccountGrain
             TokenClient tokenClient = new TokenClient(_configuration);
             var settings = await _settingsProvider.GetOIDCSettings();
 
-            var (isSuccess, data) = await tokenClient.AuthenticateClient(details.ClientID, settings.Secret, TokenClient.SCOPES_OFFLINE);
+            var (isSuccess, data) = await tokenClient.AuthenticateClient(TokenClient.SCOPES_OFFLINE, details.ClientID, settings.Secret);
             if (!isSuccess)
             {
                 details.State = AccountState.AuthenticationError;

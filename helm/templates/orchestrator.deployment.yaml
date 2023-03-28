@@ -85,6 +85,14 @@ spec:
             {{- else }}
             value: {{ .Values.listeningEndpoint }}
             {{- end }}
+          - name: ApiStorage__SenderName
+            value: "Orchestrator"
+          - name: ApiStorage__ApiStorageUri
+            value: "http://{{- include "comax-grainstorage.fullSvcName" . }}"
+          - name: ApiStorage__SerializationProvider
+            value: "standard"
+          - name: ApiStorage__SerializationConfig
+            value: ""
           # livenessProbe:
           #   httpGet:
           #     path: /

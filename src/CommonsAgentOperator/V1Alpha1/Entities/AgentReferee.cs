@@ -5,29 +5,47 @@ using System.Text.Json.Serialization;
 namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
 {
     [KubernetesEntity(
-    ApiVersion = "v1alpha1",
-    Group = "communaxiom.org",
-    Kind = "AgentReferee",
-    PluralName = "agentrefs")
-]
-    public class AgentReferee : CustomKubernetesEntity<AgentRefereeSpec, AgentRefereeState>
+        ApiVersion = "v1alpha1",
+        Group = "communaxiom.org",
+        Kind = "AgentReferee",
+        PluralName = "agentrefs")]
+    public class AgentReferee : CustomKubernetesEntity<AgentRefereeSpec, AgentRefereeState>, IAssignableSpec<AgentRefereeSpec>
     {
-        public string DeploymentName
+        public AgentReferee()
         {
-            get
-            {
-                return $"{this.Name()}-deployment";
-            }
+            this.ApiVersion = "communaxiom.org/v1alpha1";
+            this.Kind = "AgentReferee";
+        }
+
+        public void Assign(IAssignableSpec<AgentRefereeSpec> other)
+        {
+            this.Spec.Assign(other.Spec);
+        }
+
+        public void Assign(IAssignableSpec other)
+        {
+            var ao = (AgentReferee)other;
+            this.Spec.Assign(ao.Spec);
         }
     }
 
-    public class AgentRefereeState
+    public static class AgentRefereeExtensions
     {
+        public static string GetDeploymentName(this AgentReferee agentReferee)
+        {
+            return $"{agentReferee.Name()}-depl";
+        }
+        public static string GetServiceName(this AgentReferee agentReferee)
+        {
+            return $"{agentReferee.GetDeploymentName()}-ep";
+        }
+    }
+
+    public class AgentRefereeState : IComaxState
+    {
+
         [JsonPropertyName("currentState")]
         public string CurrentState { get; set; } = Status.Unknown.ToString();
-
-        [JsonPropertyName("dbAccess")]
-        public bool DbAccess { get; set; } = false;
 
         [JsonPropertyName("stateTsMs")]
         public long StateTsMs { get; set; } = 0;
@@ -36,11 +54,53 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         public long StateTs { get; set; } = 0;
     }
 
-    public class AgentRefereeSpec
+    public class AgentRefereeSpec : IAssignable<AgentRefereeSpec>
     {
-        public string Image { get; set; } = "vertechcon/referee:0.0.1";
+        public void Assign(AgentRefereeSpec other)
+        {
+            this.Annotations = other.Annotations;
+            this.CertPath = other.CertPath;
+            this.DbProvider = other.DbProvider;
+            this.EnvironmentVariables = other.EnvironmentVariables;
+            this.Image = other.Image;
+            this.KeyPath = other.KeyPath;
+            this.ListenPort = other.ListenPort;
+            this.OidcAuthority = other.OidcAuthority;
+            this.OidcClientId = other.OidcClientId;
+            this.OidcSecretKey = other.OidcSecretKey;
+            this.OidcSecretName = other.OidcSecretName;
+            this.UseHttps = other.UseHttps;
+            this.Labels = other.Labels;
+            this.Resources = other.Resources;
+        }
 
-        public int Port { get; set; } = 5002;
+        [JsonPropertyName("image")]
+        public string Image { get; set; } = "vertechcon/comax-agentreferee:latest";
+
+        [JsonPropertyName("listenPort")]
+        public int ListenPort { get; set; } = 5004;
+
+        [JsonPropertyName("oidcAuthority")]
+        public string OidcAuthority { get; set; }
+
+        [JsonPropertyName("oidcClientId")]
+        public string OidcClientId { get; set; }
+
+        [JsonPropertyName("oidcSecretName")]
+        public string OidcSecretName { get; set; }
+
+        [JsonPropertyName("oidcSecretKey")]
+        public string OidcSecretKey { get; set; }
+
+        [JsonPropertyName("useHttps")]
+        public bool UseHttps { get; set; }
+
+        [JsonPropertyName("certPath")]
+        public string CertPath { get; set; }
+        [JsonPropertyName("keyPath")]
+        public string KeyPath { get; set; }
+        [JsonPropertyName("dbProvider")]
+        public string DbProvider { get; set; }
 
         /// <summary>
         /// Optional resource limits and requests.
@@ -48,24 +108,6 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         /// </summary>
         [JsonPropertyName("resources")]
         public V1ResourceRequirements? Resources { get; set; } = new();
-
-        [JsonPropertyName("dbServerName")]
-        public string DbServerName { get; set; }
-
-        [JsonPropertyName("dbUser")]
-        public string DbUser { get; set; }
-
-        /// <summary>
-        /// Name of secret where password for dbUser is stored.
-        /// </summary>
-        [JsonPropertyName("dbPasswordSecretName")]
-        public string DbPasswordSecretName { get; set; } = null!;
-
-        /// <summary>
-        /// Key in DbPasswordSecretName which the password is stored in.
-        /// </summary>
-        [JsonPropertyName("dbPasswordSecretKey")]
-        public string DbPasswordSecretKey { get; set; } = "password";
 
         /// <summary>
         /// Additional environment variables to add to the primary container.

@@ -35,7 +35,6 @@
   "siloPort": 7718,
   "gatewayPort": 30001,
   "advertisedIp": "127.0.0.1",
-
   "client_mode": "local",
   "membership": {
     "host": "https://referee.communaxiom.org",
@@ -45,5 +44,12 @@
     "AckFrequency": "15",
     "PortfolioSyncInterval": "30",
     "PortfolioSyncReminderInterval": "5"
+  },
+  "storage": "api",
+  "ApiStorage": {
+    "SenderName": "Orchestrator",
+    "ApiStorageUri": "http://localhost:7066",
+    "SerializationProvider": "standard",
+    "SerializationConfig": ""
   }
 }

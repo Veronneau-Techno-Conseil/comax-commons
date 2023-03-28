@@ -1,7 +1,7 @@
 ﻿using CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Builder;
 using CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities;
-using DotnetKubernetesClient;
 using k8s.Models;
+using KubeOps.KubernetesClient;
 using KubeOps.Operator.Finalizer;
 
 namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
@@ -19,30 +19,12 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
 
         public async Task FinalizeAsync(AgentReferee entity)
         {
+            await _client.DeleteObject<V1Service>(_logger, entity.Namespace(), $"{entity.GetDeploymentName()}-ep");
+
+            await _client.DeleteObject<V1Deployment>(_logger, entity.Namespace(), entity.GetDeploymentName());
+
             _logger.LogInformation(
-            "Starting finalization of resource {Name} in namespace {Namespace}",
-            entity.Name(),
-            entity.Namespace()
-            );
-
-            var dep = await _client.Get<V1Deployment>(
-                entity.DeploymentName,
-                entity.Namespace()
-            );
-
-            if (dep == null)
-            {
-                _logger.LogError(
-                    "Failed to find deployment for resource {Name} in namespace {Namespace}",
-                    entity.Name(),
-                    entity.Namespace()
-                );
-                throw new Exception("Failed to find deployment.");
-            }
-
-            await _client.Delete(dep);
-            _logger.LogInformation(
-                "Removed deployment for {Name} in namespace {Namespace}",
+                "{Name} in namespace {Namespace} deleted",
                 entity.Name(),
                 entity.Namespace()
             );
