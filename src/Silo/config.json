@@ -28,9 +28,6 @@
   "gatewayPort": "30000",
   "advertisedIp": "127.0.0.1",
   "listeningEndpoint": "0.0.0.0",
-  "CommonsMembership": {
-    "Host": "https://localhost:5004"
-  },
   "AgentConfig": {
     "LiveTickerPeriod": 30,
     "ConnectionCheckPeriod": 30,
