@@ -11,7 +11,7 @@
     "authDb": "admin",
     "username": "orchAdmin",
     "password": "JTFkU054Mmt6Vwo=",
-    "host": "10.13.40.20",
+    "host": "127.0.0.1",
     "port": 27017,
     "directConnection": true,
     "useTls": false,
@@ -20,8 +20,8 @@
   "OIDC": {
     "Authority": "https://accounts.communaxiom.org/",
     "Scopes": "offline_access roles profile email",
-    "ClientId": "falso_continent_teneam_discordiae",
-    "Secret": "d67f46f5-9151-4ecb-b1df-8e58ec901382"
+    "ClientId": "dgfhbdrhrthe5rtyh",
+    "Secret": "egretgertgrthrtyhtyujhyt"
   },
   "ListenPort": "5004",
   "UseHttps": true
