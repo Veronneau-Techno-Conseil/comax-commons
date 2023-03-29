@@ -108,7 +108,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1.Entities
         /// </summary>
         [JsonPropertyName("resources")]
         public V1ResourceRequirements? Resources { get; set; } = new();
-
+        
         /// <summary>
         /// Additional environment variables to add to the primary container.
         /// </summary>

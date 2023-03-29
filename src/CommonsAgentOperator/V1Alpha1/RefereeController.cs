@@ -89,7 +89,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
                         throw new ArgumentOutOfRangeException();
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 throw;
             }
@@ -115,7 +115,7 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator.V1Alpha1
         // Returns:
         //     A task that completes, when the reconciliation is done.
         public override async Task DeletedAsync(AgentReferee entity)
-        {
+            {
             await _client.DeleteObject<V1Service>(_logger, entity.Namespace(), $"{entity.GetDeploymentName()}-ep");
 
             await _client.DeleteObject<V1Deployment>(_logger, entity.Namespace(), entity.GetDeploymentName());

@@ -36,27 +36,27 @@ pipeline {
                         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'dockerhub_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
                             sh 'if [ -z "$(docker buildx ls | grep multiarch)" ]; then docker buildx create --name multiarch --driver docker-container --use; else docker buildx use multiarch; fi'
                             sh "docker login -u ${USERNAME} -p ${PASSWORD}"
-
+                
                             sh "docker buildx build --push -t vertechcon/comax-commonsagent:latest -t vertechcon/comax-commonsagent:${patch} --platform linux/amd64,linux/arm64 -f commons-agent.Dockerfile ."
 
                             sh "docker buildx build --push -t vertechcon/comax-commonsclient:latest -t vertechcon/comax-commonsclient:${patch} --platform linux/amd64,linux/arm64 -f commons-client.Dockerfile ."
-
+                
                             sh "docker buildx build --push -t vertechcon/comax-agentreferee:latest -t vertechcon/comax-agentreferee:${patch} --platform linux/amd64,linux/arm64 -f agent-referee.Dockerfile ."
-                            
+                
                         }
                     },
                     orch:{
-                        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'dockerhub_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-                            sh 'if [ -z "$(docker buildx ls | grep multiarch)" ]; then docker buildx create --name multiarch --driver docker-container --use; else docker buildx use multiarch; fi'
-                            sh "docker login -u ${USERNAME} -p ${PASSWORD}"
-                            
+                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId:'dockerhub_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                  sh 'if [ -z "$(docker buildx ls | grep multiarch)" ]; then docker buildx create --name multiarch --driver docker-container --use; else docker buildx use multiarch; fi'
+                  sh "docker login -u ${USERNAME} -p ${PASSWORD}"
+				  
                             sh "docker buildx build --push -t vertechcon/comax-orchestrator:latest -t vertechcon/comax-orchestrator:${patch} --platform linux/amd64,linux/arm64 -f orchestrator.Dockerfile ."
-                            
+				
                             sh "docker buildx build --push -t vertechcon/comax-referee:latest -t vertechcon/comax-referee:${patch} --platform linux/amd64,linux/arm64 -f referee.Dockerfile ."
-                            
+                
                             sh "docker buildx build --push -t vertechcon/comax-apistorage:latest -t vertechcon/comax-apistorage:${patch} --platform linux/amd64,linux/arm64 -f commons-apistorage.Dockerfile ."
-                        }
-                    }
+                }
+                }
                 )
             }
 

@@ -28,19 +28,19 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator
                 if (o == null)
                     return (IKubernetesObject<V1ObjectMeta>)await cl.Create<T>((T)obj);
                 else
-                {
+        {
                     if(obj is IAssignableSpec)
-                    {
+            {
                         ((IAssignableSpec)o).Assign(obj as IAssignableSpec);
                         return (IKubernetesObject<V1ObjectMeta>)await cl.Update<T>(o);
-                    }
+            }
                     else
-                    {
+            {
                         ((dynamic)o).Spec = ((dynamic)obj).Spec;
                         return (IKubernetesObject<V1ObjectMeta>)await cl.Update<T>(o);
                     }
                     throw new InvalidOperationException("Cannot assign spec");
-                }
+            }
             }
 
             public async Task<IKubernetesObject<V1ObjectMeta>> Create(IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj)
@@ -62,28 +62,28 @@ namespace CommunAxiom.Commons.Client.Hosting.Operator
             var exeWrapper = (IGenWrapper)Activator.CreateInstance(genWrapperTp);
 
             return await exeWrapper.Save(cl, obj);
-        }
+            }
 
         public static async Task<IKubernetesObject<V1ObjectMeta>> CreateObject(this IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj)
-        {
+            {
             var tpWrapper = typeof(ExecuteWrapper<>);
             var tp = obj.GetType();
             var genWrapperTp = tpWrapper.MakeGenericType(tp);
             var exeWrapper = (IGenWrapper)Activator.CreateInstance(genWrapperTp);
             return await exeWrapper.Create(cl, obj);
-        }
+            }
 
         public static async Task<IKubernetesObject<V1ObjectMeta>> UpdateObject(this IKubernetesClient cl, IKubernetesObject<V1ObjectMeta> obj)
-        {
+            {
             var tpWrapper = typeof(ExecuteWrapper<>);
             var tp = obj.GetType();
             var genWrapperTp = tpWrapper.MakeGenericType(tp);
             var exeWrapper = (IGenWrapper)Activator.CreateInstance(genWrapperTp);
             return await exeWrapper.Update(cl, obj);
-        }
+            }
 
         public static async Task DeleteObject<TObj>(this IKubernetesClient cl, ILogger logger, string nameSpace, string name) where TObj : class, IKubernetesObject<V1ObjectMeta>
-        {
+            {
             var objRef = await cl.Get<TObj>(
                 name,
                 nameSpace
