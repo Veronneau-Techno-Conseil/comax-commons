@@ -145,12 +145,12 @@ namespace Comax.Commons.Orchestrator
                 services.Configure<LiteDbConfig>(PubSubStore, configuration.GetSection(PubSubStore));
 
                 services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME, (svc, key) =>
-                {
-                    return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
-                });
+            {
+                return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
+            });
 
-                services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(PubSubStore, (svc, key) =>
-                {
+            services.AddSingletonNamedService<IOptionsMonitor<LiteDbConfig>>(PubSubStore, (svc, key) =>
+            {
                     return svc.GetService<IOptionsMonitor<LiteDbConfig>>();
                 });
 

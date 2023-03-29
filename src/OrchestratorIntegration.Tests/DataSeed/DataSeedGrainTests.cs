@@ -57,7 +57,7 @@ namespace OrchestratorIntegration.Tests.DataSeed
                 var ds = cl.GetDataSeed(newid);
                 await ds.SendIndex(ix);
                 return await ds.GetIndex();
-            });        
+            });
 
             createdIx.Should().NotBeNull();
             createdIx.Id.Should().Be(ix.Id);
@@ -68,7 +68,7 @@ namespace OrchestratorIntegration.Tests.DataSeed
                 {
                     IdDataChunk = new IdDataChunk
                     {
-                    Id =$"{newid}-data-1",
+                        Id =$"{newid}-data-1",
                         IdDataSeed = Guid.NewGuid()
                     },
                     Data = JObject.FromObject(new Dummy
@@ -81,7 +81,7 @@ namespace OrchestratorIntegration.Tests.DataSeed
                 {
                     IdDataChunk = new IdDataChunk
                     {
-                    Id =$"{newid}-data-2",
+                        Id =$"{newid}-data-2",
                         IdDataSeed = Guid.NewGuid()
                     },
                     Data = JObject.FromObject(new Dummy
